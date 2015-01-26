@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/aopalliance-1.0.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/args4j-2.0.16.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/async-http-client-1.7.4.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/bndlib-0.0.145.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/gitective-core-0.9.9.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/gson-2.2.3.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/guice-3.0.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/javax.inject-1.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/jsch-0.1.44-1.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/log4j-1.2.17.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/morphia-0.105.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/org.eclipse.jgit-2.0.0.201206130900-r.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/slf4j-api-1.6.6.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/slf4j-log4j12-1.6.6.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/svnkit-1.3.8.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/mysql-connector-java-5.1.34-bin.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/commons-io-2.4-sources.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/commons-io-2.4.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/commons-beanutils.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/commons-collections-3.2.1.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/commons-lang-2.5.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/ezmorph-1.0.6.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/json_simple-1.1.jar"/>
+	<classpathentry kind="lib" path="/Users/guanjun/Documents/workspace/GitCrawler/lib/json-lib-2.4-jdk15.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
