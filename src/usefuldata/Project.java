@@ -23,8 +23,6 @@ public class Project {
 	@SerializedName("codes")
 	private int codes;
 	
-	@SerializedName("files")
-	private int files;
 	
 	@SerializedName("login")
 	private String owner;
@@ -47,7 +45,7 @@ public class Project {
 
 	
 
-	public Project(int id, String name, int codes, int files, String owner,
+	public Project(int id, String name, int codes, String owner,
 			String description,
 			List<Developer> developpers, List<Release> releases,
 			HashMap<Integer, Integer> contributions) {
@@ -55,7 +53,6 @@ public class Project {
 		this.id = id;
 		this.name = name;
 		this.codes = codes;
-		this.files = files;
 		this.owner = owner;
 		this.description = description;
 		this.developpers = developpers;
@@ -89,13 +86,6 @@ public class Project {
 		this.codes = codes;
 	}
 
-	public int getFiles() {
-		return files;
-	}
-
-	public void setFiles(int files) {
-		this.files = files;
-	}
 
 	public List<Developer> getDeveloppers() {
 		return developpers;

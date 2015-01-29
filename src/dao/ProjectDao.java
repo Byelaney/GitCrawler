@@ -26,7 +26,12 @@ public interface ProjectDao {
 	 */
 	public List<Developer> getAllDevelopers(int project_id);
 	
-	public List<Release> getAllReleases(int project_id);
+	/**
+	 * get all sorted releases 
+	 * @param projectName
+	 * @return
+	 */
+	public List<Release> getAllReleases(String projectName);
 	
 	
 	public void deleteProject(String owner,String projectName);

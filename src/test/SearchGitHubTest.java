@@ -3,6 +3,7 @@ package test;
 import http.HttpModule;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,10 @@ import search.SearchModule;
 import usefuldata.Developer;
 import usefuldata.ProjectContribution;
 import usefuldata.Vitality;
+import analysis.DataHelperImpl;
+import analysis.DevelopDigramImpl;
+import analysis.Relation;
+import analysis.RelationImpl;
 import analysis.VitalityCount;
 
 import com.google.inject.Guice;
@@ -29,6 +34,7 @@ import entity.Project;
 import entity.Release;
 import entity.User;
 import factory.DaoFactory;
+import factory.DataFactoryImpl;
 
 public class SearchGitHubTest {
 	
@@ -65,8 +71,9 @@ public class SearchGitHubTest {
 		
 		//a.testGetContributions();
 		
-		a.testGetVitality();
+		//a.testGetVitality();
 		
+		a.testGetFile();
 	}
 	
 	public void setup() {
@@ -111,7 +118,7 @@ public class SearchGitHubTest {
 			}
 			*/
 			
-			usefuldata.Project p = searchGitHub.getProjects("mct", "nasa");
+			usefuldata.Project p = searchGitHub.getProject("mct", "nasa");
 			if(p!=null){
 				System.out.println(p.getId());
 				System.out.println(p.getName());
@@ -196,12 +203,22 @@ public class SearchGitHubTest {
 	public void testGetAllProjectCommits() {
 		try {
 
-			Project project = new Project(new User("lastfm"),"musicbrainz-data");
+			Project project = new Project(new User("byelaney"),"codeforce");
 			
 			List<Commit> commits = searchGitHub.getAllProjectCommits(project);
 			
-			if(commits!=null)
+			if(commits!=null){
 			System.out.println(commits.size());
+			for(Commit cc:commits){
+				System.out.println(cc.getCommiter().getLogin());
+				System.out.println(cc.getAdditionsCount());
+				System.out.println(cc.getDeletionsCount());
+				System.out.println(cc.getSha());
+				System.out.println("---------------------");
+			}
+			
+			
+			}
 			else
 				System.out.println("project not found");
 			
@@ -406,6 +423,64 @@ public class SearchGitHubTest {
 		}
 		
 	}
+	
+	public void testGetFile(){
+		try{
+			
+//			ArrayList<String> files = searchGitHub.getFiles(ss, "kptran", "nasa", "mct","v1.7b3");
+//			for(int i =0;i<files.size();i++){
+//				System.out.println(files.get(i));
+//			}
+//			
+			
+			Map<String,String> ss = searchGitHub.getReleaseDate("nasa","mct");
+			List<Developer> devs = DaoFactory.getProjectDao().getAllDevelopers(4193864);
+			
+			//ArrayList<String> developers = new ArrayList<String>();
+			
+						
+			List<usefuldata.Release> rels = DaoFactory.getReleaseDao().getAllRelease("mct");
+			
+			DevelopDigramImpl ddi = new DevelopDigramImpl();
+			
+			ArrayList<String> filenames = null;
+			
+			for(Developer d:devs){
+				for(usefuldata.Release rrr:rels){
+					
+					filenames = searchGitHub.getFiles(ss, d.getLogin(), "nasa", "mct", rrr.getName());
+					for(int i=0;i<filenames.size();i++){
+						System.out.println(filenames.get(i));
+					}
+					
+					if(!filenames.isEmpty()){
+						String json_string = ddi.getDevelopDigramByVersion(filenames);
+						if(json_string!=null)
+						DaoFactory.getDeveloperEchartsDao().addDeveloperEcharts(4193864, rrr.getId(), d.getId(), json_string);
+						
+					}
+					
+				}
+			}
+			
+			
+			
+			
+			
+//			DataHelperImpl dhpi = new DataHelperImpl();
+//			ArrayList<String> files = dhpi.getFiles(ss, "kptran", "nasa", "mct", "v1.7b3");
+//			for(int i =0;i<files.size();i++){
+//				System.out.println(files.get(i));
+//			}
+			
+			
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
 	
 	
 }

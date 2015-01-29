@@ -34,7 +34,7 @@ public class ReleaseDaoImpl implements ReleaseDao{
 				ResultSet rs=null;
 				
 				try{
-					ps=con.prepareStatement("select * from releases where name =? and project_id=?");
+					ps=con.prepareStatement("select * from gitcrawler.releases where name =? and project_id=?");
 					ps.setString(1,releaseName);
 					ps.setInt(2, projectId);
 					rs=ps.executeQuery();
@@ -44,8 +44,8 @@ public class ReleaseDaoImpl implements ReleaseDao{
 						release.setId(rs.getInt("id"));
 						release.setName(rs.getString("name"));	
 						release.setCodes(rs.getInt("codes"));
-						release.setFiles(rs.getInt("files"));
 						release.setDate(rs.getString("date"));
+						release.setRelease_commits(rs.getInt("release_commits"));
 					}	
 					
 					return release;
@@ -68,7 +68,7 @@ public class ReleaseDaoImpl implements ReleaseDao{
 		ResultSet rs=null;
 		ResultSet rs2=null;
 		try{
-			ps=con.prepareStatement("select * from releases where name =? and project_id=?");
+			ps=con.prepareStatement("select * from gitcrawler.releases where name =? and project_id=?");
 			ps.setString(1,releaseName);
 			ps.setInt(2, projectId);
 			rs=ps.executeQuery();
@@ -77,7 +77,7 @@ public class ReleaseDaoImpl implements ReleaseDao{
 			
 			if(rs.next()){
 				release_id = rs.getInt("id");
-				ps2 = con.prepareStatement("select * from release_contribution where release_id =? and project_id=?");
+				ps2 = con.prepareStatement("select * from gitcrawler.release_contribution where release_id =? and project_id=?");
 				ps2.setInt(1, release_id);
 				ps2.setInt(2, projectId);
 				rs2 = ps2.executeQuery();
@@ -113,7 +113,7 @@ public class ReleaseDaoImpl implements ReleaseDao{
 		ResultSet rs=null;
 		
 		try{
-			ps=con.prepareStatement("select * from release_contribution where release_id =?");
+			ps=con.prepareStatement("select * from gitcrawler.release_contribution where release_id =?");
 			ps.setInt(1, release_id);
 			rs=ps.executeQuery();
 			HashMap<Integer, Integer> hm = new HashMap<Integer, Integer>();
@@ -170,12 +170,12 @@ public class ReleaseDaoImpl implements ReleaseDao{
 		Connection con=daoHelper.getConnection();
 		PreparedStatement ps=null;
 		try{
-			ps=con.prepareStatement("UPDATE `gitcrawler`.`releases` SET `id`=?, `name`=?,`codes`=?,`files`=?,`date`=? where `id`=?");
+			ps=con.prepareStatement("UPDATE `gitcrawler`.`releases` SET `id`=?, `name`=?,`codes`=?,`date`=?,`release_commits`=? where `id`=?");
 			ps.setInt(1,release.getId());
 			ps.setString(2, release.getName());
 			ps.setInt(3,release.getCodes());
-			ps.setInt(4,release.getFiles());
-			ps.setString(5, release.getDate());
+			ps.setString(4, release.getDate());
+			ps.setInt(5, release.getRelease_commits());
 			ps.setInt(6,release.getId());
 			ps.execute();
 			return true;
@@ -195,13 +195,13 @@ public class ReleaseDaoImpl implements ReleaseDao{
 		PreparedStatement ps=null;
 		
 		try{
-			ps=con.prepareStatement("INSERT INTO `gitcrawler`.`releases` (`id`, `name`,`codes`,`files`,`project_id`,`date`) VALUES (?,?,?,?,?,?)");
+			ps=con.prepareStatement("INSERT INTO `gitcrawler`.`releases` (`id`, `name`,`codes`,`project_id`,`date`,`release_commits`) VALUES (?,?,?,?,?,?)");
 			ps.setInt(1,0);
 			ps.setString(2,release.getName());
 			ps.setInt(3,release.getCodes());
-			ps.setInt(4,release.getFiles());
-			ps.setInt(5,project_id);
-			ps.setString(6, release.getDate());
+			ps.setInt(4,project_id);
+			ps.setString(5, release.getDate());
+			ps.setInt(6, release.getRelease_commits());
 			ps.execute();			
 			return true;
 			
@@ -248,7 +248,7 @@ public class ReleaseDaoImpl implements ReleaseDao{
 			int projectId = DaoFactory.getProjectDao().getProject(projectName).getId();
 			con=daoHelper.getConnection();
 			
-			ps=con.prepareStatement("select * from releases where project_id=?");
+			ps=con.prepareStatement("select * from gitcrawler.releases where project_id=?");
 			ps.setInt(1, projectId);
 			rs=ps.executeQuery();
 			
@@ -260,13 +260,13 @@ public class ReleaseDaoImpl implements ReleaseDao{
 				release.setId(rs.getInt("id"));
 				release.setName(rs.getString("name"));	
 				release.setCodes(rs.getInt("codes"));
-				release.setFiles(rs.getInt("files"));
 				release.setDate(rs.getString("date"));
+				release.setRelease_commits(rs.getInt("release_commits"));
 				
 				results.add(release);
 			}	
 			
-			return results;
+			return Dates.releaseSort(results);
 		}catch(SQLException e){
 			e.printStackTrace();
 		}finally{
@@ -321,7 +321,7 @@ public class ReleaseDaoImpl implements ReleaseDao{
 		ResultSet rs=null;
 		
 		try{
-			ps=con.prepareStatement("select * from releases where id=?");
+			ps=con.prepareStatement("select * from gitcrawler.releases where id=?");
 			ps.setInt(1, release_id);
 			rs=ps.executeQuery();
 			Release release = null;
@@ -330,8 +330,8 @@ public class ReleaseDaoImpl implements ReleaseDao{
 				release.setId(rs.getInt("id"));
 				release.setName(rs.getString("name"));	
 				release.setCodes(rs.getInt("codes"));
-				release.setFiles(rs.getInt("files"));
 				release.setDate(rs.getString("date"));
+				release.setRelease_commits(rs.getInt("release_commits"));
 			}	
 			
 			return release;
@@ -345,5 +345,13 @@ public class ReleaseDaoImpl implements ReleaseDao{
 		
 		return null;
 	}
+
+//	@Override
+//	public ArrayList<ReleaseContribution> getSortedContributions(int release_id) {
+//		// TODO Auto-generated method stub
+//		
+//		return null;
+//		
+//	}
 
 }

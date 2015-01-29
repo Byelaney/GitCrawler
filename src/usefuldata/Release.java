@@ -7,8 +7,8 @@ public class Release {
 	private int id;
 	private String name;
 	private int codes;
-	private int files;
 	private String date;
+	private int release_commits;
 	
 	private List<Developer> developpers;
 	
@@ -19,18 +19,19 @@ public class Release {
 		super();
 	}
 
-	public Release(int id, String name, int codes, int files,
+	public Release(int id, String name, int codes,
 			List<Developer> developpers,
 			HashMap<Integer, Integer> contributions,
-			String date) {
+			String date,
+			int release_commits) {
 		super();
 		this.id = id;
 		this.name = name;
 		this.codes = codes;
-		this.files = files;
 		this.developpers = developpers;
 		this.contributions = contributions;
 		this.date = date;
+		this.release_commits = release_commits;
 	}
 
 	public int getId() {
@@ -57,13 +58,6 @@ public class Release {
 		this.codes = codes;
 	}
 
-	public int getFiles() {
-		return files;
-	}
-
-	public void setFiles(int files) {
-		this.files = files;
-	}
 
 
 	public List<Developer> getDeveloppers() {
@@ -89,6 +83,16 @@ public class Release {
 	public void setDate(String date) {
 		this.date = date;
 	}
+
+	public int getRelease_commits() {
+		return release_commits;
+	}
+
+	public void setRelease_commits(int release_commits) {
+		this.release_commits = release_commits;
+	}
+	
+	
 	
 	
 	

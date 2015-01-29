@@ -1,16 +1,22 @@
 package factory;
 
 import dao.DeveloperDao;
+import dao.DeveloperEchartsDao;
+import dao.ForceChartDao;
 import dao.ProjectContributionDao;
 import dao.ProjectDao;
 import dao.ReleaseContributionDao;
 import dao.ReleaseDao;
+import dao.ReleaseEchartsDao;
 import dao.VitalityDao;
 import dao.impl.DeveloperDaoImpl;
+import dao.impl.DeveloperEchartsDaoImpl;
+import dao.impl.ForceChartDaoImpl;
 import dao.impl.ProjectContributionDaoImpl;
 import dao.impl.ProjectDaoImpl;
 import dao.impl.ReleaseContributionDaoImpl;
 import dao.impl.ReleaseDaoImpl;
+import dao.impl.ReleaseEchartsDaoImpl;
 import dao.impl.VitalityDaoImpl;
 
 /**
@@ -45,4 +51,16 @@ public class DaoFactory {
 		return ReleaseContributionDaoImpl.getInstance();
 	}
 	
+	public static ReleaseEchartsDao getReleaseEchartsDao(){
+		return ReleaseEchartsDaoImpl.getInstance();
+	}
+	
+	
+	public static ForceChartDao getForceChartDao(){
+		return ForceChartDaoImpl.getInstance();
+	}
+	
+	public static DeveloperEchartsDao getDeveloperEchartsDao(){
+		return DeveloperEchartsDaoImpl.getInstance();
+	}
 }

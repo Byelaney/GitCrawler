@@ -19,6 +19,10 @@ public class PackageNode {
 	public void setPath(String path) {
 		this.path = path;
 	}
+	
+	public String getName() {
+		return name;
+	}
 
 	public List<PackageNode> getChildren() {
 		return children;
@@ -40,15 +44,15 @@ public class PackageNode {
 		children.add(pn);
 	}
 
-	public String getName() {
-		return name;
-	}
+	
 
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	public String getPath() {
+	public String takePath() {
 		return path;
 	}
+
+
 }

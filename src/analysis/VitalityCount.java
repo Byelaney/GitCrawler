@@ -12,6 +12,12 @@ import dao.ProjectDao;
 import dao.ReleaseDao;
 import factory.DaoFactory;
 
+/**
+ * this method used to compute vitality with 
+ * crawled rawVitality  
+ * @author guanjun
+ *
+ */
 public class VitalityCount {
 	
 	private ReleaseDao releaseDao;

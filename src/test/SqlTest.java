@@ -75,12 +75,33 @@ public class SqlTest {
 //			System.out.println(ss.get(i).getReleaseName() + " : " + ss.get(i).getContributions());
 //			System.out.println("------------------------------");
 //		}
+//		
+//		List<ProjectContribution> ss = DaoFactory.getProjectContribution().findProjectContribution("VWoeltjen");
+//		for(int i = 0;i<ss.size();i++){
+//			System.out.println(ss.get(i).getProjectName() +" : " + ss.get(i).getContributions());
+//		}
 		
-		List<ProjectContribution> ss = DaoFactory.getProjectContribution().findProjectContribution("VWoeltjen");
-		for(int i = 0;i<ss.size();i++){
-			System.out.println(ss.get(i).getProjectName() +" : " + ss.get(i).getContributions());
-		}
+//		ArrayList<ReleaseContribution> rcb = DaoFactory.getReleaseContribution().getReleaseContribution("mct", "VWoeltjen");
+//		for(int i =0;i<rcb.size();i++){
+//			System.out.println(rcb.get(i).getReleaseName());
+//			System.out.println(rcb.get(i).getContributions());
+//			
+//			System.out.println("------------------------------");
+//			
+//		}
 		
+//		Map<String, Integer> cs= DaoFactory.getReleaseDao().getReleaseCommitNum("mct");
+//		Set<String> names = cs.keySet();
+//		for(String name:names){
+//			System.out.println(name + " : " + cs.get(name));
+//		}
+//		
+		
+//		int i = DaoFactory.getReleaseContribution().getSize("VWoeltjen", "mct", "v1.7b3");
+//		System.out.println(i);
+		
+		String a = DaoFactory.getReleaseEchartsDao().getReleaseEcharts("mct", "v1.7b3");
+		System.out.println(a);
 		
 	}
 }

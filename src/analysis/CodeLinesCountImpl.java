@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -15,19 +16,19 @@ import java.util.zip.ZipInputStream;
  * from a zip file
  * return lines of code
  */
-public class CodeLinesCount {
+public class CodeLinesCountImpl implements CodeLinesCount{
 	static private int codeLines = 0;
 
-	private static void readZipFile(String file) throws Exception {
+	@SuppressWarnings("resource")
+	private static void readZipFile(String file, ArrayList<String> languages)
+			throws Exception {
 		ZipFile zf = new ZipFile(file);
 		InputStream in = new BufferedInputStream(new FileInputStream(file));
 		ZipInputStream zin = new ZipInputStream(in);
 		ZipEntry ze;
 
 		while ((ze = zin.getNextEntry()) != null) {
-			if (ze.isDirectory()) {
-				
-			} else {
+			if (!ze.isDirectory()) {
 				String fnp = ze.getName();
 
 				String[] fns = fnp.split("/");
@@ -39,57 +40,48 @@ public class CodeLinesCount {
 				if (ftypes.length == 2) {
 					ftype = ftypes[1];
 				}
+				boolean findLanguageType = false;
 
-				
-				if (ftype.equals("java") || ftype.equals("jsp")
-						|| ftype.equals("html") || ftype.equals("js")
-						|| ftype.equals("c") || ftype.equals("cpp")
-						|| ftype.equals("h") || ftype.equals("py")
-						|| ftype.equals("rb")|| ftype.equals("php")) {
-					
+				for (String language : languages) {
+					if (ftype.equals(language))
+						findLanguageType = true;
+
+				}
+
+				if (findLanguageType) {
 
 					BufferedReader br = new BufferedReader(
 							new InputStreamReader(zf.getInputStream(ze)));
-					
 					while ((br.readLine()) != null) {
 						codeLines++;
 					}
 					br.close();
 				}
 
-				
+			
 				long size = ze.getSize();
 				if (size > 0) {
 
-					
 				}
-				
+				// s System.out.println();
 			}
 		}
 
-		
 
 		zin.closeEntry();
-		zin.close();
-		zf.close();
 	}
-	
-	public static int getCodeLines(String file)
-	{
+
+	public int getCodeLines(String file, ArrayList<String> languages) {
 		try {
-			readZipFile(file);
+			readZipFile(file, languages);
 		} catch (Exception e) {
+			
 			e.printStackTrace();
 		}
-		
-		 return codeLines;
+
+		return codeLines;
 	}
-	
-	public int StatisticCodeLines(String path,String fileName){
-		int clcount=0;
-		clcount=CodeLinesCount.getCodeLines(path + fileName);
-		return clcount;
-	}
+
 
 }
 

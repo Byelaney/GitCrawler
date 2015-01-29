@@ -31,7 +31,7 @@ public class DeveloperDaoImpl implements DeveloperDao{
 		ResultSet rs=null;
 		
 		try{
-			ps=con.prepareStatement("select * from developer where login =?");
+			ps=con.prepareStatement("select * from gitcrawler.developer where login =?");
 			ps.setString(1,name);
 			rs=ps.executeQuery();
 			Developer developer = null;
@@ -73,7 +73,7 @@ public class DeveloperDaoImpl implements DeveloperDao{
 				ResultSet rs=null;
 				
 				try{
-					ps=con.prepareStatement("select * from vitality where developer_id =?");
+					ps=con.prepareStatement("select * from gitcrawler.vitality where developer_id =?");
 					ps.setInt(1, developer.getId());
 					rs=ps.executeQuery();
 					
@@ -110,7 +110,7 @@ public class DeveloperDaoImpl implements DeveloperDao{
 		ResultSet rs2=null;
 		
 		try{
-			ps=con.prepareStatement("select * from project_contribution where developer_id =?");
+			ps=con.prepareStatement("select * from gitcrawler.project_contribution where developer_id =?");
 			ps.setInt(1, developer.getId());
 			rs=ps.executeQuery();
 			
@@ -118,7 +118,7 @@ public class DeveloperDaoImpl implements DeveloperDao{
 			
 			while(rs.next()){
 				int project_id = rs.getInt("project_id");
-				ps = con.prepareStatement("select * from project where id = ?");
+				ps = con.prepareStatement("select * from gitcrawler.project where id = ?");
 				ps.setInt(1, project_id);
 				rs2 = ps.executeQuery();
 				if(rs2.next()){
@@ -126,7 +126,6 @@ public class DeveloperDaoImpl implements DeveloperDao{
 					p.setId(project_id);
 					p.setName(rs2.getString("name"));
 					p.setCodes(rs2.getInt("codes"));
-					p.setFiles(rs2.getInt("files"));
 					p.setOwner(rs2.getString("owner"));
 					p.setDescription(rs2.getString("description"));
 					a1.add(p);
@@ -154,7 +153,7 @@ public class DeveloperDaoImpl implements DeveloperDao{
 		PreparedStatement ps=null;
 		
 		try{
-			ps=con.prepareStatement("delete from developer where login=?");
+			ps=con.prepareStatement("delete from gitcrawler.developer where login=?");
 			ps.setString(1, name);
 			ps.execute();
 			return true;
@@ -199,7 +198,7 @@ public class DeveloperDaoImpl implements DeveloperDao{
 		ResultSet rs=null;
 		
 		try{
-			ps=con.prepareStatement("select * from developer where id =?");
+			ps=con.prepareStatement("select * from gitcrawler.developer where id =?");
 			ps.setInt(1,id);
 			rs=ps.executeQuery();
 			Developer developer = null;

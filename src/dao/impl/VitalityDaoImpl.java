@@ -29,7 +29,7 @@ public class VitalityDaoImpl implements VitalityDao{
 		ResultSet rs=null;
 		
 		try{
-			ps=con.prepareStatement("select * from vitality where developer_id =?");
+			ps=con.prepareStatement("select * from gitcrawler.vitality where developer_id =?");
 			ps.setInt(1, developer.getId());
 			rs=ps.executeQuery();
 			
@@ -114,7 +114,7 @@ public class VitalityDaoImpl implements VitalityDao{
 		PreparedStatement ps=null;
 		
 		try{
-			ps=con.prepareStatement("delete from vitality where id=? and developer_id=?");
+			ps=con.prepareStatement("delete from gitcrawler.vitality where id=? and developer_id=?");
 			ps.setInt(1,vitality.getId());
 			ps.setInt(2, vitality.getDeveloper_id());
 			ps.execute();
@@ -135,7 +135,7 @@ public class VitalityDaoImpl implements VitalityDao{
 		PreparedStatement ps=null;
 		
 		try{
-			ps=con.prepareStatement("delete from vitality where developer_id=?");
+			ps=con.prepareStatement("delete from gitcrawler.vitality where developer_id=?");
 			ps.setInt(1, id);
 			ps.execute();
 		
@@ -158,7 +158,7 @@ public class VitalityDaoImpl implements VitalityDao{
 		ResultSet rs=null;
 		
 		try{
-			ps=con.prepareStatement("select * from vitality where developer_id =?");
+			ps=con.prepareStatement("select * from gitcrawler.vitality where developer_id =?");
 			ps.setInt(1, developer_id);
 			rs=ps.executeQuery();
 			
@@ -186,9 +186,41 @@ public class VitalityDaoImpl implements VitalityDao{
 	@Override
 	public List<Vitality> getVitality(String projectName, String releaseName,
 			String developer) {
-		// TODO Auto-generated method stub
+		int developer_id = DaoFactory.getDeveloperDao().findDeveloper(developer).getId();
+		int project_id = DaoFactory.getProjectDao().getProject(projectName).getId();
+		int release_id = DaoFactory.getReleaseDao().getRelease(project_id, releaseName).getId();
 		
 		
+		
+		Connection con=daoHelper.getConnection();
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		
+		try{
+			ps=con.prepareStatement("select * from gitcrawler.vitality where developer_id =? and project_id =? and release_id=?");
+			ps.setInt(1, developer_id);
+			ps.setInt(2, project_id);
+			ps.setInt(3, release_id);
+			rs=ps.executeQuery();
+			
+			ArrayList<Vitality> a1 = new ArrayList<Vitality>();
+			
+			while(rs.next()){
+				Vitality v = new Vitality();
+				v.setId(rs.getInt("id"));
+				v.setDate(rs.getString("date"));
+				v.setVitality(rs.getInt("vitality"));
+				a1.add(v);			
+			}	
+			
+			return a1;
+		}catch(SQLException e){
+			e.printStackTrace();
+		}finally{
+			daoHelper.closeResult(rs);
+			daoHelper.closePreparedStatement(ps);
+			daoHelper.closeConnection(con);
+		}
 		
 		return null;
 	}

@@ -56,7 +56,7 @@ public class ProjectContributionDaoImpl implements ProjectContributionDao{
 		ResultSet rs=null;
 		
 		try{
-			ps=con.prepareStatement("select * from project_contribution where project_id =? and developer_id=?");
+			ps=con.prepareStatement("select * from gitcrawler.project_contribution where project_id =? and developer_id=?");
 			ps.setInt(1, project_id);
 			ps.setInt(2, developer_id);
 			rs=ps.executeQuery();
@@ -111,7 +111,7 @@ public class ProjectContributionDaoImpl implements ProjectContributionDao{
 		PreparedStatement ps=null;
 		
 		try{
-			ps=con.prepareStatement("delete from project_contribution where project_id=? and developer_id=?");
+			ps=con.prepareStatement("delete from gitcrawler.project_contribution where project_id=? and developer_id=?");
 			ps.setInt(1, pct.getProject_id());
 			ps.setInt(2, pct.getDeveloper_id());
 			ps.execute();
@@ -132,8 +132,10 @@ public class ProjectContributionDaoImpl implements ProjectContributionDao{
 		
 		List<ProjectContribution> results = new ArrayList<ProjectContribution>();
 		int developer_id = DaoFactory.getDeveloperDao().findDeveloper(developerName).getId();
+		
 		Developer dp = new Developer();
 		dp.setId(developer_id);
+		
 		List<usefuldata.Project> projects = DaoFactory.getDeveloperDao().findDeveloperForProjects(dp);
 		
 		Connection con=daoHelper.getConnection();
@@ -144,7 +146,7 @@ public class ProjectContributionDaoImpl implements ProjectContributionDao{
 		
 		for(int i = 0;i<projects.size();i++){
 		
-				ps=con.prepareStatement("select * from project_contribution where project_id =? and developer_id=?");
+				ps=con.prepareStatement("select * from gitcrawler.project_contribution where project_id =? and developer_id=?");
 				ps.setInt(1, projects.get(i).getId());
 				ps.setInt(2, developer_id);
 				rs=ps.executeQuery();

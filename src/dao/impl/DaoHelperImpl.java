@@ -51,8 +51,8 @@ public class DaoHelperImpl implements DaoHelper{
 	public Connection getConnection() {
 		try{
 			connection = DriverManager.getConnection(url, user, password);
-			if(!connection.isClosed()) 
-	             System.out.println("Succeeded connecting to the Database!");
+//			if(!connection.isClosed()) 
+//	             System.out.println("Succeeded connecting to the Database!");
 		}catch(SQLException e){
 			e.printStackTrace();
 		}
@@ -64,8 +64,8 @@ public class DaoHelperImpl implements DaoHelper{
 		if(connection!=null){
 		try{
 			connection.close();
-			if(connection.isClosed())
-				System.out.println("Succeeded closing the Connection!");
+//			if(connection.isClosed())
+//				System.out.println("Succeeded closing the Connection!");
 		}catch(SQLException e){
 			e.printStackTrace();
 		}

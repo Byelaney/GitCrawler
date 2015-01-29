@@ -37,7 +37,7 @@ public class ReleaseContributionDaoImpl implements ReleaseContributionDao{
 		con=daoHelper.getConnection();
 		
 		try{
-			ps=con.prepareStatement("select * from release_contribution where project_id =? and developer_id=?");
+			ps=con.prepareStatement("select * from gitcrawler.release_contribution where project_id =? and developer_id=?");
 			ps.setInt(1, project_id);
 			ps.setInt(2, developer_id);
 			rs=ps.executeQuery();
@@ -81,6 +81,41 @@ public class ReleaseContributionDaoImpl implements ReleaseContributionDao{
 		}
 		
 		return null;
+	}
+
+	@Override
+	public int getSize(String developerName, String projectName,
+			String releaseName) {
+		// TODO Auto-generated method stub
+		int developer_id = DaoFactory.getDeveloperDao().findDeveloper(developerName).getId();
+		int project_id = DaoFactory.getProjectDao().getProject(projectName).getId();
+		int release_id = DaoFactory.getReleaseDao().getRelease(project_id, releaseName).getId();
+		
+		Connection con=daoHelper.getConnection();
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		
+		try{
+			ps=con.prepareStatement("select * from gitcrawler.release_contribution where release_id =? and developer_id=? and project_id = ?");
+			ps.setInt(1, release_id);
+			ps.setInt(2, developer_id);
+			ps.setInt(3, project_id);
+			
+			rs=ps.executeQuery();
+			if(rs.next()){
+				return rs.getInt("contributions");
+			}	
+			
+			return 0;
+		}catch(SQLException e){
+			e.printStackTrace();
+		}finally{
+			daoHelper.closeResult(rs);
+			daoHelper.closePreparedStatement(ps);
+			daoHelper.closeConnection(con);
+		}
+		
+		return 0;
 	}
 
 }

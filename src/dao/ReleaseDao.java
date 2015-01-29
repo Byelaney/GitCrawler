@@ -18,8 +18,18 @@ public interface ReleaseDao {
 	 */
 	public usefuldata.Release getRelease(int projectId,String releaseName);
 	
+	/**
+	 * remember these releases are already sorted by date
+	 * @param projectName
+	 * @return 
+	 */
 	public List<usefuldata.Release> getAllRelease(String projectName);
 	
+	/**
+	 * get a certain release
+	 * @param release_id
+	 * @return
+	 */
 	public usefuldata.Release getRelease(int release_id);
 	
 	
@@ -38,6 +48,9 @@ public interface ReleaseDao {
 	 * @return developer_id and submits
 	 */
 	public HashMap<Integer,Integer> getContributions(int release_id);
+	
+	
+	//public ArrayList<ReleaseContribution> getSortedContributions(int release_id);
 	
 	
 	//not finished yet

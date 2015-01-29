@@ -1,50 +1,36 @@
 package analysis;
 
 
+
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 import net.sf.json.JSONArray;
 import usefuldata.PackageNode;
 
-
-/**
- * this class tries to analyze package dependency...
- * @author 
- *
- */
-public class PackageDependency {
+public class PackageDependencyImpl implements PackageDependency{
 	private static ArrayList<String> directories = new ArrayList<String>();
 	private static List<PackageNode> architectures = new ArrayList<PackageNode>();
 	private static ArrayList<String> srcpaths = new ArrayList<String>();
-    private static String vison="";
-	private static void readZipFile(String file) throws Exception {
+    @SuppressWarnings({ "unused", "resource" })
+	private static void readZipFile(String file,ArrayList<String> languages) throws Exception {
 		
+		ZipFile zf = new ZipFile(file);
 		InputStream in = new BufferedInputStream(new FileInputStream(file));
 		ZipInputStream zin = new ZipInputStream(in);
 		
 		ZipEntry ze;
 
 		while ((ze = zin.getNextEntry()) != null) {
-			if (ze.isDirectory()) {
-				/*
-				 * String dir = ze.getName(); String[] dirnames =
-				 * dir.split("/"); int l = dirnames.length;
-				 * 
-				 * if (dirnames[l - 1].equals("src"))
-				 * 
-				 * { srcpaths.add(dir); }
-				 */
-
-			} else {
+			if (!ze.isDirectory())
+			{
+				
 				String fnp = ze.getName();
 
 				String[] fns = fnp.split("/");
@@ -53,16 +39,30 @@ public class PackageDependency {
 
 				String[] ftypes = fn.split("\\.");
 				String ftype = "";
+				
 				if (ftypes.length == 2) {
 					ftype = ftypes[1];
 				}
+				
 
 				String dir = "";
-				if (ftype.equals("java") || ftype.equals("jsp")
-						|| ftype.equals("html") || ftype.equals("js")
-						|| ftype.equals("c") || ftype.equals("cpp")
-						|| ftype.equals("h") || ftype.equals("py")
-						|| ftype.equals("rb")) {
+				
+				boolean findLanguageType=false;
+				
+				for(String language:languages)
+				{
+					
+					if(ftype.equals(language))
+						findLanguageType=true;
+						
+				}
+				
+			
+				
+				
+				if (findLanguageType) 
+				
+				{
 					dir = fnp.substring(0, fnp.length() - fn.length());
 				}
 
@@ -70,27 +70,15 @@ public class PackageDependency {
 
 					srcpaths.add(dir);
 
-				// System.out.println(ze.getName());
-				// System.out.println("file - " + ze.getName() + " : " +
-				// ze.getSize() + " bytes");
-				long size = ze.getSize();
-				if (size > 0) {
-
-					/*
-					 * BufferedReader br = new BufferedReader( new
-					 * InputStreamReader(zf.getInputStream(ze))); String line;
-					 * while ((line = br.readLine()) != null) {
-					 * System.out.println(line); } br.close();
-					 */
-				}
-				// s System.out.println();
+				
 			}
+			
 		}
+		
 
 		// directories.addAll(srcpaths);
 
 		zin.closeEntry();
-		zin.close();
 	}
 
 	private static void buildArchitectures() {
@@ -116,13 +104,13 @@ public class PackageDependency {
 
 		for (int i = 0; i < architectures.size(); i++) {
 			PackageNode pn = architectures.get(i);
-			String path = pn.getPath();
+			String path = pn.takePath();
 			String[] fns = path.split("/");
 
 			for (int j = 0; j < architectures.size(); j++) {
 
 				PackageNode pn2 = architectures.get(j);
-				String path2 = pn2.getPath();
+				String path2 = pn2.takePath();
 				if (path2.length() > path.length()) {
 					if (findPakage(path2) != -1) {
 
@@ -139,6 +127,7 @@ public class PackageDependency {
 			}
 		}
 		
+		
 		traverse(0);
 
 	}
@@ -146,7 +135,7 @@ public class PackageDependency {
 	@SuppressWarnings("unused")
 	private static void architecturesToString() {
 		for (PackageNode pn : architectures) {
-			System.out.print(pn.getPath());
+			System.out.print(pn.takePath());
 			System.out.print("  children: ");
 			for (Integer j : pn.takeCIndex())
 				System.out.print(j+",");
@@ -174,7 +163,7 @@ public class PackageDependency {
 		int result = -1;
 
 		for (int i = 0; i < architectures.size(); i++) {
-			if (path.equals(architectures.get(i).getPath())) {
+			if (path.equals(architectures.get(i).takePath())) {
 				result = i;
 				break;
 			}
@@ -184,19 +173,19 @@ public class PackageDependency {
 		return result;
 	}
 
-	private static String architecturesToJson(String destination) {
-		
+	private static String architecturesToJson() {
+		// String json=JSONValue.toJSONString(architectures);
 
 		JSONArray json = JSONArray.fromObject(architectures.get(0));
-		String path="";
-	   
-		 FileWriter fw = null;
+		//String path="";
+	   // System.out.println(json);
+	/*	 FileWriter fw = null;
 		 vison=directories.get(0).replace("/", "");
 		try {
 			fw = new FileWriter(destination+vison+".json");
 		    path=destination+vison+".json";
 		} catch (IOException e) {
-			
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
          PrintWriter out = new PrintWriter(fw);
@@ -205,36 +194,75 @@ public class PackageDependency {
          try {
 			fw.close();
 		} catch (IOException e) {
-			
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-         out.close();
+         out.close();*/
          
-         return path;
+		String resultStr=json.toString();
+	    directories = new ArrayList<String>();
+		architectures = new ArrayList<PackageNode>();
+		srcpaths = new ArrayList<String>();
+         return resultStr.substring(1,resultStr.length()-1);
 	}
 
-	public static ArrayList<String> readZipFile(ArrayList<String> files,String destination)
+	public  ArrayList<String> getPakageDependency(ArrayList<String> files,ArrayList<String> languages)
 	{
-		ArrayList<String> paths=new ArrayList<String>();
+
+		ArrayList<String> jsonStrs=new ArrayList<String>();
+		
+		
 		for(String file:files)
 		{
-			try {
-				readZipFile(file);
-			} catch (Exception e) {
-				
+			//System.out.println("test");
+			
+			try 
+			{
+				readZipFile(file,languages);
+			} 
+			
+			
+			catch (Exception e) 
+			{
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
 
-			buildArchitectures();
-			String path=architecturesToJson(destination);
-			if(!path.equals(""))
-				{
-				paths.add(path);
-				};
+	    buildArchitectures();
+	    
+		String jsonStr=architecturesToJson();
+		
+		jsonStrs.add(jsonStr);
+		
 		}
-		return paths;
+		
+		return jsonStrs;
 		
 	}
+
+	@Override
+	public ArrayList<String> getMainPakageDependency(ArrayList<String> files,ArrayList<String> languages) 
+	{
+		// TODO Auto-generated method stub
+		
 	
+		
+		return null;
+	}
+	
+	
+	public static void main(String[] arsg)
+	{
+		PackageDependency pd=new PackageDependencyImpl();
+		ArrayList<String> files=new ArrayList<String>();
+		files.add("F://mct-1.7b1.zip");
+		files.add("F://mct-1.7b1.zip");
+		ArrayList<String> languages=new ArrayList<String>();
+		languages.add("java");
+		
+		for(String str:pd.getPakageDependency(files, languages))
+		System.out.println(str);
+	}
 
 }

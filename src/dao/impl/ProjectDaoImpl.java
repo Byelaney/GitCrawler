@@ -10,6 +10,7 @@ import java.util.List;
 import usefuldata.Developer;
 import usefuldata.Project;
 import usefuldata.Release;
+import util.Dates;
 import dao.DaoHelper;
 import dao.ProjectDao;
 import factory.DaoFactory;
@@ -31,7 +32,7 @@ public class ProjectDaoImpl implements ProjectDao{
 		ResultSet rs=null;
 		
 		try{
-			ps=con.prepareStatement("select * from project where name = ? and owner =?");
+			ps=con.prepareStatement("select * from gitcrawler.project where name = ? and owner =?");
 			ps.setString(1,projectName);
 			ps.setString(2, owner);
 			rs=ps.executeQuery();
@@ -41,7 +42,6 @@ public class ProjectDaoImpl implements ProjectDao{
 				project.setId(rs.getInt("id"));
 				project.setName(rs.getString("name"));
 				project.setCodes(rs.getInt("codes"));
-				project.setFiles(rs.getInt("files"));
 				project.setOwner(rs.getString("owner"));
 				project.setDescription(rs.getString("description"));
 			}	
@@ -65,7 +65,7 @@ public class ProjectDaoImpl implements ProjectDao{
 		ResultSet rs=null;
 		
 		try{
-			ps=con.prepareStatement("select * from project where id = ? and name =?");
+			ps=con.prepareStatement("select * from gitcrawler.project where id = ? and name =?");
 			ps.setInt(1, project_id);
 			ps.setString(2,projectName);
 			rs=ps.executeQuery();
@@ -75,7 +75,6 @@ public class ProjectDaoImpl implements ProjectDao{
 				project.setId(rs.getInt("id"));
 				project.setName(rs.getString("name"));
 				project.setCodes(rs.getInt("codes"));
-				project.setFiles(rs.getInt("files"));
 				project.setOwner(rs.getString("owner"));
 				project.setDescription(rs.getString("description"));
 			}	
@@ -117,7 +116,7 @@ public class ProjectDaoImpl implements ProjectDao{
 		PreparedStatement ps=null;
 		ResultSet rs=null;
 		try{
-			ps=con.prepareStatement("select * from project_contribution where project_id=?");
+			ps=con.prepareStatement("select * from gitcrawler.project_contribution where project_id=?");
 			ps.setInt(1, project_id);
 			rs=ps.executeQuery();
 			
@@ -143,8 +142,42 @@ public class ProjectDaoImpl implements ProjectDao{
 	}
 
 	@Override
-	public List<Release> getAllReleases(int project_id) {
-		// TODO Auto-generated method stub
+	public List<Release> getAllReleases(String projectName) {
+		Connection con=daoHelper.getConnection();
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		try{
+			int projectId = getProject(projectName).getId();
+			con=daoHelper.getConnection();
+			
+			ps=con.prepareStatement("select * from gitcrawler.releases where project_id=?");
+			ps.setInt(1, projectId);
+			rs=ps.executeQuery();
+			
+			List<Release> results = new ArrayList<Release>();
+			
+			while(rs.next()){
+				Release release = null;
+				release = new Release();
+				release.setId(rs.getInt("id"));
+				release.setName(rs.getString("name"));	
+				release.setCodes(rs.getInt("codes"));
+				release.setDate(rs.getString("date"));
+				release.setRelease_commits(rs.getInt("release_commits"));
+				
+				results.add(release);
+			}	
+			
+			return Dates.releaseSort(results);
+		}catch(SQLException e){
+			e.printStackTrace();
+		}finally{
+			daoHelper.closeResult(rs);
+			daoHelper.closePreparedStatement(ps);
+			daoHelper.closeConnection(con);
+		}
+		
+		
 		return null;
 	}
 
@@ -155,7 +188,7 @@ public class ProjectDaoImpl implements ProjectDao{
 		ResultSet rs=null;
 		
 		try{
-			ps=con.prepareStatement("select * from project where name =?");
+			ps=con.prepareStatement("select * from gitcrawler.project where name =?");
 			ps.setString(1,projectName);
 			rs=ps.executeQuery();
 			Project project = null;
@@ -164,7 +197,6 @@ public class ProjectDaoImpl implements ProjectDao{
 				project.setId(rs.getInt("id"));
 				project.setName(rs.getString("name"));
 				project.setCodes(rs.getInt("codes"));
-				project.setFiles(rs.getInt("files"));
 				project.setOwner(rs.getString("owner"));
 				project.setDescription(rs.getString("description"));
 			}	

@@ -10,6 +10,8 @@ import org.mongodb.morphia.annotations.Reference;
 
 
 
+
+
 import util.Dates;
 
 import com.google.gson.annotations.SerializedName;
@@ -100,7 +102,7 @@ public class Commit extends GitHubEntity {
 		return this.commitDate;
 	}
 
-	public void setCommitDate(String date) {
+	public void setCommitDate(String date){
 		Date createAtDate = new Dates("yyyy-MM-dd HH:mm:ss").format(date.replaceAll("T", " ").replace("Z", ""));
 		this.commitDate = createAtDate;
 	}

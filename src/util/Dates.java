@@ -1,5 +1,7 @@
 package util;
 
+import helper.QuickSort;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -11,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
+
+import usefuldata.Release;
 
 /**
  * Helper class to deal with dates
@@ -175,6 +179,30 @@ public class Dates {
 	    	}
 	        
 	    }  
+	
+	
+	public static List<Release> releaseSort(List<Release> unsorted_release){
+		String[] dates= new String[unsorted_release.size()];
+		for(int i = 0;i<unsorted_release.size();i++){
+			String date = unsorted_release.get(i).getDate();
+			dates[i] = date;
+		}
+		
+		QuickSort.quick(dates);
+		List<Release> results = new ArrayList<Release>();
+		
+		for(int j = 0;j<dates.length;j++){
+			for(int i =0;i<unsorted_release.size();i++){
+				if(dates[j].equals(unsorted_release.get(i).getDate())){
+					results.add(unsorted_release.get(i));
+					break;
+				}
+			}
+				
+		}
+		
+		return results;
+	}
 	
 	
 	
