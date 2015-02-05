@@ -73,7 +73,7 @@ public class SearchGitHub implements ForgeSearch {
 					  .withParam("language", "java")
 					  .build();
 
-			//System.out.println(searchUrl);
+			System.out.println(searchUrl);
 			
 			String json = requests.get(searchUrl);
 			JsonObject jsonObject = gson.fromJson(json, JsonElement.class).getAsJsonObject();			
@@ -562,93 +562,8 @@ public class SearchGitHub implements ForgeSearch {
 		return commits;
 	}
 
-	public List<Commit> getProjectCommitsByCommiter(Project project, String commiter){
-		System.out.println("Searching " +commiter + "'s commits metadata");
-				
-		int page = 1;
-		
-		String searchUrl = builder.uses(GithubAPI.ROOT)
-				  .withParam("repos")
-				  .withSimpleParam("/", project.getOwner().getLogin())
-				  .withSimpleParam("/", project.getName())
-				  .withParam("/commits?author=" + commiter + "&page=" +page +"&per_page=80")
-				  .build();
-		
-		System.out.println(searchUrl);
-			
-		JsonElement jsonElement = gson.fromJson(requests.get(searchUrl), JsonElement.class);
-					
-		JsonArray jsonArray = jsonElement.getAsJsonArray();
 
-		List<Commit> commits = new ArrayList<>();
 		
-		while(jsonArray.size()!=0){
-		
-		for (JsonElement element : jsonArray) {
-			Commit commit = gson.fromJson(element, Commit.class);
-			commit.setProject(project);
-			
-			User user = gson.fromJson(element.getAsJsonObject().get("committer"), User.class);
-			commit.setCommiter(user);
-			
-			commit.setMessage(element.getAsJsonObject().get("commit").getAsJsonObject().get("message").getAsString());
-
-			String date = element.getAsJsonObject().get("commit").getAsJsonObject().get("author").getAsJsonObject().get("date").getAsString();
-			commit.setCommitDate(date);
-			
-			//System.out.println(commit.getCommitDate());
-			
-			
-			String sha = element.getAsJsonObject().get("sha").getAsString();
-			commit.setSha(sha);
-			
-			
-			String anotherUrl = builder.uses(GithubAPI.ROOT)
-					  .withParam("repos")
-					  .withSimpleParam("/", project.getOwner().getLogin())
-					  .withSimpleParam("/", project.getName())
-					  .withParam("/commits")
-					  .withParam("/" + sha)
-					  .build();
-			
-			int add = 0;
-			int del = 0;
-			JsonElement ano_jsonElement = gson.fromJson(requests.get(anotherUrl), JsonElement.class);
-			JsonArray ano_jsonArray = ano_jsonElement.getAsJsonObject().get("files").getAsJsonArray();
-			for(JsonElement e:ano_jsonArray){
-				int adi = e.getAsJsonObject().get("additions").getAsInt();
-				int dei = e.getAsJsonObject().get("deletions").getAsInt();
-				add += adi;
-				del += dei;
-			}
-			commit.setAdditionsCount(add);
-			commit.setDeletionsCount(del);
-						
-			commits.add(commit);
-		}
-		
-		page++;
-		searchUrl = builder.uses(GithubAPI.ROOT)
-				  .withParam("repos")
-				  .withSimpleParam("/", project.getOwner().getLogin())
-				  .withSimpleParam("/", project.getName())
-				  .withParam("/commits?author=" + commiter + "&page=" +page +"&per_page=80")
-				  .build();
-		
-		System.out.println(searchUrl);
-		
-		jsonElement = gson.fromJson(requests.get(searchUrl), JsonElement.class);
-		jsonArray = jsonElement.getAsJsonArray();
-		
-		}
-
-		return commits;
-		
-		
-	}
-	
-	
-	
 	/**
 	 * Fetches all the Commits of the given {@link Project} from the GitHub API
 	 * @param project the @{link Project} to which the commits belong

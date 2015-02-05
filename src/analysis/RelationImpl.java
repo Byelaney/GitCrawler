@@ -95,10 +95,10 @@ public class RelationImpl implements Relation {
 
 		for (int i = 0; i < developers.size(); i++) {
 			int dsize = (int) Math.log(dh.getSize(developers.get(i), projectName, releaseName));
-			int ddsize=0;
-			if(dsize>0)
+			int ddsize=dsize/10+1;
+			/*if(dsize>0)
 				ddsize= (int) Math.log(dh.getSize(developers.get(i), projectName, releaseName));
-
+*/
 			// size.add(dsize);
 
 			Node node = new Node(developers.get(i), ddsize);
@@ -221,9 +221,10 @@ public class RelationImpl implements Relation {
 
 		for (int i = 0; i < developers.size(); i++) {
 			int dsize = dh.getSize(developers.get(i), projectName, releaseName);
-			int ddsize=0;
+			int ddsize=dsize/10+1;
+			 /*
 			if(dsize>0)
-				ddsize= (int) Math.log(dh.getSize(developers.get(i), projectName, releaseName));
+				ddsize= (int) Math.log(dh.getSize(developers.get(i), projectName, releaseName));*/
 			// size.add(dsize);
 
 			Node node = new Node(developers.get(i), ddsize);
@@ -297,18 +298,4 @@ public class RelationImpl implements Relation {
 
 	}
 
-//	public static void main(String args[]) {
-//
-//		ArrayList<String> developers = new ArrayList<String>();
-//		developers.add("A");
-//		developers.add("B");
-//		developers.add("C");
-//		developers.add("D");
-//
-//		Map<String, String> dateMap = null;
-//
-//		Relation relation = new RelationImpl(developers, dateMap, "aa", "bb","cc");
-//		System.out.println(relation.getRelations());
-//		System.out.println(relation.getMainRelations());
-//	}
 }

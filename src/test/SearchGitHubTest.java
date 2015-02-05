@@ -73,7 +73,9 @@ public class SearchGitHubTest {
 		
 		//a.testGetVitality();
 		
-		a.testGetFile();
+		//a.testGetFile();
+		
+		a.testGetMetaProject();
 	}
 	
 	public void setup() {
@@ -124,6 +126,7 @@ public class SearchGitHubTest {
 				System.out.println(p.getName());
 				System.out.println(p.getOwner());
 				System.out.println(p.getDescription());
+				
 			}
 			
 			
@@ -480,7 +483,41 @@ public class SearchGitHubTest {
 		
 	}
 	
-	
+	public void testGetMetaProject(){
+		try {			
+			List<Project> projects = searchGitHub.getProjects("mct", 1, SearchGitHub.INFINITY);
+			for(Project p:projects){
+				if(p.getName().equals("mct")){
+					System.out.println(p.getId());
+					System.out.println(p.getName());
+					System.out.println(p.getDescription());
+					
+					System.out.println(p.getLanguage());
+					System.out.println(p.getCheckoutURL());
+					System.out.println(p.getSourceCodeURL());
+					System.out.println(p.getCreatedAt().toString());
+					System.out.println(p.getLastPushedAt().toString());
+					
+					System.out.println(p.isFork());
+					System.out.println(p.hasDownloads());
+					System.out.println(p.hasIssues());
+					System.out.println(p.hasWiki());
+					
+					System.out.println(p.getWatchersCount());
+					System.out.println(p.getForksCount());
+					System.out.println(p.getIssuesCount());
+					
+					break;
+				}
+			}
+			
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+		}
+		
+	}
 	
 	
 }

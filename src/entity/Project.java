@@ -524,4 +524,16 @@ public class Project extends GitHubEntity {
 	public String toString() {
 		return String.format("Project(%s, %s)", this.name, this.sourceCodeURL);
 	}
+
+	public String getSourceCodeURL() {
+		return sourceCodeURL;
+	}
+
+	public void setSourceCodeURL(String sourceCodeURL) {
+		this.sourceCodeURL = sourceCodeURL;
+	}
+	
+	
+	
+	
 }

@@ -3,7 +3,9 @@ package metadao.impl;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.List;
 
+import util.Dates;
 import entity.Commit;
 import metadao.CommitDao;
 import metadao.MetaDaoHelper;
@@ -27,7 +29,7 @@ public class CommitDaoImpl implements CommitDao{
 			
 			ps.setString(1,commit.getSha());
 			ps.setString(2,commit.getMessage());
-			ps.setString(3, commit.getCommitDate().toString());
+			ps.setString(3, Dates.metaDateFormat(commit.getCommitDate().toString()));
 			ps.setInt(4, commit.getAdditionsCount());
 			ps.setInt(5, commit.getDeletionsCount());
 			ps.setInt(6, project_id);
@@ -42,6 +44,18 @@ public class CommitDaoImpl implements CommitDao{
 			daoHelper.closeConnection(con);
 		}
 		
+		return false;
+	}
+
+	@Override
+	public List<Commit> getCommits(String projectName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean updateCommit(Commit commit) {
+		// TODO Auto-generated method stub
 		return false;
 	}
 

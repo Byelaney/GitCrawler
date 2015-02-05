@@ -204,6 +204,38 @@ public class Dates {
 		return results;
 	}
 	
+	public static String metaDateFormat(String date){
+		//"Fri Sep 21 21:43:26 CST 2012";
+		String []months = {"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+		String result;
+		try{
+		String year = date.substring(24);// 2012
+		String month = date.substring(4, 7);
+		
+		for(int i =0;i<months.length;i++){
+			
+			if(months[i].equals(month)){
+				
+				int idx = i + 1;
+				if(idx<10){
+					month = "0" + idx;
+				}
+				else
+					month = "" + idx;
+			}
+				
+		}
+		
+		String day = date.substring(8, 10);
+		result = year + "-" + month + "-" + day;
+		return result;
+		
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
 	
 	
 }

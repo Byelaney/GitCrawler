@@ -10,8 +10,6 @@ import analysis.DevelopDigram;
 import analysis.DevelopDigramImpl;
 import analysis.PackageDependency;
 import analysis.PackageDependencyImpl;
-import analysis.RelationImpl;
-import analysis.Relation;
 
 public class DataFactoryImpl implements DataFactory{
 	@Override
