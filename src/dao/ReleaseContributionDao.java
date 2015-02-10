@@ -14,6 +14,9 @@ public interface ReleaseContributionDao {
 	 */
 	public ArrayList<ReleaseContribution> getReleaseContribution(String projectName,String developer);
 	
-	public int getSize(String developerName, String projectName,
-			String releaseName);
+	
+	public int getReleaseContributions(int developer_id, int project_id,
+			int release_id);
+	
+
 }

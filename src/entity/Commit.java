@@ -41,10 +41,15 @@ public class Commit extends GitHubEntity {
 	
 	private int deletionsCount;
 	
+	public Commit(){
+		super();
+	}
+	
 	public Commit(String sha, Project project) {
 		this.sha = sha;
 		this.project = project;
 	}
+	
 	
 	/**
 	 * Informs the SHA checksum of the commit
@@ -103,8 +108,14 @@ public class Commit extends GitHubEntity {
 	}
 
 	public void setCommitDate(String date){
-		Date createAtDate = new Dates("yyyy-MM-dd HH:mm:ss").format(date.replaceAll("T", " ").replace("Z", ""));
-		this.commitDate = createAtDate;
+		if(date.length() >10){
+			Date createAtDate = new Dates("yyyy-MM-dd HH:mm:ss").format(date.replaceAll("T", " ").replace("Z", ""));
+			this.commitDate = createAtDate;
+		}
+		else{
+			Date createAtDate = new Dates("yyyy-MM-dd").format(date);
+			this.commitDate = createAtDate;
+		}
 	}
 
 	/**

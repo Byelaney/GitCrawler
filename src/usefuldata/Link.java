@@ -1,5 +1,10 @@
 package usefuldata;
 
+/**
+ * 
+ * @author Bacchus_yl
+ * 表示node 间关联
+ */
 public class Link {
 	private int source;
 	private int target;
@@ -27,4 +32,5 @@ public class Link {
 	}
 
 }
+
 

@@ -34,7 +34,7 @@ public class VitalityCount {
 		int project_id = projectDao.getProject(projectName).getId();
 		int developer_id = developerDao.findDeveloper(developer).getId();
 		
-		List<usefuldata.Release> releases = releaseDao.getAllRelease(projectName);
+		List<usefuldata.Release> releases = releaseDao.getAllRelease(project_id);
 		Map<String,String> dateMap = new HashMap<String,String>();
 		for(int i = 0;i<releases.size();i++){
 			String tagName = releases.get(i).getName();

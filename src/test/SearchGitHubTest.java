@@ -440,9 +440,8 @@ public class SearchGitHubTest {
 			List<Developer> devs = DaoFactory.getProjectDao().getAllDevelopers(4193864);
 			
 			//ArrayList<String> developers = new ArrayList<String>();
-			
-						
-			List<usefuldata.Release> rels = DaoFactory.getReleaseDao().getAllRelease("mct");
+			 			
+			List<usefuldata.Release> rels = DaoFactory.getReleaseDao().getAllRelease(4193864);
 			
 			DevelopDigramImpl ddi = new DevelopDigramImpl();
 			

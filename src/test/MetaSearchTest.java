@@ -8,7 +8,9 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 
 import entity.Commit;
+import entity.CommitFile;
 import entity.Project;
+import entity.UnPublishedRelease;
 import entity.User;
 import factory.MetaDaoFactory;
 import search.MetaSearchGitHub;
@@ -23,7 +25,7 @@ public class MetaSearchTest {
 	public static void main(String []args){
 		MetaSearchTest a = new MetaSearchTest();
 		a.setup();
-		a.testGetAllCommits();
+		a.testGetCommitFiles();
 	}
 	
 	public void setup() {
@@ -32,6 +34,9 @@ public class MetaSearchTest {
 		searchGitHub2 = injector.getInstance(SearchGitHub.class);
 	}
 	
+	/**
+	 * already test over
+	 */
 	public void testgetProject(){
 		try{
 		Project p = MetasearchGitHub.getProject("mct", "nasa");
@@ -54,6 +59,8 @@ public class MetaSearchTest {
 			
 			MetaDaoFactory.getProjectDao().addProject(p);
 			
+			//System.out.println(p.getUser().getName());
+			
 		}else
 			System.out.println("project not found");
 		
@@ -64,6 +71,9 @@ public class MetaSearchTest {
 		}
 	}
 
+	/**
+	 * already test over
+	 */
 	public void testGetAllCommits(){
 		try {
 			entity.Project p = new Project(new User("nasa"), "mct");
@@ -83,5 +93,46 @@ public class MetaSearchTest {
 		}
 	}
 
+	/**
+	 * already test over
+	 */
+	public void testGetUnPublishedRelease(){
+		List<UnPublishedRelease> upbr = MetasearchGitHub.getAllUnPublishedRelease("nasa", "mct");
+		if(upbr!=null){
+			for(UnPublishedRelease r:upbr){
+				MetaDaoFactory.getUnPublishedReleaseDao().addUnPublishedRelease(r, 4193864);
+			}
+		}
+	}
+	
+	/**
+	 * already test over 
+	 * but has some bugs
+	 * time 60000 with no response
+	 */
+	public void testGetCommitFiles(){
+		
+		int projectId = MetaDaoFactory.getProjectDao().getProject("nasa", "mct").getId();
+		List<Commit> commits = MetaDaoFactory.getCommitDao().getCommits(projectId);
+		
+		
+		for(int i = 537;i < commits.size();i++){
+//			if(commits.get(i).getSha().equals("ab9761a663d890d3051eeda306c7dcc4b386ed1d")){
+//				System.out.println(i);
+//			}
+			
+			List<CommitFile> cmfs = MetasearchGitHub.getCommitFiles("nasa", "mct", commits.get(i).getSha());
+			if(cmfs !=null){
+				for(CommitFile commitfile:cmfs){
+					MetaDaoFactory.getCommitFileDao().addCommitFile(commitfile);
+				}
+			}
+				
+		}
+		
+		
+		
+	}
+	
 }
 	

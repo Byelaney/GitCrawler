@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import search.UrlBuilder.GithubAPI;
+import util.Dates;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -18,6 +19,7 @@ import com.google.inject.Guice;
 import com.google.inject.Inject;
 
 import entity.Commit;
+import entity.CommitFile;
 import entity.Contributor;
 import entity.GroundhogException;
 import entity.Issue;
@@ -274,20 +276,170 @@ public class MetaSearchGitHub implements ForgeSearch{
 		return contributors;
 	}
 	
+	
+	/**
+	 * get all UnPublished Releases 
+	 * @param owner
+	 * @param projectName
+	 * @return List<UnPublishedRelease> or null
+	 */
 	public List<UnPublishedRelease> getAllUnPublishedRelease(String owner,String projectName){
 		
 		System.out.println("Searching UnPublishedRelease metadata...");
+		
+		int page = 1;
 		
 		String searchUrl = builder.uses(GithubAPI.ROOT)
 				  .withParam("repos")
 				  .withSimpleParam("/", owner)
 				  .withSimpleParam("/", projectName)
-				  .withParam("/releases")
+				  .withParam("/tags")
+				  .withParam("?page=" + page + "&per_page=80")
 				  .build();
 		
+		String jsonString = requests.getWithPreviewHeader(searchUrl);
+        JsonArray jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
+        
+        if(jsonArray.size() == 0){
+			return null;
+		}
+        
+        List<UnPublishedRelease> results = null;
+        
+        while(jsonArray.size()!=0){
+        	results = new ArrayList<UnPublishedRelease>();
+        	for (JsonElement element: jsonArray) {
+        		UnPublishedRelease upbRelease = gson.fromJson(element, UnPublishedRelease.class);
+        		String url = (element.getAsJsonObject().get("commit").getAsJsonObject().get("url").getAsString());
+        		String date = getCommitDate(url);
+        		upbRelease.setCommit_url(url);
+        		upbRelease.setDate(date);
+        		results.add(upbRelease);
+        	}
+        	
+        	page++;
+        	searchUrl = builder.uses(GithubAPI.ROOT)
+  				  .withParam("repos")
+  				  .withSimpleParam("/", owner)
+  				  .withSimpleParam("/", projectName)
+  				  .withParam("/tags")
+  				  .withParam("?page=" + page + "&per_page=80")
+  				  .build();
+        	
+        	jsonString = requests.getWithPreviewHeader(searchUrl);
+            jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
+
+        }
 		
-		return null;
+		return results;
 	}
 	
+	/**
+	 * try to get a commit date using URL
+	 * @param url
+	 * @return String date
+	 */
+	private String getCommitDate(String url){
+		System.out.println("Getting date for a certain commit...");
+		
+		String searchUrl = url;
+		
+		String jsonString = requests.getWithPreviewHeader(searchUrl);
+		JsonObject jsonobject = gson.fromJson(jsonString, JsonElement.class).getAsJsonObject();
+		
+		String date = jsonobject.get("commit").getAsJsonObject().get("author").getAsJsonObject().get("date").getAsString();
+		date = Dates.dateFormat(date);
+		return date;
+	}
+	
+	/**
+	 * try to get all files of a certain commit
+	 * @param owner
+	 * @param projectName
+	 * @param sha
+	 * @return List<CommitFile>
+	 */
+	public List<CommitFile> getCommitFiles(String owner,String projectName,String sha){
+		try{
+			System.out.println("Getting commit files for a certain commit...");
+			
+			String searchUrl = builder.uses(GithubAPI.ROOT)
+					  .withParam("repos")
+					  .withSimpleParam("/", owner)
+					  .withSimpleParam("/", projectName)
+					  .withSimpleParam("/", "commits")
+					  .withSimpleParam("/",sha)
+					  .build();
+			
+			String jsonLegacy = getWithProtection(searchUrl);
+			JsonObject jsonobject = new JsonParser().parse(jsonLegacy).getAsJsonObject();
+			JsonArray jsonArray = jsonobject.get("files").getAsJsonArray();
+			
+			System.out.println(searchUrl);
+			System.out.println("----------------------");
+			
+			
+			if(jsonArray.size()==0){
+				return null;
+			}
+			
+			List<CommitFile> results = new ArrayList<CommitFile>();
+			
+			for (JsonElement element : jsonArray) {
+				CommitFile cmf = new CommitFile();
+				
+				/**
+				 * sometimes the sha is null
+				 */
+				JsonElement tmpElement= element.getAsJsonObject().get("sha");
+				String file_sha = "";
+				if(!tmpElement.isJsonNull())
+				file_sha = element.getAsJsonObject().get("sha").getAsString();
+				
+				String filename = element.getAsJsonObject().get("filename").getAsString();
+				String status = element.getAsJsonObject().get("status").getAsString();
+				int additions = element.getAsJsonObject().get("additions").getAsInt();
+				int deletions = element.getAsJsonObject().get("deletions").getAsInt();
+				int changes = element.getAsJsonObject().get("changes").getAsInt();
+				String contents_url = element.getAsJsonObject().get("contents_url").getAsString();
+				
+				cmf.setSha(file_sha);
+				cmf.setFilename(filename);
+				cmf.setStatus(status);
+				cmf.setAdditions(additions);
+				cmf.setDeletions(deletions);
+				cmf.setChanges(changes);
+				cmf.setContents_url(contents_url);
+				cmf.setCommit_sha(sha);
+				
+				results.add(cmf);
+			}
+			
+			return results;
+			
+			
+		}catch (Throwable e) {
+			e.printStackTrace();
+			throw new SearchException(e);
+		}
+		
+	}
+	
+	
+	private String getWithProtection(String url){
+		String data = requests.get(url);
+
+		if (data.contains("API rate limit exceeded for")) {
+			try {
+				Thread.sleep(1000 * 60 * 60);
+				data = requests.get(url);
+
+			} catch (InterruptedException ex) {
+				ex.printStackTrace();
+			}
+		}
+
+		return data;
+	}
 	
 }

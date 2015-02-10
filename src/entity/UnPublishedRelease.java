@@ -8,24 +8,28 @@ import com.google.gson.annotations.SerializedName;
 @Entity("UnPublishedRelease")
 public class UnPublishedRelease {
 
-	@SerializedName("tag_name")
+	@SerializedName("name")
 	private String name;
 	
-	@SerializedName("tag_name")
+	@SerializedName("zipball_url")
 	private String zipball_url;
 	
-	@SerializedName("tag_name")
+	@SerializedName("tarball_url")
 	private String tarball_url;
+	
+	
 	private String commit_url;
 	
+	private String date;
 
 	public UnPublishedRelease(String name, String zipball_url,
-			String tarball_url, String commit_url) {
+			String tarball_url, String commit_url,String date) {
 		super();
 		this.name = name;
 		this.zipball_url = zipball_url;
 		this.tarball_url = tarball_url;
 		this.commit_url = commit_url;
+		this.date = date;
 	}
 	
 	public String getName() {
@@ -51,6 +55,14 @@ public class UnPublishedRelease {
 	}
 	public void setCommit_url(String commit_url) {
 		this.commit_url = commit_url;
+	}
+
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
 	}
 	
 	

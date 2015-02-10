@@ -13,6 +13,8 @@ public interface CommitDao {
 	 * @return
 	 */
 	public boolean addCommit(Commit commit,int project_id);
-	public List<Commit> getCommits(String projectName);
+	
+	
+	public List<Commit> getCommits(int projectId);
 	public boolean updateCommit(Commit commit);
 }

@@ -240,13 +240,11 @@ public class ReleaseDaoImpl implements ReleaseDao{
 	}
 
 	@Override
-	public List<Release> getAllRelease(String projectName) {
+	public List<Release> getAllRelease(int projectId) {
 		Connection con=daoHelper.getConnection();
 		PreparedStatement ps=null;
 		ResultSet rs=null;
 		try{
-			int projectId = DaoFactory.getProjectDao().getProject(projectName).getId();
-			con=daoHelper.getConnection();
 			
 			ps=con.prepareStatement("select * from gitcrawler.releases where project_id=?");
 			ps.setInt(1, projectId);
@@ -282,8 +280,8 @@ public class ReleaseDaoImpl implements ReleaseDao{
 	/**
 	 * this method also deals with the data
 	 */
-	public Map<String, Integer> getReleaseCommitNum(String projectName) {
-		List<Release> tmp_releases = getAllRelease(projectName);
+	public Map<String, Integer> getReleaseCommitNum(int projectId) {
+		List<Release> tmp_releases = getAllRelease(projectId);
 		Map<String, Integer> results = new HashMap<String, Integer>();
 		
 		Map<String, String> unSortedDates = new HashMap<String, String>();

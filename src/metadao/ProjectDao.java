@@ -10,4 +10,6 @@ public interface ProjectDao {
 	 * @return
 	 */
 	public boolean addProject(Project project);
+
+	public Project getProject(String owner,String projectName);
 }

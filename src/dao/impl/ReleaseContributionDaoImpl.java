@@ -54,7 +54,7 @@ public class ReleaseContributionDaoImpl implements ReleaseContributionDao{
 				results.add(rcb);
 			}	
 			
-			List<Release> reles = DaoFactory.getReleaseDao().getAllRelease(projectName);;
+			List<Release> reles = DaoFactory.getReleaseDao().getAllRelease(project_id);
 			ArrayList<ReleaseContribution> res = new ArrayList<ReleaseContribution>();
 			for(Release r:reles){
 				res.add(new ReleaseContribution(r.getName(),0));
@@ -83,14 +83,10 @@ public class ReleaseContributionDaoImpl implements ReleaseContributionDao{
 		return null;
 	}
 
+
 	@Override
-	public int getSize(String developerName, String projectName,
-			String releaseName) {
-		// TODO Auto-generated method stub
-		int developer_id = DaoFactory.getDeveloperDao().findDeveloper(developerName).getId();
-		int project_id = DaoFactory.getProjectDao().getProject(projectName).getId();
-		int release_id = DaoFactory.getReleaseDao().getRelease(project_id, releaseName).getId();
-		
+	public int getReleaseContributions(int developer_id,
+			int project_id, int release_id) {		
 		Connection con=daoHelper.getConnection();
 		PreparedStatement ps=null;
 		ResultSet rs=null;

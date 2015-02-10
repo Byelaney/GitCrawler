@@ -83,6 +83,10 @@ public class Project extends GitHubEntity {
 	@SerializedName("open_issues_count")
 	private int issuesCount;
 
+	public Project(){
+		super();
+	}
+	
 	/**
 	 * 2-parameter complimentary constructor
 	 * @param user the {@link User} to who the project belongs
@@ -107,6 +111,8 @@ public class Project extends GitHubEntity {
 		this.checkoutURL = checkoutURL;
 	}
 
+	
+	
 	/**
 	 * Informs the name of the project
 	 * @return the name of the project
@@ -338,8 +344,14 @@ public class Project extends GitHubEntity {
 	 * @param createdAtParam the String correspondent to the creation date of the project in question. e.g: 2012-04-28T15:40:35Z
 	 */
 	public void setCreatedAt(String createdAtParam) {
-		Date createAtDate = new Dates("yyyy-MM-dd HH:mm:ss").format(createdAtParam);
-		this.createdAt = createAtDate;
+		if(createdAtParam.length() >10){
+			Date createAtDate = new Dates("yyyy-MM-dd HH:mm:ss").format(createdAtParam);
+			this.createdAt = createAtDate;
+		}
+		else{
+			Date createAtDate = new Dates("yyyy-MM-dd").format(createdAtParam);
+			this.createdAt = createAtDate;
+		}
 	}
 
 	/**
@@ -364,8 +376,14 @@ public class Project extends GitHubEntity {
 	 * in question. e.g: 2012-04-28T15:40:35Z
 	 */
 	public void setLastPushedAt(String lastPushedAtParam){
-		Date lastPushDate = new Dates("yyyy-MM-dd HH:mm:ss").format(lastPushedAtParam);
-		this.lastPushedAt = lastPushDate;
+		if(lastPushedAtParam.length() >10){
+			Date createAtDate = new Dates("yyyy-MM-dd HH:mm:ss").format(lastPushedAtParam);
+			this.lastPushedAt = createAtDate;
+		}
+		else{
+			Date createAtDate = new Dates("yyyy-MM-dd").format(lastPushedAtParam);
+			this.lastPushedAt = createAtDate;
+		}
 	}
 
 	/**

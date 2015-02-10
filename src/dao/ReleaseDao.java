@@ -23,7 +23,7 @@ public interface ReleaseDao {
 	 * @param projectName
 	 * @return 
 	 */
-	public List<usefuldata.Release> getAllRelease(String projectName);
+	public List<usefuldata.Release> getAllRelease(int projectId);
 	
 	/**
 	 * get a certain release
@@ -97,6 +97,6 @@ public interface ReleaseDao {
 	public boolean addRelease(int release_id,int developer_id,int project_id,int contributions);
 	
 	
-	public Map<String,Integer> getReleaseCommitNum(String projectName);
+	public Map<String,Integer> getReleaseCommitNum(int projectId);
 	
 }

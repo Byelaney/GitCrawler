@@ -24,8 +24,7 @@ public class ProjectContributionDaoImpl implements ProjectContributionDao{
 	
 	
 	@Override
-	public boolean addProjectContribution(
-			ProjectContribution projectContribution) {
+	public boolean addProjectContribution(ProjectContribution projectContribution) {
 		Connection con=daoHelper.getConnection();
 		PreparedStatement ps=null;
 		
@@ -46,7 +45,6 @@ public class ProjectContributionDaoImpl implements ProjectContributionDao{
 		
 		return false;
 	}
-
 
 	@Override
 	public ProjectContribution findProjectContribution(int project_id,
@@ -80,7 +78,6 @@ public class ProjectContributionDaoImpl implements ProjectContributionDao{
 		return null;
 	}
 
-
 	@Override
 	public boolean updateProjectContribution(ProjectContribution pct) {
 		Connection con=daoHelper.getConnection();
@@ -104,7 +101,6 @@ public class ProjectContributionDaoImpl implements ProjectContributionDao{
 		return false;
 	}
 
-
 	@Override
 	public boolean deleteProjectContribution(ProjectContribution pct) {
 		Connection con=daoHelper.getConnection();
@@ -124,7 +120,6 @@ public class ProjectContributionDaoImpl implements ProjectContributionDao{
 		}
 		return false;
 	}
-
 
 	@Override
 	public List<ProjectContribution> findProjectContribution(
@@ -171,6 +166,68 @@ public class ProjectContributionDaoImpl implements ProjectContributionDao{
 		
 		
 		return results;
+	}
+
+	@Override
+	public int getProjectContributions(int developer_id, int project_id) {
+		
+		Connection con=daoHelper.getConnection();
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		
+		try{
+			ps=con.prepareStatement("select * from gitcrawler.project_contribution where project_id =? and developer_id=?");
+			ps.setInt(1, project_id);
+			ps.setInt(2, developer_id);
+			
+			rs=ps.executeQuery();
+			if(rs.next()){
+				return rs.getInt("contributions");
+			}	
+			
+			return 0;
+		}catch(SQLException e){
+			e.printStackTrace();
+		}finally{
+			daoHelper.closeResult(rs);
+			daoHelper.closePreparedStatement(ps);
+			daoHelper.closeConnection(con);
+		}
+		
+		return 0;
+	}
+
+
+	@Override
+	public ArrayList<Integer> getAllProjectContributors(int project_id) {
+		// TODO Auto-generated method stub
+		
+		Connection con=daoHelper.getConnection();
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		
+		ArrayList<Integer> developer_ids = new ArrayList<Integer>();
+		
+		try{
+			ps=con.prepareStatement("select * from gitcrawler.project_contribution where project_id =?");
+			ps.setInt(1, project_id);
+			
+			rs=ps.executeQuery();
+			while(rs.next()){
+				int id = rs.getInt("developer_id");
+				developer_ids.add(id);
+			}	
+			
+			return developer_ids;
+		}catch(SQLException e){
+			e.printStackTrace();
+		}finally{
+			daoHelper.closeResult(rs);
+			daoHelper.closePreparedStatement(ps);
+			daoHelper.closeConnection(con);
+		}
+		
+		return null;
 	}
 
 }

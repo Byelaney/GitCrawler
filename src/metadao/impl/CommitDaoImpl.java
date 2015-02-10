@@ -2,7 +2,9 @@ package metadao.impl;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import util.Dates;
@@ -48,8 +50,39 @@ public class CommitDaoImpl implements CommitDao{
 	}
 
 	@Override
-	public List<Commit> getCommits(String projectName) {
-		// TODO Auto-generated method stub
+	public List<Commit> getCommits(int projectId) {
+		Connection con=daoHelper.getConnection();
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		
+		try{
+			ps=con.prepareStatement("select * from metadata.commits where project_id =?");
+			ps.setInt(1, projectId);
+			
+			rs=ps.executeQuery();
+			
+			List<Commit> result = new ArrayList<Commit>();
+			while(rs.next()){
+				Commit commit = new Commit();
+				commit.setSha(rs.getString("sha"));
+				commit.setMessage(rs.getString("message"));
+				commit.setCommitDate(rs.getString("commitdate"));;
+				commit.setAdditionsCount(rs.getInt("additionscount"));
+				commit.setDeletionsCount(rs.getInt("deletionscount"));
+				
+				result.add(commit);
+			}	
+			
+			return result;
+			
+		}catch(SQLException e){
+			e.printStackTrace();
+		}finally{
+			daoHelper.closeResult(rs);
+			daoHelper.closePreparedStatement(ps);
+			daoHelper.closeConnection(con);
+		}
+		
 		return null;
 	}
 

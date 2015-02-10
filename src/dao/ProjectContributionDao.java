@@ -1,5 +1,6 @@
 package dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import usefuldata.ProjectContribution;
@@ -36,5 +37,11 @@ public interface ProjectContributionDao {
 	 * @return
 	 */
 	public boolean deleteProjectContribution(ProjectContribution pct);
+	
+	
+	public int getProjectContributions(int developer_id, int project_id);
+	
+	public ArrayList<Integer> getAllProjectContributors(int project_id);
+	
 	
 }
