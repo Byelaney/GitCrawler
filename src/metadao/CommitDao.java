@@ -16,5 +16,9 @@ public interface CommitDao {
 	
 	
 	public List<Commit> getCommits(int projectId);
-	public boolean updateCommit(Commit commit);
+	
+	public List<Commit> getCommits(int projectId,int contributor_id);
+	
+	
+	public boolean updateCommit(Commit commit,int project_id);
 }

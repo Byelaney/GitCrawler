@@ -1,8 +1,8 @@
 package analysis;
 
 import java.util.ArrayList;
-import java.util.Map;
 
+import usefuldata.Comment;
 import usefuldata.CommitDate;
 import usefuldata.VersionDate;
 
@@ -16,50 +16,57 @@ public interface DataHelper {
 	 * @param releaseName
 	 * @return
 	 */
-	public int getSize(String developerName, String projectName,
-			String releaseName);
+	public int getReleasetSize(String developerName, String projectName,
+			String releaseName);// use in force chart
 	
 	/**
-	 * try to get a developer's contribution
+	 * try to get a developer's contribution from some release(contained)  to Now
 	 * @param developerName
 	 * @param projectName
 	 * @return int
 	 */
-	public int getSize(String developerName, String projectName);
+	public int getSize(String developerName, String projectName,String release);//use in evolve
 
-
-
-	//----relation----	
+	
+	
 	/**
-	 * get all filenames of a commit
+	 * try to get a developer's contribution to this project
+	 * @param developerName
+	 * @param projectName
+	 * @return
+	 */
+	public int getSize(String developerName, String projectName);
+	
+	
+	/**
+	 * get all filenames of a project which modified by one in a release
 	 * @param developerName
 	 * @param projectName
 	 * @param releaseName
 	 * @return
 	 */
 	
-
-	public ArrayList<String> getFiles(Map<String,String> dateMap,String developerName,String owner,String projectName,
-			String releaseName);
+	public ArrayList<String> getFiles(String projectName,String release,String developer); //use in force chart
 	
-	//----new-----------------------------	
 	/**
 	 * get all developers of a project
 	 * @param projectName 
 	 * @return ArrayList<String>
 	 */
 
-	public ArrayList<String> getAllDeveloperNames(String projectName);
+	public ArrayList<String> getAllDeveloperNames(String projectName);//use in evolve
 	
 	
 	/**
-	 * get all files modified by some developer
+	 * get all files modified by some developer during a period of time(start to end )
 	 * @prama projectName
 	 * @prama developerName(one)
+	 * @param start date (yy-mm-dd)
+	 * @param end date (yy-mm-dd)
 	 * @return ArrayList<String>
 	 */
 	
-	public ArrayList<String> getFiles(String projectName,String developer);//----evolve----
+	public ArrayList<String> getFiles(String projectName,String developer,String start,String end);//use in evolve
 	
 	
 	/**
@@ -69,7 +76,7 @@ public interface DataHelper {
 	 *
 	 */
 	
-	public ArrayList<VersionDate> getVersions(String projectName);
+	public ArrayList<VersionDate> getVersions(String projectName);//use in evolve
 	
 	
 	/**
@@ -80,28 +87,28 @@ public interface DataHelper {
 	 *
 	 */
 	
-	public ArrayList<CommitDate> getCommits(String projectName);
+	public ArrayList<CommitDate> getCommits(String projectName);//use in evolve
 	
 	
 	/**
-	 *get issue count of one release
+	 *get issues of one project
 	 *@prama projectName
-	 *@prama release
-	 *@return int
+	 *
+	 *@return ArrayList<Issue>
 	 *
 	 */
 	
-	public int getIssueCount(String projectName,String release);
+	public ArrayList<usefuldata.Issue> getIssues(String projectName);//use in evolve
 	
-	
+
 	/**
-	 *get comments count of one release
+	 *get comments of one project
 	 *@prama projectName
-	 *@prama release
-	 *@return int
+	 *
+	 *@return ArrayList<Issue>
 	 *
 	 */
-	public int getCommentCount(String projectName,String release);
+	public ArrayList<Comment> getCommentsCount(String projectName);//use in evolve
 	
 	
 	/**
@@ -112,7 +119,6 @@ public interface DataHelper {
 	 *
 	 */
 	
-	public int getCodes(String projectName,String release);
-	
+	public int getCodes(String projectName,String release);//use in evolve
 	
 }

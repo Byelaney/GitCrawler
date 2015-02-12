@@ -7,7 +7,6 @@ import java.sql.SQLException;
 
 import dao.DaoHelper;
 import dao.DeveloperEchartsDao;
-import factory.DaoFactory;
 
 public class DeveloperEchartsDaoImpl implements DeveloperEchartsDao{
 
@@ -48,12 +47,9 @@ public class DeveloperEchartsDaoImpl implements DeveloperEchartsDao{
 	}
 
 	@Override
-	public String getDeveloperEcharts(String projectName, String releaseName,
-			String developer) {
-		int project_id = DaoFactory.getProjectDao().getProject(projectName).getId();
-		int release_id = DaoFactory.getReleaseDao().getRelease(project_id, releaseName).getId();
-		int developer_id = DaoFactory.getDeveloperDao().findDeveloper(developer).getId();
-		
+	public String getDeveloperEcharts(int project_id, int release_id,
+			int developer_id) {
+
 		Connection con=daoHelper.getConnection();
 		PreparedStatement ps=null;
 		ResultSet rs=null;

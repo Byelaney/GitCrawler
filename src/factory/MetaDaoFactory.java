@@ -5,10 +5,12 @@ import metadao.CommitFileDao;
 import metadao.ContributorDao;
 import metadao.ProjectDao;
 import metadao.UnPublishedReleaseDao;
+import metadao.UserDao;
 import metadao.impl.CommitDaoImpl;
 import metadao.impl.CommitFileDaoImpl;
 import metadao.impl.ContributorDaoImpl;
 import metadao.impl.UnPublishedReleaseDaoImpl;
+import metadao.impl.UserDaoImpl;
 
 
 
@@ -32,5 +34,9 @@ public class MetaDaoFactory {
 	
 	public static CommitFileDao getCommitFileDao(){
 		return CommitFileDaoImpl.getInstance();
+	}
+	
+	public static UserDao getUserDao(){
+		return UserDaoImpl.getInstance();
 	}
 }

@@ -7,7 +7,6 @@ import java.sql.SQLException;
 
 import dao.DaoHelper;
 import dao.ReleaseEchartsDao;
-import factory.DaoFactory;
 
 public class ReleaseEchartsDaoImpl implements ReleaseEchartsDao{
 
@@ -20,10 +19,7 @@ public class ReleaseEchartsDaoImpl implements ReleaseEchartsDao{
 	
 	
 	@Override
-	public String getReleaseEcharts(String projectName, String releaseName) {
-		int project_id = DaoFactory.getProjectDao().getProject(projectName).getId();
-		int release_id = DaoFactory.getReleaseDao().getRelease(project_id, releaseName).getId();
-		
+	public String getReleaseEcharts(int project_id, int release_id) {	
 		Connection con=daoHelper.getConnection();
 		PreparedStatement ps=null;
 		ResultSet rs=null;

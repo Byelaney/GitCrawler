@@ -2,12 +2,19 @@ package analysis;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import entity.Commit;
+import entity.CommitFile;
+import entity.UnPublishedRelease;
 import factory.DaoFactory;
+import factory.MetaDaoFactory;
+import usefuldata.Comment;
 import usefuldata.CommitDate;
 import usefuldata.VersionDate;
+import util.Dates;
 
 
 
@@ -35,13 +42,6 @@ public class DataHelperImpl implements DataHelper {
 		return contributions;
 	}
 
-	@Override
-	public ArrayList<String> getFiles(Map<String, String> dateMap,
-			String developerName, String owner, String projectName,
-			String releaseName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	@Override
 	public ArrayList<String> getAllDeveloperNames(String projectName) {
@@ -56,18 +56,7 @@ public class DataHelperImpl implements DataHelper {
 		return names;
 	}
 
-	@Override
-	public ArrayList<String> getFiles(String projectName, String developer) {
-		// TODO Auto-generated method stub
-		ArrayList<String> list = new ArrayList<String>();
-		for (int i = 0; i < 50; i++) {
-			if (developer.equals("a" + i)) {
-				list.add("./Users/bacchus/Workspaces/MyEclipse Professional 2014/DataAnalysis/src"
-						+ i%10  + "/getCodeLinesCount.java");
-			}
-		}
-		return list;
-	}
+	
 
 	@Override
 	public ArrayList<VersionDate> getVersions(String projectName) {
@@ -86,56 +75,7 @@ public class DataHelperImpl implements DataHelper {
 		return versionDates;
 	}
 
-	/*
-	 * public ArrayList<CommitDate> getCommits(String projectName, String
-	 * release) { // TODO Auto-generated method stub
-	 * 
-	 * ArrayList<CommitDate> list = new ArrayList<CommitDate>();
-	 * 
-	 * for (int j = 2; j < 9; j++) { String version = "version" + j;
-	 * 
-	 * if (release.equals(version)) {
-	 * 
-	 * if(j==5) { for (int i = 0; i < 3; i++) { CommitDate commitDate = new
-	 * CommitDate(); commitDate.setDate("2014-0" + (j-1) + "-10");
-	 * commitDate.setName("a" + i);
-	 * 
-	 * list.add(commitDate); } for (int i =3; i < 6; i++) { CommitDate
-	 * commitDate = new CommitDate(); commitDate.setDate("2014-0" + (j-1) +
-	 * "-18"); commitDate.setName("a" + i);
-	 * 
-	 * list.add(commitDate); } for (int i = 6; i < 9; i++) { CommitDate
-	 * commitDate = new CommitDate(); commitDate.setDate("2014-0"+(j-1)+"-21");
-	 * commitDate.setName("a" + i);
-	 * 
-	 * list.add(commitDate); } }
-	 * 
-	 * for (int i = 0; i < 3; i++) { CommitDate commitDate = new CommitDate();
-	 * commitDate.setDate("2014-0" + (j-1) + "-10"); commitDate.setName("a" +
-	 * (i+(j-2)*9));
-	 * 
-	 * list.add(commitDate); } for (int i =3; i < 6; i++) { CommitDate
-	 * commitDate = new CommitDate(); commitDate.setDate("2014-0" + (j-1) +
-	 * "-18"); commitDate.setName("a" + (i+(j-2)*9));
-	 * 
-	 * list.add(commitDate); } for (int i = 6; i < 9; i++) { CommitDate
-	 * commitDate = new CommitDate(); commitDate.setDate("2014-0"+(j-1)+"-21");
-	 * commitDate.setName("a" + (i+(j-2)*9));
-	 * 
-	 * list.add(commitDate); } } } return list; }
-	 */
 
-	@Override
-	public int getIssueCount(String projectName, String release) {
-		// TODO Auto-generated method stub
-		return (int) ((Math.random()) * 30 + 1);
-	}
-
-	@Override
-	public int getCommentCount(String projectName, String release) {
-		// TODO Auto-generated method stub
-		return (int) ((Math.random()) * 50 + 1);
-	}
 
 	@Override
 	public int getCodes(String projectName, String release) {
@@ -148,112 +88,88 @@ public class DataHelperImpl implements DataHelper {
 
 	@Override
 	public ArrayList<CommitDate> getCommits(String projectName) {
-		// TODO Auto-generated method stub
-		ArrayList<CommitDate> list = new ArrayList<CommitDate>();
-
-		for (int i = 0; i < 5; i++) {
-			list.add(getCommitDate("a" + i, 1));
-		}// 只参加了第一个版本
-
-		for (int i = 5; i < 10; i++) {
-			list.add(getCommitDate("a" + i, 8));
-		}// 参加了最后一个版本之后
-
-		for (int i = 10; i < 15; i++) {
-			list.add(getCommitDate("a" + i, 7));
-		}// 参加了最后一个版本
-
-		for (int i = 15; i < 20; i++) {
-			list.add(getCommitDate("a" + i, 7));
-			list.add(getCommitDate("a" + i, 1));
-		}// 参加了最后一个版本，和第一个版本
-
-		for (int i = 20; i < 25; i++) {
-			list.add(getCommitDate("a" + i, 8));
-			list.add(getCommitDate("a" + i, 1));
-		}// 参加了最后一个版本之后，和第一个版本
-
-		for (int i = 25; i < 30; i++) {
-			list.add(getCommitDate("a" + i, 8));
-			list.add(getCommitDate("a" + i, 1));
-		}// 参加了最后一个版本之后，和最后一个版本
-
-		for (int i = 30; i < 35; i++) {
-			list.add(getCommitDate("a" + i, 8));
-			list.add(getCommitDate("a" + i, 7));
-			list.add(getCommitDate("a" + i, 6));
-			list.add(getCommitDate("a" + i, 5));
-			list.add(getCommitDate("a" + i, 4));
-			list.add(getCommitDate("a" + i, 3));
-			list.add(getCommitDate("a" + i, 2));
-			list.add(getCommitDate("a" + i, 1));
-		}// 参加了所有版本
-
-		for (int i = 35; i < 40; i++) {
-
-			list.add(getCommitDate("a" + i, 2));
+		int projectId = DaoFactory.getProjectDao().getProject(projectName).getId();
+		List<Commit> commits = MetaDaoFactory.getCommitDao().getCommits(projectId);
+		ArrayList<CommitDate> cds = new ArrayList<CommitDate>();
+		
+		for(Commit cmt:commits){
 			CommitDate cd = new CommitDate();
-			cd.setName("a" + 1);
-			cd.setDate("2014-02-11");
-			list.add(cd);
-
-		}// 在第二个版本提交两次
-
-		for (int i = 40; i < 45; i++) {
-
-			list.add(getCommitDate("a" + i, 2));
-			CommitDate cd = new CommitDate();
-			cd.setName("a" + 1);
-			cd.setDate("2014-02-11");
-			list.add(cd);
-
-			list.add(getCommitDate("a" + i, 5));
-			list.add(getCommitDate("a" + i, 5));
-			list.add(getCommitDate("a" + i, 5));
-			list.add(getCommitDate("a" + i, 5));
-			list.add(getCommitDate("a" + i, 5));
-
-		}// 在第二个版本提交两次,第五个牒本提交相同五次
-
-		for (int i = 45; i < 50; i++) {
-
-			list.add(getCommitDate("a" + i, 2));
-			CommitDate cd = new CommitDate();
-			cd.setName("a" + 1);
-			cd.setDate("2014-02-11");
-			list.add(cd);
-
-			list.add(getCommitDate("a" + i, 5));
-			list.add(getCommitDate("a" + i, 5));
-			list.add(getCommitDate("a" + i, 5));
-			list.add(getCommitDate("a" + i, 5));
-			list.add(getCommitDate("a" + i, 5));
-
-			int j = 5;
-			while (j > 0) {
-				list.add(getCommitDate("a" + i, 8));
-				j--;
-
-			}
-			j = 5;
-			while (j > 0) {
-				list.add(getCommitDate("a" + i, 10));
-				j--;
-			}
-
-		}// 在第二个版本提交两次,第五个牒本提交相同五次,最后一个版本后提交10次
-
-		return list;
+			cd.setName(cmt.getCommiter().getLogin());
+			cd.setDate(cmt.getCommitDate().toString());
+			cds.add(cd);
+		}
+		
+		return cds;
 	}
 
-	private CommitDate getCommitDate(String name, int version) {
-		CommitDate cd = new CommitDate();
-		cd.setName(name);
-		if (version < 10)
-			cd.setDate("2014-0" + (version + 1) + "-14");
-		else
-			cd.setDate("2014-" + (version + 1) + "-14");
-		return cd;
+
+	@Override
+	public int getReleasetSize(String developerName, String projectName,
+			String releaseName) {	
+		int developer_id = DaoFactory.getDeveloperDao().findDeveloper(developerName).getId();
+		int project_id = DaoFactory.getProjectDao().getProject(projectName).getId();
+		int release_id = DaoFactory.getReleaseDao().getRelease(project_id, releaseName).getId();
+		int contributions = DaoFactory.getReleaseContribution().getReleaseContributions(developer_id, project_id, release_id);
+		
+		return contributions;
+	}
+
+	@Override
+	public ArrayList<String> getFiles(String projectName, String release,
+			String developer) {
+		int developer_id = DaoFactory.getDeveloperDao().findDeveloper(developer).getId();
+		int project_id = DaoFactory.getProjectDao().getProject(projectName).getId();
+		
+		UnPublishedRelease upbr = MetaDaoFactory.getUnPublishedReleaseDao().getUnPublishedRelease(release, project_id);
+		List<UnPublishedRelease> releases = MetaDaoFactory.getUnPublishedReleaseDao().getAllUnPublishedReleases(project_id);
+		List<Commit> commits = MetaDaoFactory.getCommitDao().getCommits(project_id, developer_id);
+		
+		ArrayList<String> shas = new ArrayList<String>();
+		
+		int upbr_idx = 0;
+		
+		Map<String,String> release_dates = new HashMap<String,String>();
+		for(int i =0;i<releases.size();i++){
+			if(upbr.getName().equals(releases.get(i).getName())){
+				upbr_idx = i;
+			}
+			release_dates.put(releases.get(i).getName(), releases.get(i).getDate());
+		}
+		
+		for(Commit c:commits){
+			int idx = Dates.getDateIndex(Dates.dateToString(c.getCommitDate()), release_dates);
+			if(idx == upbr_idx){
+				shas.add(c.getSha());
+			}
+		}
+		
+		ArrayList<String> files = new ArrayList<String>();
+		
+		for(String sha:shas){
+			CommitFile commitFile = MetaDaoFactory.getCommitFileDao().getCommitFile(sha);
+			files.add(commitFile.getFilename());
+		}
+		
+		return files;
+	}
+
+	@Override
+	public ArrayList<String> getFiles(String projectName, String developer,
+			String start, String end) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<usefuldata.Issue> getIssues(String projectName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public ArrayList<Comment> getCommentsCount(String projectName) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

@@ -1,8 +1,11 @@
 package analysis;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import usefuldata.Comment;
 import usefuldata.CommitDate;
 import usefuldata.Link;
 import usefuldata.Movement;
@@ -38,7 +41,7 @@ public class EvolveAnalysis {
 
 	}
 
-	private String getNodesJson() {
+	private String getNodesJson(String releaseName) {
 		List<Node> nodes = new ArrayList<Node>();
 		ArrayList<String> nodeNames = new ArrayList<String>();
 		for (Movement mm : movements) {
@@ -53,17 +56,19 @@ public class EvolveAnalysis {
 		int maxDsize = 0;
 		for (; i < nodeNames.size(); i++) {
 			String developerName = nodeNames.get(i);
-			if (Math.log(dh.getSize(developerName, projectName)) > maxDsize)
-				maxDsize = dh.getSize(developerName, projectName);
+			if (Math.log(dh.getSize(developerName, projectName, releaseName)) > maxDsize)
+				maxDsize = dh.getSize(developerName, projectName, releaseName);
 		}
 		i = 0;
 		for (; i < nodeNames.size(); i++) {
 			String developerName = nodeNames.get(i);
 			int dsize = 0;
-			if (Math.log(dh.getSize(developerName, projectName)) < 1)
-				dsize = (int) Math.log(dh.getSize(developerName, projectName)) + 1;
+			if (Math.log(dh.getSize(developerName, projectName, releaseName)) < 1)
+				dsize = (int) Math.log(dh.getSize(developerName, projectName,
+						releaseName)) + 1;
 			else
-				dsize = (int) Math.log(dh.getSize(developerName, projectName));
+				dsize = (int) Math.log(dh.getSize(developerName, projectName,
+						releaseName));
 			dsize = dsize * 100 / maxDsize;
 
 			Node node = new Node(developerName, dsize);
@@ -91,8 +96,8 @@ public class EvolveAnalysis {
 				String filePath2 = fileToComepare.substring(0,
 						fileToComepare.length() - filename2.length());
 
-			//System.out.println("filePath:"+filePath);
-				//System.out.println("filePath2:"+filePath2);
+				// System.out.println("filePath:"+filePath);
+				// System.out.println("filePath2:"+filePath2);
 				if (filePath.equals(filePath2)) {
 					result = true;
 					break;
@@ -105,7 +110,10 @@ public class EvolveAnalysis {
 		return result;
 	}
 
-	private String getLinksJson() {
+	private String getLinksJson(String releaseName) {
+		VersionDate vd = new VersionDate();
+		vd = getVersionDate(releaseName);// get release date
+
 		ArrayList<String> nodeNames = new ArrayList<String>();
 		for (Movement mm : movements) {
 			if (mm.getMove().equals("join")) {
@@ -119,23 +127,28 @@ public class EvolveAnalysis {
 		for (; i < nodeNames.size(); i++) {
 			String developerName1 = nodeNames.get(i);
 			ArrayList<String> files1 = new ArrayList<String>();
-			files1 = dh.getFiles(projectName, developerName1);
+			Date now = new Date();
+			SimpleDateFormat sdf = new SimpleDateFormat("YYYY-MM-dd");
+			String dtStr = sdf.format(now);// get instant time
+
+			files1 = dh.getFiles(projectName, developerName1, vd.getDate(),
+					dtStr);
 			int j = 0;
 			for (; j < nodeNames.size(); j++) {
 				if (j != i) {
 					String developerName2 = nodeNames.get(j);
 					ArrayList<String> files2 = new ArrayList<String>();
-					files2 = dh.getFiles(projectName, developerName2);
+
+					files2 = dh.getFiles(projectName, developerName2,
+							vd.getDate(), dtStr);
 					Link link = new Link(i, j);
 					boolean linked = false;
 					linked = isLinked(files1, files2);
-					if (linked) 
-					{
-						//System.out.println("Linked!!");
+					if (linked) {
+						// System.out.println("Linked!!");
 						if (links.size() == 0) {
 							links.add(link);
-					}
-					else {
+						} else {
 
 							boolean add = true;
 							for (int p = 0; p < links.size(); p++) {
@@ -238,29 +251,28 @@ public class EvolveAnalysis {
 	private Movement getLatestMoveOfOne(String developerName) {
 		ArrayList<Movement> mms = new ArrayList<Movement>();
 
-	
-			for (Movement mm : movements) {
-				if (mm.getName().equals(developerName)) {
-					mms.add(mm);
-				}
+		for (Movement mm : movements) {
+			if (mm.getName().equals(developerName)) {
+				mms.add(mm);
 			}
+		}
 
-			int i = mms.size() - 1;
-			for (; i > 0; --i) {
-				Movement mm1 = new Movement();
-				mm1 = mms.get(i);
-				int j = 0;
-				for (; j < i; ++j) {
-					Movement mm2 = mms.get(j);
-					if (DateIsGreater(mm1.getDate(), mm2.getDate())) {
-						Movement temp = mm2;
-						mms.set(j, mm1);
-						mms.set(i, temp);
-					}
+		int i = mms.size() - 1;
+		for (; i > 0; --i) {
+			Movement mm1 = new Movement();
+			mm1 = mms.get(i);
+			int j = 0;
+			for (; j < i; ++j) {
+				Movement mm2 = mms.get(j);
+				if (DateIsGreater(mm1.getDate(), mm2.getDate())) {
+					Movement temp = mm2;
+					mms.set(j, mm1);
+					mms.set(i, temp);
 				}
 			}
-			
-			if (mms.size() > 0) {
+		}
+
+		if (mms.size() > 0) {
 
 			return mms.get(0);
 		} else
@@ -350,7 +362,7 @@ public class EvolveAnalysis {
 	 * @param release
 	 * @return VersionDate
 	 */
-	@SuppressWarnings("unused")
+
 	private VersionDate getPreVersionDate(String release) {
 		VersionDate versiondate = new VersionDate();
 
@@ -362,11 +374,14 @@ public class EvolveAnalysis {
 		}
 
 		int i = 0;
-		ArrayList<VersionDate> versions = new ArrayList<VersionDate>();
-		versions = orderVersions(versionDates);
-		for (; i < versions.size(); i++) {
-			if (versiondate.getVersion().equals(versions.get(i).getVersion())) {
-				versiondate = versions.get(i - 1);
+
+		for (; i < versionDates.size(); i++) {
+			if (versiondate.getVersion().equals(
+					versionDates.get(i).getVersion())) {
+				if (i != 0)
+					versiondate = versionDates.get(i - 1);
+				else
+					versiondate = null;
 			}
 
 		}
@@ -446,12 +461,11 @@ public class EvolveAnalysis {
 
 				Movement latestMm = getLatestMoveOfOne(cd.getName());// 某开发者最近一次迁移情况
 
-				
 				if (latestMm != null) {
-//					if(cd.getName().equals("a45"))
-//					{
-//						System.out.println(latestMm.getDate());
-//					}
+					// if(cd.getName().equals("a45"))
+					// {
+					// System.out.println(latestMm.getDate());
+					// }
 					// 之前参加项目
 					if (latestMm.getMove().equals("leave")) {
 						movements.add(mm);
@@ -492,12 +506,104 @@ public class EvolveAnalysis {
 		JSONArray json = JSONArray.fromObject(movements);
 		String jsonStr = json.toString();
 
-//		 for (Movement mm : movements) {
-//		 System.out.println(mm.getName() + ":" + mm.getMove() + ";"
-//		 + mm.getDate());
-	//	}
+		// for (Movement mm : movements) {
+		// System.out.println(mm.getName() + ":" + mm.getMove() + ";"
+		// + mm.getDate());
+		// }
 		return jsonStr;
 
+	}
+
+	/**
+	 * 判断时间是否在两个版本发布时间之间，也就是属于某个版本
+	 * 
+	 * @param prevd
+	 * @param vd
+	 * @return
+	 */
+	private boolean dateIsBetweenTwoVersions(VersionDate prevd, VersionDate vd,
+			String date) {
+		boolean result = false;
+		if (DateIsGreater(vd.getDate(), date)
+				&& DateIsGreater(date, prevd.getDate())
+				&& (!date.equals(prevd.getDate())))// 如果发布时间先于等于传入 且
+													// 传入时间先于前一个版本发布时间 且
+													// 传入时间不等于前一个版本发布时间
+		{
+			result = true;
+		}
+		return result;
+	}
+
+	/**
+	 * try to get the count of Comments in One release
+	 * 
+	 * @param projectName
+	 * @param releaseName
+	 * @return
+	 */
+	private int getCommentCount(String projectName, String releaseName) {
+		int commentCount = 0;
+		ArrayList<Comment> comentList = new ArrayList<Comment>();
+		comentList = dh.getCommentsCount(projectName);
+		if (releaseName.equals(versionDates.get(0).getVersion())) {// 如果是第一个版本，取第个版本之前的时间（包含）
+			VersionDate vd = new VersionDate();
+			vd = getVersionDate(releaseName);
+			for (Comment comment : comentList) {
+				if (DateIsGreater(vd.getDate(), comment.getDate()))
+					commentCount++;
+			}
+
+		} else {
+
+			VersionDate vd = new VersionDate();
+			vd = getVersionDate(releaseName);
+			VersionDate prevd = new VersionDate();
+			prevd = getPreVersionDate(releaseName);
+
+			for (Comment comment : comentList) {
+				if (dateIsBetweenTwoVersions(prevd, vd, comment.getDate()))
+					commentCount++;
+			}
+		}
+
+		return commentCount;
+	}
+
+	/**
+	 * try to get the count of Issues in One release
+	 * 
+	 * @param projectName
+	 * @param releaseName
+	 * @return
+	 */
+	private int getIssueCount(String projectName, String releaseName) {
+		int issueCount = 0;
+		ArrayList<usefuldata.Issue> issueList = new ArrayList<usefuldata.Issue>();
+		issueList = dh.getIssues(projectName);
+		if (releaseName.equals(versionDates.get(0).getVersion())) {// 如果是第一个版本，取第个版本之前的时间（包含）
+			VersionDate vd = new VersionDate();
+			vd = getVersionDate(releaseName);
+			for (usefuldata.Issue issue : issueList) {
+				if (DateIsGreater(vd.getDate(), issue.getInjectedDate()))
+					issueCount++;
+
+			}
+		} else {// 不是第一个版本，则都取与之前版本（不包含）之间的时间
+
+			VersionDate vd = new VersionDate();
+			vd = getVersionDate(releaseName);
+			VersionDate prevd = new VersionDate();
+			prevd = getPreVersionDate(releaseName);
+
+			for (usefuldata.Issue issue : issueList) {
+				if (dateIsBetweenTwoVersions(prevd, vd, issue.getInjectedDate()))
+					issueCount++;
+
+			}
+
+		}
+		return issueCount;
 	}
 
 	private String getRadarJson(String release) {
@@ -517,7 +623,7 @@ public class EvolveAnalysis {
 
 		for (; j < versiondates.size(); j++) {
 
-			//计算issue comment commit codes developers 指标最大量
+			// 计算issue comment commit codes developers 指标最大量
 			allCommits = dh.getCommits(projectName);
 
 			if (getVersionDateNum(versiondates.get(j).getVersion()) == 0) {// 如果请求的版本号是第一个版本，选返回所有commits，再减去第一个版本发布时间后的所有commits
@@ -545,7 +651,7 @@ public class EvolveAnalysis {
 
 			}
 
-			String thisRelease = versionDates.get(j).getVersion();
+			String thisRelease = versiondates.get(j).getVersion();
 			if (developerSizeInVersion.get(j) > maxDeveloperSize)
 				maxDeveloperSize = developerSizeInVersion.get(j);
 
@@ -555,13 +661,21 @@ public class EvolveAnalysis {
 			if (commits.size() > maxCommits)
 				maxCommits = commits.size();
 
-			if (dh.getCommentCount(projectName, thisRelease) > maxComments)
-				maxComments = dh.getCommentCount(projectName, thisRelease);
+			if (getCommentCount(projectName, thisRelease) > maxComments)
+				maxComments = getCommentCount(projectName, thisRelease);
 
-			if (dh.getIssueCount(projectName, thisRelease) > maxIssues)
-				maxIssues = dh.getIssueCount(projectName, thisRelease);
+			if (getIssueCount(projectName, thisRelease) > maxIssues)
+			{
+				
+				maxIssues = getIssueCount(projectName, thisRelease);
+//				System.out.println(thisRelease+":");
+//				System.out.println("maxIssues:"+maxIssues);
+//				System.out.println("Issues:"+getIssueCount(projectName, thisRelease));
+			}
 
+		
 		}
+		
 
 		int i = 0;
 		for (; i < versiondates.size(); i++) {
@@ -594,41 +708,49 @@ public class EvolveAnalysis {
 			}
 
 			VersionDate vd = new VersionDate();
-			vd = versionDates.get(i);
+			vd = versiondates.get(i);
 
 			Version v = new Version();
 			v.setDate(vd.getDate().replace("-", ""));
 			v.setName(vd.getVersion());
 			List<Radar> radars = new ArrayList<Radar>();
 			String thisRelease = vd.getVersion();
-			radars.add(
-					0,
-					new Radar(
-							"developer",
-							(10 * developerSizeInVersion.get(i) / maxDeveloperSize)));
+			int developerValue = 0;
+			if (maxDeveloperSize != 0)
+				developerValue = (10 * developerSizeInVersion.get(i)
+						/ maxDeveloperSize);
+			int codeValue = 0;
+			if (maxCodes != 0)
+				codeValue = (10 * dh.getCodes(projectName, thisRelease)
+						/ maxCodes);
+			int commitValue = 0;
+			if (maxCommits != 0)
+				commitValue = (10 * commits.size() / maxCommits);
+
+			int commentValue = 0;
+			if (maxComments != 0)
+				commentValue = (10 * getCommentCount(projectName, thisRelease) / maxComments);
+			int issueValue = 0;
+			if (maxIssues != 0)
+				issueValue = (10 * getIssueCount(projectName, thisRelease) / maxIssues);
+//			System.out.println(thisRelease+":");
+//			System.out.println("maxIssues:"+maxIssues);
+//			System.out.println("Issues:"+getIssueCount(projectName, thisRelease));
+//			System.out.println("issueValue:"+issueValue);
+
+			radars.add(0, new Radar("developer", developerValue));
 			// System.out.println(developerSizeInVersion.get(i));
-			radars.add(
-					1,
-					new Radar("code", (10 * dh.getCodes(projectName,
-							thisRelease) / maxCodes)));
-			radars.add(2, new Radar("commit",
-					(10 * commits.size() / maxCommits)));
-			radars.add(
-					3,
-					new Radar("comment", (10 * dh.getCommentCount(projectName,
-							thisRelease) / maxComments)));
-			radars.add(
-					4,
-					new Radar("issue", (10 * dh.getIssueCount(projectName,
-							thisRelease) / maxIssues)));
+			radars.add(1, new Radar("code", codeValue));
+			radars.add(2, new Radar("commit", commitValue));
+			radars.add(3, new Radar("comment", commentValue));
+			radars.add(4, new Radar("issue", issueValue));
 
 			// radars.add(1,"code",c)
 			List<List<Radar>> radarL = new ArrayList<List<Radar>>();
-			
+
 			radarL.add(radars);
 			v.setRadar(radarL);
 			versions.add(v);
-			
 
 		}
 
@@ -641,8 +763,8 @@ public class EvolveAnalysis {
 	public String getEvolveJson(String release) {
 		String movementsJson = getMovementsJson(release);
 
-		String nodesJson = getNodesJson();
-		String linksJson = getLinksJson();
+		String nodesJson = getNodesJson(release);
+		String linksJson = getLinksJson(release);
 		String radarJson = getRadarJson(release);
 
 		versionDates = dh.getVersions(projectName);
@@ -655,8 +777,8 @@ public class EvolveAnalysis {
 		developers = dh.getAllDeveloperNames(projectName);
 		// releases = dh.getReleaseNames(projectName);
 		movements = new ArrayList<Movement>();
-		 return "{nodes:" + nodesJson + ",links:" + linksJson
-		+ ",movements:" + movementsJson + ",version:" + radarJson + "}";
+		return "{nodes:" + nodesJson + ",links:" + linksJson + ",movements:"
+				+ movementsJson + ",version:" + radarJson + "}";
 
 	}
 
@@ -671,6 +793,6 @@ public class EvolveAnalysis {
 		EvolveAnalysis ea = new EvolveAnalysis("projecName");
 		System.out.println(ea.getEvolveJson("version3"));
 
-
 	}
 }
+

@@ -7,6 +7,7 @@ import java.util.List;
 import usefuldata.Release;
 import factory.DaoFactory;
 import analysis.CodeLinesCountImpl;
+import analysis.DataHelperImpl;
 import analysis.DevelopDigram;
 import analysis.DevelopDigramImpl;
 import analysis.PackageDependency;
@@ -32,32 +33,34 @@ public class AnalysisTest {
 //		ewq.add("databasePersistence/src/main/java/gov/nasa/arc/mct/dbpersistence/service/PersistenceServiceImpl.java");
 //		System.out.println(dd.getDevelopDigramByVersion(ewq));
 //		
-		ArrayList<String> languages = new ArrayList<String>();
-		languages.add("java");
-		
-		ArrayList<String> paths = new ArrayList<String>();
-		
-		List<Release> rels = DaoFactory.getProjectDao().getAllReleases("mct");
-		
-		for(int i =0;i<rels.size();i++){
-			paths.add(rels.get(i).getName() + ".zip");
-		}
+//		ArrayList<String> languages = new ArrayList<String>();
+//		languages.add("java");
+//		
+//		ArrayList<String> paths = new ArrayList<String>();
+//		
+//		List<Release> rels = DaoFactory.getProjectDao().getAllReleases("mct");
+//		
+//		for(int i =0;i<rels.size();i++){
+//			paths.add(rels.get(i).getName() + ".zip");
+//		}
 		
 		//paths.add("v1.7.0.zip");
 		//paths.add("v1.7b1.zip");
 		
 		
-		
-		PackageDependency pd = new PackageDependencyImpl();
-		ArrayList<String> ds;
-		ds = pd.getPakageDependency(paths, languages);
-		
-		
-//		for(int j =0;j<rels.size();j++){
-//			DaoFactory.getReleaseEchartsDao().addReleaseEcharts(4193864, rels.get(j).getId(), ds.get(j));
-//		}
-		
-		System.out.println(DaoFactory.getReleaseEchartsDao().getReleaseEcharts("mct", "v1.7.0"));
+		AnalysisTest at = new AnalysisTest();
+		at.DataHelperImplTest();
+	}
+	
+	public void DataHelperImplTest(){
+		DataHelperImpl dhi = new DataHelperImpl();
+		ArrayList<String> ss = dhi.getFiles("mct", "v1.8b2", "DanBerrios");
+		for(int i =0;i<ss.size();i++){
+			System.out.println(ss.get(i));
+		}
 		
 	}
+	
+	
+	
 }

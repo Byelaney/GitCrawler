@@ -24,17 +24,11 @@ public class ReleaseContributionDaoImpl implements ReleaseContributionDao{
 	
 	@Override
 	public ArrayList<ReleaseContribution> getReleaseContribution(
-			String projectName, String developer) {
+			int project_id, int developer_id) {
 		
 		Connection con=daoHelper.getConnection();
 		PreparedStatement ps=null;
 		ResultSet rs=null;
-		
-		int project_id = DaoFactory.getProjectDao().getProject(projectName).getId();
-		con=daoHelper.getConnection();
-		int developer_id = DaoFactory.getDeveloperDao().findDeveloper(developer).getId();
-		
-		con=daoHelper.getConnection();
 		
 		try{
 			ps=con.prepareStatement("select * from gitcrawler.release_contribution where project_id =? and developer_id=?");

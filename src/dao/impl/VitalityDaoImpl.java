@@ -11,7 +11,6 @@ import usefuldata.Developer;
 import usefuldata.Vitality;
 import dao.DaoHelper;
 import dao.VitalityDao;
-import factory.DaoFactory;
 
 public class VitalityDaoImpl implements VitalityDao{
 
@@ -150,9 +149,7 @@ public class VitalityDaoImpl implements VitalityDao{
 	}
 
 	@Override
-	public List<Vitality> getVitality(String developer) {
-		int developer_id = DaoFactory.getDeveloperDao().findDeveloper(developer).getId();
-		
+	public List<Vitality> getVitality(int developer_id) {
 		Connection con=daoHelper.getConnection();
 		PreparedStatement ps=null;
 		ResultSet rs=null;
@@ -184,14 +181,9 @@ public class VitalityDaoImpl implements VitalityDao{
 	}
 
 	@Override
-	public List<Vitality> getVitality(String projectName, String releaseName,
-			String developer) {
-		int developer_id = DaoFactory.getDeveloperDao().findDeveloper(developer).getId();
-		int project_id = DaoFactory.getProjectDao().getProject(projectName).getId();
-		int release_id = DaoFactory.getReleaseDao().getRelease(project_id, releaseName).getId();
-		
-		
-		
+	public List<Vitality> getVitality(int project_id, int release_id,
+			int developer_id) {
+				
 		Connection con=daoHelper.getConnection();
 		PreparedStatement ps=null;
 		ResultSet rs=null;

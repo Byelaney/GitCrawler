@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import entity.UnPublishedRelease;
 import usefuldata.Release;
 
 /**
@@ -145,6 +146,7 @@ public class Dates {
 		return sorted_dates.size();
 	}
 	
+	
 	private static int compare_date(String date1,String date2){
 	    	if(date1.equals(date2))
 	    		return 0;
@@ -237,5 +239,32 @@ public class Dates {
 		return null;
 	}
 	
+	public static List<UnPublishedRelease> unPublishedReleaseSort(List<UnPublishedRelease> unsorted_release){
+		String[] dates= new String[unsorted_release.size()];
+		for(int i = 0;i<unsorted_release.size();i++){
+			String date = unsorted_release.get(i).getDate();
+			dates[i] = date;
+		}
+		
+		QuickSort.quick(dates);
+		List<UnPublishedRelease> results = new ArrayList<UnPublishedRelease>();
+		
+		for(int j = 0;j<dates.length;j++){
+			for(int i =0;i<unsorted_release.size();i++){
+				if(dates[j].equals(unsorted_release.get(i).getDate())){
+					results.add(unsorted_release.get(i));
+					break;
+				}
+			}
+				
+		}
+		
+		return results;
+	}
+	
+	public static String dateToString(Date date){
+		   SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd");
+		   return df.format(date);
+	}
 	
 }

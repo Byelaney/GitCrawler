@@ -19,26 +19,25 @@ public class RelationImpl implements Relation {
 	private ArrayList<String> developers = new ArrayList<String>();
 	private String projectName = null;
 	private String releaseName = null;
-
-	// private ArrayList<Integer> size=new ArrayList<Integer>();
+	private int[] sizeRank={180,130,100,75,55,40,25,15,10,5};
+	
+	
 	public RelationImpl(ArrayList<String> developers,
 			Map<String, String> dateMap, String owner, String projectName,
 			String releaseName) {
 		this.developers = developers;
 		this.projectName = projectName;
 		this.releaseName = releaseName;
-		setFiles(developers, dateMap, owner, projectName, releaseName);
+		setFiles(developers, projectName, releaseName);
 	
 	}
 
-	private void setFiles(ArrayList<String> developers,
-			Map<String, String> dateMap, String owner, String projectName,
+	private void setFiles(ArrayList<String> developers, String projectName,
 			String releaseName) 
 	{
 		for (int i = 0; i < developers.size(); i++) {
 			ArrayList<String> filenames = new ArrayList<String>();
-			filenames = dh.getFiles(dateMap, developers.get(i), owner,
-					projectName, releaseName);
+			filenames = dh.getFiles(developers.get(i),projectName,releaseName);
 			files.add(filenames);
 
 		}
@@ -89,19 +88,29 @@ public class RelationImpl implements Relation {
 		return result;
 	}
 
+	
+	
 	@Override
 	public String getRelations() {
 		// TODO Auto-generated method stub
-
+//          int maxSize=0;
+//		for (int i = 0; i < developers.size(); i++)
+//		{
+//			int dsize = (int) Math.log(dh.getSize(developers.get(i), projectName, releaseName));
+//			if(dsize>maxSize)
+//			{
+//				maxSize=dsize;
+//			}
+//			
+//		}
+		
 		for (int i = 0; i < developers.size(); i++) {
-			int dsize = (int) Math.log(dh.getSize(developers.get(i), projectName, releaseName));
-			int ddsize=dsize/10+1;
-			/*if(dsize>0)
-				ddsize= (int) Math.log(dh.getSize(developers.get(i), projectName, releaseName));
-*/
-			// size.add(dsize);
 
-			Node node = new Node(developers.get(i), ddsize);
+			
+			int dsize=dh.getSize(developers.get(i), projectName, releaseName);
+
+
+			Node node = new Node(developers.get(i), dsize);
 			nodes.add(node);
 
 			ArrayList<String> filenames = new ArrayList<String>();
@@ -126,6 +135,19 @@ public class RelationImpl implements Relation {
 
 		}
 
+		sort(0, nodes.size() - 1);
+		
+		for(int i=0;i<nodes.size();i++)
+		{
+			Node node=null;
+			node=nodes.get(i);
+			if(i<10)
+			node.setSize(sizeRank[i]);
+			else
+			node.setSize(sizeRank[9]+30);
+				
+		}//将size调整为比较好显示的数据
+		
 		JSONArray jsonNode = JSONArray.fromObject(nodes);
 		JSONArray jsonLink = JSONArray.fromObject(links);
 		String resultStr = "{ 'nodes': " + jsonNode.toString() + ", 'links':"
@@ -134,34 +156,6 @@ public class RelationImpl implements Relation {
 		nodes = new ArrayList<Node>();
 		links = new ArrayList<Link>();
 
-		// FileWriter fw = null;
-		// String destination = path + projectName + "_" + releaseName + "_"
-		// + "relations.json";
-		//
-		// boolean written = false;
-		// try {
-		// fw = new FileWriter(destination);
-		//
-		// } catch (IOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// PrintWriter out = new PrintWriter(fw);
-		// out.write(resultStr);
-		// out.println();
-		// written = true;
-		// try {
-		// fw.close();
-		// } catch (IOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// out.close();
-		//
-		// if (written)
-		//
-		// return destination;
-		// else
 		return resultStr;
 	}
 
@@ -220,14 +214,9 @@ public class RelationImpl implements Relation {
 	public String getMainRelations() {
 
 		for (int i = 0; i < developers.size(); i++) {
-			int dsize = dh.getSize(developers.get(i), projectName, releaseName);
-			int ddsize=dsize/10+1;
-			 /*
-			if(dsize>0)
-				ddsize= (int) Math.log(dh.getSize(developers.get(i), projectName, releaseName));*/
-			// size.add(dsize);
 
-			Node node = new Node(developers.get(i), ddsize);
+			int dsize=dh.getSize(developers.get(i), projectName, releaseName);
+			Node node = new Node(developers.get(i), dsize);
 
 			nodes.add(node);
 		}
@@ -257,6 +246,17 @@ public class RelationImpl implements Relation {
 
 			}
 		}
+		
+		for(int i=0;i<nodes.size();i++)
+		{
+			Node node=null;
+			node=nodes.get(i);
+			if(i<10)
+			node.setSize(sizeRank[i]);
+			else
+			node.setSize(sizeRank[9]+30);
+				
+		}//将size调整为比较好显示的数据
 
 		JSONArray jsonNode = JSONArray.fromObject(nodes);
 		JSONArray jsonLink = JSONArray.fromObject(links);
@@ -266,36 +266,12 @@ public class RelationImpl implements Relation {
 		nodes = new ArrayList<Node>();
 		links = new ArrayList<Link>();
 
-		// FileWriter fw = null;
-		// String destination = path + projectName + "_" + releaseName + "_"
-		// + "relations.json";
-		//
-		// boolean written = false;
-		// try {
-		// fw = new FileWriter(destination);
-		//
-		// } catch (IOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// PrintWriter out = new PrintWriter(fw);
-		// out.write(resultStr);
-		// out.println();
-		// written = true;
-		// try {
-		// fw.close();
-		// } catch (IOException e) {
-		// // TODO Auto-generated catch block
-		// e.printStackTrace();
-		// }
-		// out.close();
-		//
-		// if (written)
-		//
-		// return destination;
-		// else
 		return resultStr;
 
+	}
+	public static void main(String[] args)
+	{
+		
 	}
 
 }

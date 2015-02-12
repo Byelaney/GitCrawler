@@ -8,6 +8,7 @@ import search.MetaSearchGitHub;
 import search.SearchGitHub;
 import search.SearchModule;
 import usefuldata.Developer;
+import util.Dates;
 
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -24,13 +25,18 @@ public class MetaSqlTest {
 	
 	public static void main(String []args){
 		
-		MetaSqlTest mst = new MetaSqlTest();
-		mst.setup();
-		mst.testCommitDao();
-		
-//		List<Commit> commits = MetaDaoFactory.getCommitDao().getCommits("mct");
-//		System.out.println(commits.get(0).getCommitDate().toString());
+//		MetaSqlTest mst = new MetaSqlTest();
+//		mst.setup();
+//		mst.testCommitDao();
 //		
+		List<Commit> ccs = MetaDaoFactory.getCommitDao().getCommits(4193864);
+		for(Commit c:ccs){
+			//c.setCommitDate(c.getCommitDate().toString());
+			
+			c.setCommitDate(Dates.metaDateFormat(c.getCommitDate().toString()));
+			MetaDaoFactory.getCommitDao().updateCommit(c, 4193864);
+		}
+		
 	}
 	
 	public void setup() {
@@ -68,22 +74,19 @@ public class MetaSqlTest {
 		
 			//System.out.println(project.getId());
 			
-		
 			entity.Project p = new Project(new User("nasa"), "mct");
-			List<Developer> dp = searchGitHub2.getDevelopers(p);
+			List<Contributor> dp = MetaDaoFactory.getContributorDao().getAllContributors(4193864);
 			
-			for(int i = dp.size()-1;i>=0;i--){
-				List<Commit> commits = searchGitHub.getProjectCommitsByCommiter(p, dp.get(i).getLogin());
-				for(Commit cm:commits){
-					MetaDaoFactory.getCommitDao().addCommit(cm, 4193864);
-					
+			for(int i = 4;i>=0;i--){
+				//only 4 has not been crawled
+				if(dp.get(i).getLogin().equals("VWoeltjen")){
+					List<Commit> commits = searchGitHub.getProjectCommitsByCommiter(p, dp.get(i).getLogin());
+					for(Commit cm:commits){
+						MetaDaoFactory.getCommitDao().addCommit(cm, 4193864);
+					}
+					break;
 				}
-				
 			}
-			
-			
-			
-			
 		} catch (Exception e) {
 			e.printStackTrace();
 			
@@ -91,7 +94,18 @@ public class MetaSqlTest {
 		
 	}
 	
-	
+	public void testGetAllContributors(){
+		try {
+			List<Contributor> ctbs = MetaDaoFactory.getContributorDao().getAllContributors(4193864);
+			for(Contributor c:ctbs){
+				System.out.println(c.getLogin());
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			
+		}
+	}
 	
 	
 	

@@ -100,8 +100,8 @@ public class SqlTest {
 //		int i = DaoFactory.getReleaseContribution().getSize("VWoeltjen", "mct", "v1.7b3");
 //		System.out.println(i);
 		
-		String a = DaoFactory.getReleaseEchartsDao().getReleaseEcharts("mct", "v1.7b3");
-		System.out.println(a);
+		//String a = DaoFactory.getReleaseEchartsDao().getReleaseEcharts("mct", "v1.7b3");
+		//System.out.println(a);
 		
 	}
 }

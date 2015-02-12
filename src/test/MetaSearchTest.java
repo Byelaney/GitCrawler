@@ -9,6 +9,8 @@ import com.google.inject.Injector;
 
 import entity.Commit;
 import entity.CommitFile;
+import entity.Contributor;
+import entity.Issue;
 import entity.Project;
 import entity.UnPublishedRelease;
 import entity.User;
@@ -25,7 +27,7 @@ public class MetaSearchTest {
 	public static void main(String []args){
 		MetaSearchTest a = new MetaSearchTest();
 		a.setup();
-		a.testGetCommitFiles();
+		a.testgetAllProjectIssues();
 	}
 	
 	public void setup() {
@@ -130,7 +132,30 @@ public class MetaSearchTest {
 				
 		}
 		
+	}
+	
+	
+	public void testGetUsers(){
+		List<Contributor> ctbs = MetaDaoFactory.getContributorDao().getAllContributors(4193864);
+		for(Contributor c:ctbs){
+			entity.User user = MetasearchGitHub.getUser(c.getLogin());
+			MetaDaoFactory.getUserDao().addUser(user);
+		}
 		
+	}
+	
+	public void testgetAllProjectIssues(){
+		entity.Project p = new Project(new User("nasa"), "mct");
+		List<Issue> issues = MetasearchGitHub.getAllProjectIssues(p);
+		int id = 0;
+		for(Issue i:issues){
+			System.out.println(i.getId());
+			System.out.println(i.getTitle());
+			System.out.println(i.getBody());
+			System.out.println("------------");
+			id++;
+		}
+		System.out.println(id);
 		
 	}
 	

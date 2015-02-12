@@ -8,7 +8,6 @@ import java.util.ArrayList;
 
 import dao.DaoHelper;
 import dao.ForceChartDao;
-import factory.DaoFactory;
 
 public class ForceChartDaoImpl implements ForceChartDao{
 
@@ -22,11 +21,9 @@ public class ForceChartDaoImpl implements ForceChartDao{
 	
 	
 	@Override
-	public boolean addForceChart(String projectName, String releaseName,
+	public boolean addForceChart(int project_id, int release_id,
 			String relation,String main_relation) {
-		int project_id = DaoFactory.getProjectDao().getProject(projectName).getId();
-		int release_id = DaoFactory.getReleaseDao().getRelease(project_id, releaseName).getId();
-		
+
 		Connection con=daoHelper.getConnection();
 		PreparedStatement ps=null;
 		
@@ -53,11 +50,9 @@ public class ForceChartDaoImpl implements ForceChartDao{
 
 
 	@Override
-	public ArrayList<String> getForceChart(String projectName,
-			String releaseName) {
-		int project_id = DaoFactory.getProjectDao().getProject(projectName).getId();
-		int release_id = DaoFactory.getReleaseDao().getRelease(project_id, releaseName).getId();
-		
+	public ArrayList<String> getForceChart(int project_id,
+			int release_id) {
+
 		Connection con=daoHelper.getConnection();
 		PreparedStatement ps=null;
 		ResultSet rs=null;

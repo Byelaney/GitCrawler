@@ -2,6 +2,7 @@ package metadao.impl;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import entity.CommitFile;
@@ -46,6 +47,44 @@ public class CommitFileDaoImpl implements CommitFileDao{
 		}
 		
 		return false;
+	}
+
+	@Override
+	public CommitFile getCommitFile(String commit_sha) {
+		Connection con=daoHelper.getConnection();
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		
+		try{
+			ps=con.prepareStatement("select * from metadata.commit_files where commit_sha =?");
+			ps.setString(1,commit_sha);
+			
+			rs=ps.executeQuery();
+			
+			CommitFile commitFile = null;
+			if(rs.next()){
+				commitFile = new CommitFile();
+				commitFile.setSha(rs.getString("file_sha"));
+				commitFile.setFilename(rs.getString("filename"));
+				commitFile.setStatus(rs.getString("status"));
+				commitFile.setAdditions(rs.getInt("additions"));
+				commitFile.setDeletions(rs.getInt("deletions"));
+				commitFile.setChanges(rs.getInt("changes"));
+				commitFile.setContents_url(rs.getString("contents_url"));
+				commitFile.setCommit_sha(rs.getString("commit_sha"));
+			}	
+			
+			return commitFile;
+			
+		}catch(SQLException e){
+			e.printStackTrace();
+		}finally{
+			daoHelper.closeResult(rs);
+			daoHelper.closePreparedStatement(ps);
+			daoHelper.closeConnection(con);
+		}
+		
+		return null;
 	}
 	
 }

@@ -22,7 +22,7 @@ public interface ProjectContributionDao {
 	public ProjectContribution findProjectContribution(int project_id,int developer_id);
 	
 	
-	public List<ProjectContribution> findProjectContribution(String developerName);
+	public List<ProjectContribution> findProjectContribution(int developer_id,List<usefuldata.Project> projects);
 	
 	/**
 	 * try to update a ProjectContribution

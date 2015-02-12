@@ -14,9 +14,10 @@ public interface VitalityDao {
 	 */
 	public List<Vitality> getVitality(Developer developer);
 	
-	public List<Vitality> getVitality(String developer);
+	public List<Vitality> getVitality(int developer_id);
 	
-	public List<Vitality> getVitality(String projectName,String releaseName,String developer);
+	public List<Vitality> getVitality(int project_id, int release_id,
+			int developer_id);
 	
 	/**
 	 * try to update vitality

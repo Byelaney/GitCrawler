@@ -12,7 +12,7 @@ public interface ReleaseContributionDao {
 	 * @param developer
 	 * @return
 	 */
-	public ArrayList<ReleaseContribution> getReleaseContribution(String projectName,String developer);
+	public ArrayList<ReleaseContribution> getReleaseContribution(int project_id, int developer_id);
 	
 	
 	public int getReleaseContributions(int developer_id, int project_id,

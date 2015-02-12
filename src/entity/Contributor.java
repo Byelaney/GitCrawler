@@ -92,6 +92,9 @@ public class Contributor extends GitHubEntity {
     @SerializedName("contributions")
     private int contributions;
     
+    public Contributor(){
+    	super();
+    }
     
     /**<p>This constructor that doesn't require all fields, but they <b>should</b> be setted after instantiation for a good use like we have described in
 	 {@link Contributor} Class annotation <p>*/

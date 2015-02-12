@@ -3,7 +3,6 @@ package search;
 import http.HttpModule;
 import http.Requests;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +22,7 @@ import entity.CommitFile;
 import entity.Contributor;
 import entity.GroundhogException;
 import entity.Issue;
+import entity.IssueLabel;
 import entity.Project;
 import entity.UnPublishedRelease;
 import entity.User;
@@ -65,10 +65,69 @@ public class MetaSearchGitHub implements ForgeSearch{
 		return null;
 	}
 
-	@Override
-	public List<Issue> getAllProjectIssues(Project gr) throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+	/**
+	 * Fetches all the Issues of the given {@link Project} from the GitHub API
+	 * 
+	 * @param project the @{link Project} of which the Issues are about
+	 * @return a {@link List} of {@link Issues} objects
+	 */
+	
+	public List<Issue> getAllProjectIssues(Project project) {
+
+		System.out.println("Searching project issues metadata");
+		
+		int page = 1;
+		
+		String searchUrl = builder.uses(GithubAPI.ROOT)
+				  .withParam("repos")
+				  .withSimpleParam("/", project.getOwner().getLogin())
+				  .withSimpleParam("/", project.getName())
+				  .withParam("/issues")
+				  .withParam("?page=" +page +"&per_page=80")
+				  .build();
+		
+		System.out.println(searchUrl);		
+		
+		String  jsonString = getWithProtection(searchUrl);
+		System.out.println(jsonString);
+		
+		JsonElement jsonElement = gson.fromJson(jsonString, JsonElement.class);
+		JsonArray jsonArray = jsonElement.getAsJsonArray();
+		
+		
+		List<Issue> issues = new ArrayList<Issue>();
+		List<IssueLabel> labels = new ArrayList<IssueLabel>();
+		
+		
+		while(jsonArray.size()!=0){
+			for (JsonElement element : jsonArray) {
+				Issue issue = gson.fromJson(element, Issue.class);
+				issue.setProject(project);
+				
+				for (JsonElement lab : element.getAsJsonObject().get("labels").getAsJsonArray()) {
+					IssueLabel label = gson.fromJson(lab, IssueLabel.class);				
+					labels.add(label);
+				}
+				
+				issue.setLabels(labels);
+				issues.add(issue);
+			}
+			
+			page++;
+			searchUrl = builder.uses(GithubAPI.ROOT)
+					  .withParam("repos")
+					  .withSimpleParam("/", project.getOwner().getName())
+					  .withSimpleParam("/", project.getName())
+					  .withParam("/issues")
+					  .withParam("?page=" +page +"&per_page=80")
+					  .build();
+			
+			jsonString = getWithProtection(searchUrl);
+			jsonElement = gson.fromJson(jsonString, JsonElement.class);
+			jsonArray = jsonElement.getAsJsonArray();
+		}
+		
+		return issues;
 	}
 
 	
@@ -93,7 +152,10 @@ public class MetaSearchGitHub implements ForgeSearch{
 		System.out.println(searchUrl);
 		
 		try{
-			JsonElement jsonElement = gson.fromJson(requests.get(searchUrl), JsonElement.class);
+			String jsonLegacy = getWithProtection(searchUrl);
+			
+			//could be requests.get(searchUrl)
+			JsonElement jsonElement = gson.fromJson(jsonLegacy, JsonElement.class);
 			
 			JsonArray jsonArray = jsonElement.getAsJsonArray();
 
@@ -424,6 +486,23 @@ public class MetaSearchGitHub implements ForgeSearch{
 		}
 		
 	}
+	
+	public entity.User getUser(String login){
+		System.out.println("Searching user's specific metadata");
+		
+		String searchUrl = builder.uses(GithubAPI.USERS)
+				  .withParam(login)
+				  .build();
+		
+		String jsonString = requests.getWithPreviewHeader(searchUrl);
+		entity.User user = gson.fromJson(jsonString, entity.User.class);
+		user.setCreated_at(Dates.dateFormat(user.getCreated_at()));
+		user.setUpdatedAt(Dates.dateFormat(user.getUpdatedAt()));
+		return user;
+	}
+	
+	
+	
 	
 	
 	private String getWithProtection(String url){

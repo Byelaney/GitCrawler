@@ -10,7 +10,6 @@ import usefuldata.Developer;
 import usefuldata.ProjectContribution;
 import dao.DaoHelper;
 import dao.ProjectContributionDao;
-import factory.DaoFactory;
 
 public class ProjectContributionDaoImpl implements ProjectContributionDao{
 
@@ -123,16 +122,12 @@ public class ProjectContributionDaoImpl implements ProjectContributionDao{
 
 	@Override
 	public List<ProjectContribution> findProjectContribution(
-			String developerName) {
+			int developer_id,List<usefuldata.Project> projects) {
 		
-		List<ProjectContribution> results = new ArrayList<ProjectContribution>();
-		int developer_id = DaoFactory.getDeveloperDao().findDeveloper(developerName).getId();
-		
+		List<ProjectContribution> results = new ArrayList<ProjectContribution>();	
 		Developer dp = new Developer();
 		dp.setId(developer_id);
-		
-		List<usefuldata.Project> projects = DaoFactory.getDeveloperDao().findDeveloperForProjects(dp);
-		
+				
 		Connection con=daoHelper.getConnection();
 		PreparedStatement ps=null;
 		ResultSet rs=null;
@@ -200,7 +195,6 @@ public class ProjectContributionDaoImpl implements ProjectContributionDao{
 
 	@Override
 	public ArrayList<Integer> getAllProjectContributors(int project_id) {
-		// TODO Auto-generated method stub
 		
 		Connection con=daoHelper.getConnection();
 		PreparedStatement ps=null;

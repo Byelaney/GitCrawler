@@ -22,6 +22,10 @@ public class UnPublishedRelease {
 	
 	private String date;
 
+	public UnPublishedRelease(){
+		super();
+	}
+	
 	public UnPublishedRelease(String name, String zipball_url,
 			String tarball_url, String commit_url,String date) {
 		super();
