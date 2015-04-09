@@ -59,4 +59,9 @@ public interface DeveloperDao {
 	 */
 	public boolean addDeveloper(Developer developer);
 	
+	
+	public boolean addDevelopers(List<Developer> dps);
+	
+	public boolean updateDeveloper(Developer developer);
+	
 }

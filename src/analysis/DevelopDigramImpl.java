@@ -9,40 +9,14 @@ public class DevelopDigramImpl implements DevelopDigram {
 
 	private ArrayList<PackageNode> architectures;
 	private boolean toJson;
+	
+	public  DevelopDigramImpl()
 	{
 		architectures= new ArrayList<PackageNode>();
 		toJson=false;
 	}
 
 	private String architecturesToJson(boolean toJson) {
-
-		//boolean result = false;
- 
-		/* ArrayList<String> jsons=new ArrayList<String>();
-		
-		for (int i = 0; i < architectures.size(); i++) {
-			//System.out.println(architectures.get(i).getPath());
-			String[] pathNames = architectures.get(i).takePath().split("/");
-			if (pathNames.length == 1) {
-
-				JSONArray json = JSONArray.fromObject(architectures.get(i));
-				jsons.add(json.toString());
-			}
-
-		}*/
-		//System.out.println(architectures.size());
-	
-		// System.out.println(json);
-		
-		/*String jsonStr="{";
-		for(int i=0;i<jsons.size();i++)
-		{
-			if(i!=(jsons.size()-1))
-			jsonStr+=jsons.get(i)+",";
-			else
-			jsonStr+=jsons.get(i);
-		}
-		jsonStr+="}";*/
 		
 		if(toJson)
 		{
@@ -142,39 +116,14 @@ public class DevelopDigramImpl implements DevelopDigram {
 			
 		}
 
-		
-	/*	for (int i = 0; i < architectures.size(); i++) {
-			//System.out.println(architectures.get(i).getPath());
-			String[] pathNames = architectures.get(i).takePath().split("/");
-			if (pathNames.length == 1) {
-
-				
-			}
-
-		}*/
 		if(filenames.size()!=0)
 		{
 		traverse(0);
 	    toJson=true;
 		}
 		
-		
-
 		return architecturesToJson(toJson);
 	}
-	
-//	public static void main(String[] args)
-//	{
-//		DevelopDigram dd=new DevelopDigramImpl();
-//		ArrayList<String> filenames=new ArrayList<String>();
-//	
-//	//	filenames.add("collectionComponent/src/main/java/gov/nasa/arc/mct/collection/CollectionComponentProvider.java");
-//		
-//		
-//		System.out.println(dd.getDevelopDigramByVersion(filenames));
-//	
-//	}
-
 
 }
 

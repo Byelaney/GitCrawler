@@ -12,4 +12,9 @@ public interface ProjectDao {
 	public boolean addProject(Project project);
 
 	public Project getProject(String owner,String projectName);
+	
+	public Project getProject(String projectName);
+	
+	public boolean updateProject(Project project);
+	
 }

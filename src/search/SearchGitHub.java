@@ -502,9 +502,14 @@ public class SearchGitHub implements ForgeSearch {
 
 		List<Commit> commits = new ArrayList<>();
 		
+		//int crawled_index = 0;
+		
 		while(jsonArray.size()!=0){
 		
 		for (JsonElement element : jsonArray) {
+			//crawled_index++;
+			
+			
 			Commit commit = gson.fromJson(element, Commit.class);
 			commit.setProject(project);
 			
@@ -559,6 +564,7 @@ public class SearchGitHub implements ForgeSearch {
 		
 		}
 
+		//System.out.println("finally at " + crawled_index);
 		return commits;
 	}
 
@@ -799,11 +805,14 @@ public class SearchGitHub implements ForgeSearch {
 
 		System.out.println("Searching project releases metadata");
 		
+		int page = 1;
+		
 		String searchUrl = builder.uses(GithubAPI.ROOT)
 				  .withParam("repos")
 				  .withSimpleParam("/", project.getUser().getLogin())
 				  .withSimpleParam("/", project.getName())
 				  .withParam("/releases")
+				  .withParam("?page=" + page + "&per_page=80")
 				  .build();
 		
 		//System.out.println(searchUrl);
@@ -811,14 +820,32 @@ public class SearchGitHub implements ForgeSearch {
 		String jsonString = requests.getWithPreviewHeader(searchUrl);
 		JsonArray jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
 
-		List<Release> releases = new ArrayList<>();
-		for (JsonElement element : jsonArray) {
-			Release release = gson.fromJson(element, Release.class);
-			release.setProject(project);
-			
-			releases.add(release);
+		if(jsonArray.size() == 0){
+			return null;
 		}
+		
+		List<Release> releases = new ArrayList<>();
+		while(jsonArray.size()!=0){
+			for (JsonElement element : jsonArray) {
+				Release release = gson.fromJson(element, Release.class);
+				release.setProject(project);	
+				releases.add(release);
+			}
+			
+			page++;
+			searchUrl = builder.uses(GithubAPI.ROOT)
+					  .withParam("repos")
+					  .withSimpleParam("/", project.getUser().getLogin())
+					  .withSimpleParam("/", project.getName())
+					  .withParam("/releases")
+					  .withParam("?page=" + page + "&per_page=80")
+					  .build();
+			
+			jsonString = requests.getWithPreviewHeader(searchUrl);
+            jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
 
+		}
+		
 		return releases;
 	
 	}

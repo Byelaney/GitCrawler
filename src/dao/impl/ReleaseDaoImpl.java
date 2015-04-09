@@ -1,5 +1,7 @@
 package dao.impl;
 
+import helper.DBHelper;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -12,7 +14,6 @@ import java.util.Map;
 import usefuldata.Developer;
 import usefuldata.Release;
 import util.Dates;
-import dao.DaoHelper;
 import dao.DeveloperDao;
 import dao.ReleaseDao;
 import factory.DaoFactory;
@@ -20,7 +21,7 @@ import factory.DaoFactory;
 public class ReleaseDaoImpl implements ReleaseDao{
 
 	private static ReleaseDaoImpl releaseDaoImpl=new ReleaseDaoImpl();
-	private static DaoHelper daoHelper=DaoHelperImpl.getBaseDaoInstance();
+	private static DBHelper daoHelper=DaoHelperImpl.getBaseDaoInstance();
 	private static DeveloperDao developerDao = DaoFactory.getDeveloperDao();
 	
 	public static ReleaseDaoImpl getInstance(){
@@ -44,8 +45,14 @@ public class ReleaseDaoImpl implements ReleaseDao{
 						release.setId(rs.getInt("id"));
 						release.setName(rs.getString("name"));	
 						release.setCodes(rs.getInt("codes"));
+						release.setProject_id(rs.getInt("project_id"));
 						release.setDate(rs.getString("date"));
 						release.setRelease_commits(rs.getInt("release_commits"));
+						release.setDocument(rs.getInt("document"));
+						release.setTest(rs.getInt("test"));
+						release.setCommit_rate(rs.getDouble("commit_rate"));
+						release.setIssue_number(rs.getInt("issue_number"));
+						release.setComprehensive(rs.getInt("comprehensive"));
 					}	
 					
 					return release;
@@ -141,7 +148,7 @@ public class ReleaseDaoImpl implements ReleaseDao{
 	}
 
 	@Override
-	public boolean updateRelease(int release_id,int developer_id,int project_id,int submits) {
+	public boolean updateReleaseContributon(int release_id,int developer_id,int project_id,int submits) {
 		Connection con=daoHelper.getConnection();
 		PreparedStatement ps=null;
 		try{
@@ -170,13 +177,22 @@ public class ReleaseDaoImpl implements ReleaseDao{
 		Connection con=daoHelper.getConnection();
 		PreparedStatement ps=null;
 		try{
-			ps=con.prepareStatement("UPDATE `gitcrawler`.`releases` SET `id`=?, `name`=?,`codes`=?,`date`=?,`release_commits`=? where `id`=?");
+			ps=con.prepareStatement("UPDATE `gitcrawler`.`releases` SET `id`=?, `name`=?,`codes`=?,`project_id`=?,`date`=?,`release_commits`=?,`document`=?,`test`=?,`commit_rate`=?,`issue_number`=?,`comprehensive` where `id`=? and `project_id`=?");
 			ps.setInt(1,release.getId());
 			ps.setString(2, release.getName());
 			ps.setInt(3,release.getCodes());
-			ps.setString(4, release.getDate());
-			ps.setInt(5, release.getRelease_commits());
-			ps.setInt(6,release.getId());
+			ps.setInt(4, release.getProject_id());
+			ps.setString(5, release.getDate());
+			ps.setInt(6, release.getRelease_commits());
+			ps.setInt(7, release.getDocument());
+			ps.setInt(8, release.getTest());
+			ps.setDouble(9, release.getCommit_rate());
+			ps.setInt(10, release.getIssue_number());
+			ps.setInt(11, release.getComprehensive());
+			ps.setInt(12,release.getId());
+			ps.setInt(13,release.getProject_id());
+			
+			
 			ps.execute();
 			return true;
 		}catch(SQLException e){
@@ -191,32 +207,46 @@ public class ReleaseDaoImpl implements ReleaseDao{
 	
 	@Override
 	public boolean addReleaseInfo(Release release, int project_id) {
-		Connection con=daoHelper.getConnection();
-		PreparedStatement ps=null;
-		
-		try{
-			ps=con.prepareStatement("INSERT INTO `gitcrawler`.`releases` (`id`, `name`,`codes`,`project_id`,`date`,`release_commits`) VALUES (?,?,?,?,?,?)");
-			ps.setInt(1,0);
-			ps.setString(2,release.getName());
-			ps.setInt(3,release.getCodes());
-			ps.setInt(4,project_id);
-			ps.setString(5, release.getDate());
-			ps.setInt(6, release.getRelease_commits());
-			ps.execute();			
-			return true;
+		Release r = getRelease(project_id,release.getName());
+		if(r != null){
+			return updateReleaseInfo(release);
+		}
+		else{
+			Connection con=daoHelper.getConnection();
+			PreparedStatement ps=null;
 			
-		}catch(SQLException e){
-			e.printStackTrace();
-		}finally{
-			daoHelper.closePreparedStatement(ps);
-			daoHelper.closeConnection(con);
+			try{
+				ps=con.prepareStatement("INSERT INTO `gitcrawler`.`releases` (`id`, `name`,`codes`,`project_id`,`date`,`release_commits`,`document`,`test`,`commit_rate`,`issue_number`,`comprehensive`) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
+				
+				ps.setInt(1,0);
+				ps.setString(2, release.getName());
+				ps.setInt(3,release.getCodes());
+				ps.setInt(4,release.getProject_id());
+				ps.setString(5, release.getDate());
+				ps.setInt(6, release.getRelease_commits());
+				ps.setInt(7, release.getDocument());
+				ps.setInt(8, release.getTest());
+				ps.setDouble(9, release.getCommit_rate());
+				ps.setInt(10, release.getIssue_number());
+				ps.setInt(11, release.getComprehensive());
+				
+				ps.execute();			
+				return true;
+				
+			}catch(SQLException e){
+				e.printStackTrace();
+			}finally{
+				daoHelper.closePreparedStatement(ps);
+				daoHelper.closeConnection(con);
+			}
+			
+			return false;
 		}
 		
-		return false;
 	}
 
 	@Override
-	public boolean addRelease(int release_id,int developer_id,int project_id,int contributions) {
+	public boolean addReleaseContribution(int release_id,int developer_id,int project_id,int contributions) {
 		Connection con=daoHelper.getConnection();
 		PreparedStatement ps=null;
 		
@@ -258,9 +288,14 @@ public class ReleaseDaoImpl implements ReleaseDao{
 				release.setId(rs.getInt("id"));
 				release.setName(rs.getString("name"));	
 				release.setCodes(rs.getInt("codes"));
+				release.setProject_id(rs.getInt("project_id"));
 				release.setDate(rs.getString("date"));
 				release.setRelease_commits(rs.getInt("release_commits"));
-				
+				release.setDocument(rs.getInt("document"));
+				release.setTest(rs.getInt("test"));
+				release.setCommit_rate(rs.getDouble("commit_rate"));
+				release.setIssue_number(rs.getInt("issue_number"));
+				release.setComprehensive(rs.getInt("comprehensive"));
 				results.add(release);
 			}	
 			
@@ -328,8 +363,14 @@ public class ReleaseDaoImpl implements ReleaseDao{
 				release.setId(rs.getInt("id"));
 				release.setName(rs.getString("name"));	
 				release.setCodes(rs.getInt("codes"));
+				release.setProject_id(rs.getInt("project_id"));
 				release.setDate(rs.getString("date"));
 				release.setRelease_commits(rs.getInt("release_commits"));
+				release.setDocument(rs.getInt("document"));
+				release.setTest(rs.getInt("test"));
+				release.setCommit_rate(rs.getDouble("commit_rate"));
+				release.setIssue_number(rs.getInt("issue_number"));
+				release.setComprehensive(rs.getInt("comprehensive"));
 			}	
 			
 			return release;
@@ -342,6 +383,19 @@ public class ReleaseDaoImpl implements ReleaseDao{
 		}
 		
 		return null;
+	}
+
+	@Override
+	public boolean addRelease(Release r) {
+		return addReleaseInfo(r,r.getProject_id());
+	}
+
+	@Override
+	public boolean addReleases(List<Release> releases) {
+		for(int i = 0;i<releases.size();i++)
+			addRelease(releases.get(i));
+		
+		return true;
 	}
 
 //	@Override

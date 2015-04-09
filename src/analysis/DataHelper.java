@@ -1,6 +1,7 @@
 package analysis;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import usefuldata.Comment;
 import usefuldata.CommitDate;
@@ -16,7 +17,7 @@ public interface DataHelper {
 	 * @param releaseName
 	 * @return
 	 */
-	public int getReleasetSize(String developerName, String projectName,
+	public int getReleaseSize(String developerName, String projectName,
 			String releaseName);// use in force chart
 	
 	/**
@@ -108,7 +109,7 @@ public interface DataHelper {
 	 *@return ArrayList<Issue>
 	 *
 	 */
-	public ArrayList<Comment> getCommentsCount(String projectName);//use in evolve
+	public ArrayList<Comment> getComments(String projectName);//use in evolve
 	
 	
 	/**
@@ -121,4 +122,27 @@ public interface DataHelper {
 	
 	public int getCodes(String projectName,String release);//use in evolve
 	
+	/**
+	 * get commit nums of a certain release
+	 * @param projectName
+	 * @param release
+	 * @return
+	 */
+	public int getReleaseCommits(String projectName,String release);
+	
+	/**
+	 * get issue nums of a certain release
+	 * @param projectName
+	 * @param release
+	 * @return
+	 */
+	public int getIssueNum(String projectName,String release);
+	
+	public int getComprehensive();
+	
+	public int getTest();
+	
+	public int getDocument();
+	
+	public List<usefuldata.Vitality> getVitality(String projectName,String developer);
 }

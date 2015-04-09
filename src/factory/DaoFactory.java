@@ -2,6 +2,7 @@ package factory;
 
 import dao.DeveloperDao;
 import dao.DeveloperEchartsDao;
+import dao.EvolveEchartsDao;
 import dao.ForceChartDao;
 import dao.ProjectContributionDao;
 import dao.ProjectDao;
@@ -11,6 +12,7 @@ import dao.ReleaseEchartsDao;
 import dao.VitalityDao;
 import dao.impl.DeveloperDaoImpl;
 import dao.impl.DeveloperEchartsDaoImpl;
+import dao.impl.EvolveEchartsDaoImpl;
 import dao.impl.ForceChartDaoImpl;
 import dao.impl.ProjectContributionDaoImpl;
 import dao.impl.ProjectDaoImpl;
@@ -62,5 +64,9 @@ public class DaoFactory {
 	
 	public static DeveloperEchartsDao getDeveloperEchartsDao(){
 		return DeveloperEchartsDaoImpl.getInstance();
+	}
+	
+	public static EvolveEchartsDao getEvolveEchartsDao(){
+		return EvolveEchartsDaoImpl.getInstance();
 	}
 }

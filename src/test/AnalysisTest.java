@@ -2,16 +2,26 @@ package test;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import usefuldata.CommitDate;
 import usefuldata.Release;
+import entity.Contributor;
+import entity.UnPublishedRelease;
 import factory.DaoFactory;
+import factory.MetaDaoFactory;
+import analysis.CodeLinesCount;
 import analysis.CodeLinesCountImpl;
 import analysis.DataHelperImpl;
 import analysis.DevelopDigram;
 import analysis.DevelopDigramImpl;
+import analysis.EvolveAnalysis;
 import analysis.PackageDependency;
 import analysis.PackageDependencyImpl;
+import analysis.Relation;
+import analysis.RelationImpl;
 public class AnalysisTest {
 	
 	public static void main(String []args){
@@ -49,7 +59,7 @@ public class AnalysisTest {
 		
 		
 		AnalysisTest at = new AnalysisTest();
-		at.DataHelperImplTest();
+		at.evolveTest();
 	}
 	
 	public void DataHelperImplTest(){
@@ -61,6 +71,78 @@ public class AnalysisTest {
 		
 	}
 	
+	public void getCommitsTest(){
+		DataHelperImpl dhi = new DataHelperImpl();
+		ArrayList<CommitDate> cds = dhi.getCommits("mct");
+		for(CommitDate c:cds){
+			System.out.println(c.getName());
+			System.out.println(c.getDate());
+			
+		}
+		
+	}
+	
+	public void getFilesTest(){
+		DataHelperImpl dhi = new DataHelperImpl();
+		ArrayList<String> files = dhi.getFiles("mct", "VWoeltjen", "2012-06-11", "2013-08-12");
+		for(int i =0;i<files.size();i++){
+			System.out.println(files.get(i));
+		}
+		
+	}
+	
+	public void evolveTest(){
+		EvolveAnalysis ea = new EvolveAnalysis("mct");
+		List<UnPublishedRelease> upr = MetaDaoFactory.getUnPublishedReleaseDao().getAllUnPublishedReleases(4193864);
+		int project_id = MetaDaoFactory.getProjectDao().getProject("mct").getId();
+		for(UnPublishedRelease e:upr){
+			String json = ea.getEvolveJson(e.getName());
+			System.out.println(e.getName());
+			System.out.println(json);
+			System.out.println("*********");
+			//DaoFactory.getEvolveEchartsDao().addEvolveEcharts(project_id, e.getId(), json);
+		}
+		
+		
+	}
+	
+	public void codecountTest(){
+		CodeLinesCount ds = new CodeLinesCountImpl();
+		ArrayList<String> languages = new ArrayList<String>();
+		languages.add("java");
+		System.out.println(ds.getCodeLines("Downloads/nasa_mct/v1.7.0.zip", languages));
+	}
+	
+	
+	public void RelationTest(){
+		Map<String, String> date_maps = new HashMap<String, String>();
+		
+		List<Contributor> ctr = MetaDaoFactory.getContributorDao().getAllContributors(4193864);
+		List<UnPublishedRelease> upr= MetaDaoFactory.getUnPublishedReleaseDao().getAllUnPublishedReleases(4193864);
+		ArrayList<String> developers = new ArrayList<String>();
+		for(Contributor c:ctr){
+			//System.out.println(c.getLogin());
+			developers.add(c.getLogin());
+		}
+			
+		
+		for(UnPublishedRelease u:upr){
+			//System.out.println(u.getName());
+			date_maps.put(u.getName(), u.getDate());
+		}
+			
+		
+		Relation relation;
+		String projectName = "mct";
+				
+		for(UnPublishedRelease u:upr){
+			relation = new RelationImpl(projectName, u.getName());
+			System.out.println(u.getName());
+			System.out.println(relation.getRelations());
+			System.out.println(relation.getMainRelations());
+			System.out.println("*************************");
+		}
+	}
 	
 	
 }

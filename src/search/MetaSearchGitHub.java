@@ -17,13 +17,16 @@ import com.google.gson.JsonParser;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 
+import entity.Comment;
 import entity.Commit;
 import entity.CommitFile;
 import entity.Contributor;
+import entity.Crawlindex;
 import entity.GroundhogException;
 import entity.Issue;
 import entity.IssueLabel;
 import entity.Project;
+import entity.Release;
 import entity.UnPublishedRelease;
 import entity.User;
 
@@ -35,12 +38,15 @@ public class MetaSearchGitHub implements ForgeSearch{
 	private final Requests requests;
 	private final UrlBuilder builder;
 	
-	
+	private Crawlindex crawlIndex;
+		
+
 	@Inject
 	public MetaSearchGitHub(Requests requests) {
 		this.requests = requests;
 		this.gson = new Gson();
 		this.builder = Guice.createInjector(new HttpModule()).getInstance(UrlBuilder.class);
+		crawlIndex = new Crawlindex();
 	}
 	
 	
@@ -74,7 +80,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 	
 	public List<Issue> getAllProjectIssues(Project project) {
 
-		System.out.println("Searching project issues metadata");
+		System.out.println("Searching project all issues metadata");
 		
 		int page = 1;
 		
@@ -85,11 +91,66 @@ public class MetaSearchGitHub implements ForgeSearch{
 				  .withParam("/issues")
 				  .withParam("?page=" +page +"&per_page=80")
 				  .build();
+				
+		String  jsonString = getWithProtection(searchUrl);
+				
+		JsonElement jsonElement = gson.fromJson(jsonString, JsonElement.class);
+		JsonArray jsonArray = jsonElement.getAsJsonArray();
+		
+		List<Issue> issues = new ArrayList<Issue>();
+		List<IssueLabel> labels = new ArrayList<IssueLabel>();
+				
+		while(jsonArray.size()!=0){
+			for (JsonElement element : jsonArray) {
+				Issue issue = gson.fromJson(element, Issue.class);
+				issue.setProject(project);
+				
+				for (JsonElement lab : element.getAsJsonObject().get("labels").getAsJsonArray()) {
+					IssueLabel label = gson.fromJson(lab, IssueLabel.class);				
+					labels.add(label);
+				}
+				
+				issue.setLabels(labels);				
+				issues.add(issue);
+			}
+			
+			page++;
+			searchUrl = builder.uses(GithubAPI.ROOT)
+					  .withParam("repos")
+					  .withSimpleParam("/", project.getOwner().getLogin())
+					  .withSimpleParam("/", project.getName())
+					  .withParam("/issues")
+					  .withParam("?page=" +page +"&per_page=80")
+					  .build();
+			
+			jsonString = getWithProtection(searchUrl);
+			jsonElement = gson.fromJson(jsonString, JsonElement.class);
+			
+			jsonArray = jsonElement.getAsJsonArray();
+		}
+		
+		this.crawlIndex.setIssue_page(page-1);
+			
+		return issues;
+	}
+
+	public List<Issue> getAllProjectIssues(Project project,int page){
+		System.out.println("Searching project all issues metadata");
+		
+		
+		String searchUrl = builder.uses(GithubAPI.ROOT)
+				  .withParam("repos")
+				  .withSimpleParam("/", project.getOwner().getLogin())
+				  .withSimpleParam("/", project.getName())
+				  .withParam("/issues")
+				  .withParam("?page=" +page +"&per_page=10")
+				  .build();
 		
 		System.out.println(searchUrl);		
 		
 		String  jsonString = getWithProtection(searchUrl);
-		System.out.println(jsonString);
+		
+		//System.out.println(jsonString);
 		
 		JsonElement jsonElement = gson.fromJson(jsonString, JsonElement.class);
 		JsonArray jsonArray = jsonElement.getAsJsonArray();
@@ -110,13 +171,14 @@ public class MetaSearchGitHub implements ForgeSearch{
 				}
 				
 				issue.setLabels(labels);
+			
 				issues.add(issue);
 			}
 			
 			page++;
 			searchUrl = builder.uses(GithubAPI.ROOT)
 					  .withParam("repos")
-					  .withSimpleParam("/", project.getOwner().getName())
+					  .withSimpleParam("/", project.getOwner().getLogin())
 					  .withSimpleParam("/", project.getName())
 					  .withParam("/issues")
 					  .withParam("?page=" +page +"&per_page=80")
@@ -127,10 +189,9 @@ public class MetaSearchGitHub implements ForgeSearch{
 			jsonArray = jsonElement.getAsJsonArray();
 		}
 		
+		this.crawlIndex.setIssue_page(page-1);
 		return issues;
 	}
-
-	
 /**
  * get a contributor's all commits about a certain project
  * @param project
@@ -232,6 +293,98 @@ public class MetaSearchGitHub implements ForgeSearch{
 		
 	}
 	
+	public List<Commit> getProjectCommits(Project project,int page){
+		System.out.println("Searching " + "updated commits metadata");
+		
+		String searchUrl = builder.uses(GithubAPI.ROOT)
+				  .withParam("repos")
+				  .withSimpleParam("/", project.getOwner().getLogin())
+				  .withSimpleParam("/", project.getName())
+				  .withParam("/commits?"  + "&page=" +page +"&per_page=80")
+				  .build();
+		
+		System.out.println(searchUrl);
+		
+		try{
+			String jsonLegacy = getWithProtection(searchUrl);
+			
+			//could be requests.get(searchUrl)
+			JsonElement jsonElement = gson.fromJson(jsonLegacy, JsonElement.class);
+			
+			JsonArray jsonArray = jsonElement.getAsJsonArray();
+
+			List<Commit> commits = new ArrayList<>();
+			
+			while(jsonArray.size()!=0){
+			
+			for (JsonElement element : jsonArray) {
+				Commit commit = gson.fromJson(element, Commit.class);
+				commit.setProject(project);
+				
+				User user = gson.fromJson(element.getAsJsonObject().get("committer"), User.class);
+				commit.setCommiter(user);
+				
+				commit.setMessage(element.getAsJsonObject().get("commit").getAsJsonObject().get("message").getAsString());
+
+				String date = element.getAsJsonObject().get("commit").getAsJsonObject().get("author").getAsJsonObject().get("date").getAsString();
+				commit.setCommitDate(date);
+				
+				//System.out.println(commit.getCommitDate());
+				
+				
+				String sha = element.getAsJsonObject().get("sha").getAsString();
+				commit.setSha(sha);
+				
+				String anotherUrl = builder.uses(GithubAPI.ROOT)
+						  .withParam("repos")
+						  .withSimpleParam("/", project.getOwner().getLogin())
+						  .withSimpleParam("/", project.getName())
+						  .withParam("/commits")
+						  .withParam("/" + sha)
+						  .build();
+				
+				int add = 0;
+				int del = 0;
+				JsonElement ano_jsonElement = gson.fromJson(requests.get(anotherUrl), JsonElement.class);
+				JsonArray ano_jsonArray = ano_jsonElement.getAsJsonObject().get("files").getAsJsonArray();
+				for(JsonElement e:ano_jsonArray){
+					int adi = e.getAsJsonObject().get("additions").getAsInt();
+					int dei = e.getAsJsonObject().get("deletions").getAsInt();
+					add += adi;
+					del += dei;
+				}
+				commit.setAdditionsCount(add);
+				commit.setDeletionsCount(del);
+							
+				commits.add(commit);
+			}
+			
+			page++;
+			searchUrl = builder.uses(GithubAPI.ROOT)
+					  .withParam("repos")
+					  .withSimpleParam("/", project.getOwner().getLogin())
+					  .withSimpleParam("/", project.getName())
+					  .withParam("/commits?"  + "&page=" +page +"&per_page=80")
+					  .build();
+			
+			System.out.println(searchUrl);
+			
+			jsonElement = gson.fromJson(requests.get(searchUrl), JsonElement.class);
+			jsonArray = jsonElement.getAsJsonArray();
+			}
+
+			this.crawlIndex.setCommit_page(page-1);
+			return commits;
+			
+			
+		}catch (GroundhogException e) {
+			e.printStackTrace();
+			throw new SearchException(e);
+		}
+		
+	}
+	
+	
 	/**
 	 * try to find a certain project 
 	 * if not return null
@@ -246,9 +399,10 @@ public class MetaSearchGitHub implements ForgeSearch{
 				  .withParam("order", "desc")
 				  .build();
 		
-		System.out.println("trying to get project...");
+		System.out.println("trying to get " + ownerName +"'s " + projectName + " project");
+		//System.out.println(searchUrl);
 		try{
-			String json = requests.get(searchUrl);
+			String json = getWithProtection(searchUrl);
 			
 			JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
 			JsonArray jsonArray= jsonObject.get("items").getAsJsonArray();
@@ -289,7 +443,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 	 */
 	public List<Contributor> getAllProjectContributors(Project project) {
 		
-		System.out.println("Searching project contributors metadata");
+		System.out.println("Searching project all contributors metadata");
 		
 		List<Contributor> contributors = new ArrayList<>();
 		
@@ -335,6 +489,56 @@ public class MetaSearchGitHub implements ForgeSearch{
 
         }
         
+        this.crawlIndex.setContributor_page(page-1);
+		return contributors;
+	}
+	
+	public List<Contributor> getAllProjectContributors(Project project,int page){
+		System.out.println("Searching project all contributors metadata");
+		
+		List<Contributor> contributors = new ArrayList<>();
+				
+		String searchUrl = builder.uses(GithubAPI.ROOT)
+				  .withParam("repos")
+				  .withSimpleParam("/", project.getUser().getLogin())
+				  .withSimpleParam("/", project.getName())
+				  .withParam("/contributors")
+				  .withParam("?page=" + page + "&per_page=80")
+				  .build();
+		
+		//System.out.println(searchUrl);
+		
+		String jsonString = requests.getWithPreviewHeader(searchUrl);
+        JsonArray jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
+        
+        if(jsonArray.size() == 0){
+			return null;
+		}
+        
+        
+        while(jsonArray.size()!=0){
+        	
+        	for (JsonElement element: jsonArray) {
+            	Contributor contributor = gson.fromJson(element, Contributor.class);
+            	contributors.add(contributor);
+            }
+        	
+        	page++;
+        	
+        	searchUrl = builder.uses(GithubAPI.ROOT)
+  				  .withParam("repos")
+  				  .withSimpleParam("/", project.getUser().getLogin())
+  				  .withSimpleParam("/", project.getName())
+  				  .withParam("/contributors")
+  				  .withParam("?page=" + page + "&per_page=80")
+  				  .build();
+        	
+        	jsonString = requests.getWithPreviewHeader(searchUrl);
+            jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
+
+        }
+        
+        this.crawlIndex.setContributor_page(page-1);
 		return contributors;
 	}
 	
@@ -347,7 +551,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 	 */
 	public List<UnPublishedRelease> getAllUnPublishedRelease(String owner,String projectName){
 		
-		System.out.println("Searching UnPublishedRelease metadata...");
+		System.out.println("getting " + projectName + " project UnPublishedRelease metadata...");
 		
 		int page = 1;
 		
@@ -372,9 +576,18 @@ public class MetaSearchGitHub implements ForgeSearch{
         	results = new ArrayList<UnPublishedRelease>();
         	for (JsonElement element: jsonArray) {
         		UnPublishedRelease upbRelease = gson.fromJson(element, UnPublishedRelease.class);
-        		String url = (element.getAsJsonObject().get("commit").getAsJsonObject().get("url").getAsString());
-        		String date = getCommitDate(url);
-        		upbRelease.setCommit_url(url);
+        		String sha = (element.getAsJsonObject().get("commit").getAsJsonObject().get("sha").getAsString());
+        		
+        		String commit_url = builder.uses(GithubAPI.ROOT)
+      				  .withParam("repos")
+    				  .withSimpleParam("/", owner)
+    				  .withSimpleParam("/", projectName)
+    				  .withParam("/commits")
+    				  .withParam("/" + sha)
+    				  .build();
+        		
+        		String date = getCommitDate(commit_url);
+        		upbRelease.setCommit_url(commit_url);
         		upbRelease.setDate(date);
         		results.add(upbRelease);
         	}
@@ -393,6 +606,65 @@ public class MetaSearchGitHub implements ForgeSearch{
 
         }
 		
+        this.crawlIndex.setUpbrelease_page(page-1);
+		return results;
+	}
+	
+	public List<UnPublishedRelease> getAllUnPublishedRelease(String owner,String projectName,int page){
+		System.out.println("getting " + projectName + " project UnPublishedRelease metadata...");
+				
+		String searchUrl = builder.uses(GithubAPI.ROOT)
+				  .withParam("repos")
+				  .withSimpleParam("/", owner)
+				  .withSimpleParam("/", projectName)
+				  .withParam("/tags")
+				  .withParam("?page=" + page + "&per_page=80")
+				  .build();
+		
+		String jsonString = requests.getWithPreviewHeader(searchUrl);
+        JsonArray jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
+        
+        if(jsonArray.size() == 0){
+			return null;
+		}
+        
+        List<UnPublishedRelease> results = null;
+        
+        while(jsonArray.size()!=0){
+        	results = new ArrayList<UnPublishedRelease>();
+        	for (JsonElement element: jsonArray) {
+        		UnPublishedRelease upbRelease = gson.fromJson(element, UnPublishedRelease.class);
+        		String sha = (element.getAsJsonObject().get("commit").getAsJsonObject().get("sha").getAsString());
+        		
+        		String commit_url = builder.uses(GithubAPI.ROOT)
+      				  .withParam("repos")
+    				  .withSimpleParam("/", owner)
+    				  .withSimpleParam("/", projectName)
+    				  .withParam("/commits")
+    				  .withParam("/" + sha)
+    				  .build();
+        		
+        		String date = getCommitDate(commit_url);
+        		upbRelease.setCommit_url(commit_url);
+        		upbRelease.setDate(date);
+        		results.add(upbRelease);
+        	}
+        	
+        	page++;
+        	searchUrl = builder.uses(GithubAPI.ROOT)
+  				  .withParam("repos")
+  				  .withSimpleParam("/", owner)
+  				  .withSimpleParam("/", projectName)
+  				  .withParam("/tags")
+  				  .withParam("?page=" + page + "&per_page=80")
+  				  .build();
+        	
+        	jsonString = requests.getWithPreviewHeader(searchUrl);
+            jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
+
+        }
+		
+        this.crawlIndex.setUpbrelease_page(page-1);
 		return results;
 	}
 	
@@ -402,7 +674,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 	 * @return String date
 	 */
 	private String getCommitDate(String url){
-		System.out.println("Getting date for a certain commit...");
+		//System.out.println("Getting date for a certain commit...");
 		
 		String searchUrl = url;
 		
@@ -413,6 +685,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 		date = Dates.dateFormat(date);
 		return date;
 	}
+	
 	
 	/**
 	 * try to get all files of a certain commit
@@ -488,7 +761,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 	}
 	
 	public entity.User getUser(String login){
-		System.out.println("Searching user's specific metadata");
+		System.out.println("Searching " + login + "user's specific metadata");
 		
 		String searchUrl = builder.uses(GithubAPI.USERS)
 				  .withParam(login)
@@ -501,8 +774,286 @@ public class MetaSearchGitHub implements ForgeSearch{
 		return user;
 	}
 	
+	public List<entity.Comment> getComments(String projectName,String owner){
+		System.out.println("Searching " + projectName + " project's comment metadata");
+		
+		List<entity.Comment> comments = new ArrayList<entity.Comment>();
+		
+		int page = 1;
+		
+		String searchUrl = builder.uses(GithubAPI.ROOT)
+				  .withParam("repos")
+				  .withSimpleParam("/", owner)
+				  .withSimpleParam("/", projectName)
+				  .withParam("/comments")
+				  .withParam("?page=" + page + "&per_page=80")
+				  .build();
+		
+		//System.out.println(searchUrl);
+		
+		String jsonString = requests.getWithPreviewHeader(searchUrl);
+        JsonArray jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
+        
+        if(jsonArray.size() == 0){
+			return null;
+		}
+        
+        
+        while(jsonArray.size()!=0){
+        	
+        	for (JsonElement element: jsonArray) {
+        		Comment comment = new Comment();
+        		
+        		comment.setId(element.getAsJsonObject().get("id").getAsInt());
+        		comment.setUrl(element.getAsJsonObject().get("url").getAsString());
+        		
+        		comment.setUser(element.getAsJsonObject().get("user").getAsJsonObject().get("login").getAsString()
+        		);
+        		comment.setUser_id(element.getAsJsonObject().get("user").getAsJsonObject().get("id").getAsInt()
+                );
+        		
+        		if(element.getAsJsonObject().get("position").isJsonNull()){
+        			comment.setPosition(0);
+        		}
+        		else{
+        			comment.setPosition(element.getAsJsonObject().get("position").getAsInt());
+        		}
+        		
+        		if(element.getAsJsonObject().get("line").isJsonNull()){
+        			comment.setLine(0);
+        		}
+        		else{
+        			comment.setLine(element.getAsJsonObject().get("line").getAsInt());
+        		}
+        		
+        		if(element.getAsJsonObject().get("path").isJsonNull()){
+        			comment.setPath("");
+        		}
+        		else{
+        			comment.setPath(element.getAsJsonObject().get("path").getAsString());
+        		}
+     
+        		comment.setCommit_id(element.getAsJsonObject().get("commit_id").getAsString());
+        		comment.setCreated_at(Dates.dateFormat(element.getAsJsonObject().get("created_at").getAsString()));
+        		comment.setUpdated_at(Dates.dateFormat(element.getAsJsonObject().get("updated_at").getAsString()));
+        		comment.setBody(element.getAsJsonObject().get("body").getAsString());
+        		
+            	comments.add(comment);
+            }
+        	
+        	page++;
+        	
+        	searchUrl = builder.uses(GithubAPI.ROOT)
+  				  .withParam("repos")
+  				  .withSimpleParam("/", owner)
+  				  .withSimpleParam("/", projectName)
+  				  .withParam("/comments")
+  				  .withParam("?page=" + page + "&per_page=80")
+  				  .build();
+        	
+        	jsonString = requests.getWithPreviewHeader(searchUrl);
+            jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
+
+        }
+        
+        this.crawlIndex.setComment_page(page-1);
+		return comments;
+		
+	}
 	
+	public List<entity.Comment> getComments(String projectName,String owner,int page){
+		System.out.println("Searching " + projectName + " project's comment metadata");
+		
+		List<entity.Comment> comments = new ArrayList<entity.Comment>();
+				
+		String searchUrl = builder.uses(GithubAPI.ROOT)
+				  .withParam("repos")
+				  .withSimpleParam("/", owner)
+				  .withSimpleParam("/", projectName)
+				  .withParam("/comments")
+				  .withParam("?page=" + page + "&per_page=80")
+				  .build();
+		
+		//System.out.println(searchUrl);
+		
+		String jsonString = requests.getWithPreviewHeader(searchUrl);
+        JsonArray jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
+        
+        if(jsonArray.size() == 0){
+			return null;
+		}
+        
+        
+        while(jsonArray.size()!=0){
+        	
+        	for (JsonElement element: jsonArray) {
+        		Comment comment = new Comment();
+        		
+        		comment.setId(element.getAsJsonObject().get("id").getAsInt());
+        		comment.setUrl(element.getAsJsonObject().get("url").getAsString());
+        		
+        		comment.setUser(element.getAsJsonObject().get("user").getAsJsonObject().get("login").getAsString()
+        		);
+        		comment.setUser_id(element.getAsJsonObject().get("user").getAsJsonObject().get("id").getAsInt()
+                );
+        		
+        		if(element.getAsJsonObject().get("position").isJsonNull()){
+        			comment.setPosition(0);
+        		}
+        		else{
+        			comment.setPosition(element.getAsJsonObject().get("position").getAsInt());
+        		}
+        		
+        		if(element.getAsJsonObject().get("line").isJsonNull()){
+        			comment.setLine(0);
+        		}
+        		else{
+        			comment.setLine(element.getAsJsonObject().get("line").getAsInt());
+        		}
+        		
+        		if(element.getAsJsonObject().get("path").isJsonNull()){
+        			comment.setPath("");
+        		}
+        		else{
+        			comment.setPath(element.getAsJsonObject().get("path").getAsString());
+        		}
+     
+        		comment.setCommit_id(element.getAsJsonObject().get("commit_id").getAsString());
+        		comment.setCreated_at(Dates.dateFormat(element.getAsJsonObject().get("created_at").getAsString()));
+        		comment.setUpdated_at(Dates.dateFormat(element.getAsJsonObject().get("updated_at").getAsString()));
+        		comment.setBody(element.getAsJsonObject().get("body").getAsString());
+        		
+            	comments.add(comment);
+            }
+        	
+        	page++;
+        	
+        	searchUrl = builder.uses(GithubAPI.ROOT)
+  				  .withParam("repos")
+  				  .withSimpleParam("/", owner)
+  				  .withSimpleParam("/", projectName)
+  				  .withParam("/comments")
+  				  .withParam("?page=" + page + "&per_page=80")
+  				  .build();
+        	
+        	jsonString = requests.getWithPreviewHeader(searchUrl);
+            jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
+
+        }
+        
+        this.crawlIndex.setComment_page(page-1);
+		return comments;
+		
+		
+	}
 	
+	/**
+	 * Fetches all the Releases of the given {@link Project} from the GitHub API
+	 * 
+	 * @param project the @{link Project} of which the Releases are about
+	 * @return a {@link List} of {@link Release} objects
+	 */
+	public List<Release> getAllProjectReleases(Project project) {
+
+		System.out.println("Searching " + project.getName() +  " project releases metadata");
+		
+		int page = 1;
+		
+		String searchUrl = builder.uses(GithubAPI.ROOT)
+				  .withParam("repos")
+				  .withSimpleParam("/", project.getUser().getLogin())
+				  .withSimpleParam("/", project.getName())
+				  .withParam("/releases")
+				  .withParam("?page=" + page + "&per_page=80")
+				  .build();
+		
+		//System.out.println(searchUrl);
+		
+		String jsonString = requests.getWithPreviewHeader(searchUrl);
+		JsonArray jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
+
+		if(jsonArray.size() == 0){
+			return null;
+		}
+		
+		List<Release> releases = new ArrayList<>();
+		while(jsonArray.size()!=0){
+			for (JsonElement element : jsonArray) {
+				Release release = gson.fromJson(element, Release.class);
+				release.setProject(project);	
+				releases.add(release);
+			}
+			
+			page++;
+			searchUrl = builder.uses(GithubAPI.ROOT)
+					  .withParam("repos")
+					  .withSimpleParam("/", project.getUser().getLogin())
+					  .withSimpleParam("/", project.getName())
+					  .withParam("/releases")
+					  .withParam("?page=" + page + "&per_page=80")
+					  .build();
+			
+			jsonString = requests.getWithPreviewHeader(searchUrl);
+            jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
+
+		}
+		
+		this.crawlIndex.setRelease_page(page-1);
+		return releases;
+	
+	}
+	
+	/**
+	 * with the page param
+	 * @param project
+	 * @param page
+	 * @return
+	 */
+	public List<Release> getAllProjectReleases(Project project,int page) {
+		System.out.println("Searching " + project.getName() +  " project releases metadata");
+				
+		String searchUrl = builder.uses(GithubAPI.ROOT)
+				  .withParam("repos")
+				  .withSimpleParam("/", project.getUser().getLogin())
+				  .withSimpleParam("/", project.getName())
+				  .withParam("/releases")
+				  .withParam("?page=" + page + "&per_page=80")
+				  .build();
+		
+		//System.out.println(searchUrl);
+		
+		String jsonString = requests.getWithPreviewHeader(searchUrl);
+		JsonArray jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
+
+		if(jsonArray.size() == 0){
+			return null;
+		}
+		
+		List<Release> releases = new ArrayList<>();
+		while(jsonArray.size()!=0){
+			for (JsonElement element : jsonArray) {
+				Release release = gson.fromJson(element, Release.class);
+				release.setProject(project);	
+				releases.add(release);
+			}
+			
+			page++;
+			searchUrl = builder.uses(GithubAPI.ROOT)
+					  .withParam("repos")
+					  .withSimpleParam("/", project.getUser().getLogin())
+					  .withSimpleParam("/", project.getName())
+					  .withParam("/releases")
+					  .withParam("?page=" + page + "&per_page=80")
+					  .build();
+			
+			jsonString = requests.getWithPreviewHeader(searchUrl);
+            jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
+
+		}
+		
+		this.crawlIndex.setRelease_page(page-1);
+		return releases;
+	}
 	
 	
 	private String getWithProtection(String url){
@@ -519,6 +1070,40 @@ public class MetaSearchGitHub implements ForgeSearch{
 		}
 
 		return data;
+	}
+	
+	public static int getINFINITY() {
+		return INFINITY;
+	}
+
+
+	public static void setINFINITY(int iNFINITY) {
+		INFINITY = iNFINITY;
+	}
+
+
+	public Crawlindex getCrawlIndex() {
+		return crawlIndex;
+	}
+
+
+	public void setCrawlIndex(Crawlindex crawlIndex) {
+		this.crawlIndex = crawlIndex;
+	}
+
+
+	public Gson getGson() {
+		return gson;
+	}
+
+
+	public Requests getRequests() {
+		return requests;
+	}
+
+
+	public UrlBuilder getBuilder() {
+		return builder;
 	}
 	
 }

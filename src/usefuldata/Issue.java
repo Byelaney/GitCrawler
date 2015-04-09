@@ -3,15 +3,15 @@ package usefuldata;
 import java.util.ArrayList;
 
 public class Issue {
-	private String issueId;
+	private int issueId;
 	private String injectedDate;
 	private ArrayList<String> updateDate;
     private String state;
     
-	public String getIssueId() {
+	public int getIssueId() {
 		return issueId;
 	}
-	public void setIssueId(String issueId) {
+	public void setIssueId(int issueId) {
 		this.issueId = issueId;
 	}
 	public String getInjectedDate() {

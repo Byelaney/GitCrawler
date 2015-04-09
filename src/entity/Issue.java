@@ -61,6 +61,10 @@ public class Issue extends GitHubEntity {
 	@SerializedName("closed_at")
 	private Date closedAt;
 
+	public Issue(){
+		super();
+	}
+	
 	public Issue(Project project, int number, String state) {
 		this.number = number;
 		this.project = project;

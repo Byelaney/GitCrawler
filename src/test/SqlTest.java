@@ -18,90 +18,42 @@ import java.util.Map;
 import java.util.Set;
 
 import usefuldata.Developer;
+import usefuldata.DeveloperEcharts;
 import usefuldata.Project;
 import usefuldata.ProjectContribution;
 import usefuldata.Release;
 import usefuldata.ReleaseContribution;
 import usefuldata.Vitality;
+import entity.Crawlindex;
 import factory.DaoFactory;
+import factory.MetaDaoFactory;
 
 public class SqlTest {
 	
 	
 	public static void main(String []args){
-		
-		//Developer a = DaoFactory.getDeveloperDao().findDeveloperForId("jason");
-		//List<Developer> dp = DaoFactory.getReleaseDao().getAllDeveloper(1, "v1");
-		//System.out.println(a.getId());
-		
-		/*
-		for(Developer e:dp){
-			System.out.println(e.getId());
-			System.out.println(e.getName());
-			
-		}
-		
-		Developer dp = new Developer();
-		dp.setId(1743086);
-		dp.setLogin(null);
-		dp.setEmail(null);
-		dp.setUrl("https://github.com/bhong");
-		
-		DaoFactory.getDeveloperDao().addDeveloper(dp);
-		
-		
-		
-		Vitality v = new Vitality();
-		v.setSubmits(900);
-		v.setDate("2015-1-13");
-		boolean flag = DaoFactory.getVitalityDao().deleteAllVitality(1);
-		if(flag)
-			System.out.println("succeed!");
-		
-		
-		Project p = DaoFactory.getProjectDao().getProject("nasa", "mct");
-		if(p!=null)
-			System.out.println(p.getDescription());
-		*/
-		
-		
-		
-		
-		//DaoFactory.getReleaseDao().addRelease(release_id, developer_id, 4193864, contributions);
-		
-//		ArrayList<ReleaseContribution> ss = DaoFactory.getReleaseContribution().getReleaseContribution("mct", "kptran");
+//		DeveloperEcharts dpe = new DeveloperEcharts();
+//		dpe.setDeveloper_id(1);
+//		dpe.setJson_string("hello world");
+//		dpe.setProject_id(2);
+//		dpe.setRelease_id(3);
+//		DaoFactory.getDeveloperEchartsDao().updateEcharts(dpe);
 //		
-//		for(int i = 0;i<ss.size();i++){
-//			System.out.println(ss.get(i).getReleaseName() + " : " + ss.get(i).getContributions());
-//			System.out.println("------------------------------");
-//		}
-//		
-//		List<ProjectContribution> ss = DaoFactory.getProjectContribution().findProjectContribution("VWoeltjen");
-//		for(int i = 0;i<ss.size();i++){
-//			System.out.println(ss.get(i).getProjectName() +" : " + ss.get(i).getContributions());
-//		}
+		Crawlindex ci = new Crawlindex();
+		ci.setComment_page(1);
+		ci.setCommit_page(1);
+		ci.setContributor_page(1);
+		ci.setIssue_page(1);
+		ci.setMilestone_page(1);
+		ci.setProject_id(1);
+		ci.setPullrequest_page(1);
+		ci.setRelease_idx(1);
+		ci.setRelease_page(1);
+		ci.setUpbrelease_page(1);
+		ci.setUser_page(1);
 		
-//		ArrayList<ReleaseContribution> rcb = DaoFactory.getReleaseContribution().getReleaseContribution("mct", "VWoeltjen");
-//		for(int i =0;i<rcb.size();i++){
-//			System.out.println(rcb.get(i).getReleaseName());
-//			System.out.println(rcb.get(i).getContributions());
-//			
-//			System.out.println("------------------------------");
-//			
-//		}
 		
-//		Map<String, Integer> cs= DaoFactory.getReleaseDao().getReleaseCommitNum("mct");
-//		Set<String> names = cs.keySet();
-//		for(String name:names){
-//			System.out.println(name + " : " + cs.get(name));
-//		}
-//		
-		
-//		int i = DaoFactory.getReleaseContribution().getSize("VWoeltjen", "mct", "v1.7b3");
-//		System.out.println(i);
-		
-		//String a = DaoFactory.getReleaseEchartsDao().getReleaseEcharts("mct", "v1.7b3");
-		//System.out.println(a);
+		MetaDaoFactory.getCrawlindexDao().addCrawlindex(ci);
 		
 	}
 }

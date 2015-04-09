@@ -1,18 +1,20 @@
 package metadao.impl;
 
+import helper.DBHelper;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import entity.CommitFile;
 import metadao.CommitFileDao;
-import metadao.MetaDaoHelper;
 
 public class CommitFileDaoImpl implements CommitFileDao{
 
 	private static CommitFileDaoImpl commitFileDaoImpl=new CommitFileDaoImpl();
-	private static MetaDaoHelper daoHelper=MetaDaoHelperImpl.getBaseDaoInstance();
+	private static DBHelper daoHelper=MetaDaoHelperImpl.getBaseDaoInstance();
 	
 	public static CommitFileDaoImpl getInstance(){
 		return commitFileDaoImpl;
@@ -85,6 +87,15 @@ public class CommitFileDaoImpl implements CommitFileDao{
 		}
 		
 		return null;
+	}
+
+	@Override
+	public boolean addCommitFiles(List<CommitFile> cmfs) {
+		for(CommitFile cmf:cmfs){
+			addCommitFile(cmf);
+		}
+
+		return true;
 	}
 	
 }

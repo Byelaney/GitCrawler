@@ -1,11 +1,15 @@
 package dao;
 
+
 import java.util.ArrayList;
 import java.util.List;
 
 import usefuldata.ProjectContribution;
 
 public interface ProjectContributionDao {
+	
+	public boolean addProjectContributions(List<ProjectContribution> pct);
+	
 	
 	/**
 	 * try to add projectContribution to database
@@ -23,6 +27,11 @@ public interface ProjectContributionDao {
 	
 	
 	public List<ProjectContribution> findProjectContribution(int developer_id,List<usefuldata.Project> projects);
+	
+	public List<ProjectContribution> findProjectContributionByProjectID(int project_id);
+	
+	public List<ProjectContribution> findProjectContribution(int developer_id);
+	
 	
 	/**
 	 * try to update a ProjectContribution

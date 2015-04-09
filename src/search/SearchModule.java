@@ -8,6 +8,5 @@ public class SearchModule extends AbstractModule {
 	@Override
 	protected void configure() {
 		bind(SearchGitHub.class).in(Singleton.class);
-		
 	}
 }

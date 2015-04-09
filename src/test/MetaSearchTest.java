@@ -145,17 +145,34 @@ public class MetaSearchTest {
 	}
 	
 	public void testgetAllProjectIssues(){
-		entity.Project p = new Project(new User("nasa"), "mct");
+		entity.Project p = new Project(new User("codahale"), "bcrypt-ruby");
 		List<Issue> issues = MetasearchGitHub.getAllProjectIssues(p);
-		int id = 0;
+		
 		for(Issue i:issues){
-			System.out.println(i.getId());
 			System.out.println(i.getTitle());
-			System.out.println(i.getBody());
-			System.out.println("------------");
-			id++;
 		}
-		System.out.println(id);
+		
+	}
+	
+	public void testGetProjectComment(){
+		List<entity.Comment> comments = MetasearchGitHub.getComments("mct", "nasa");
+		for(entity.Comment c :comments){
+			MetaDaoFactory.getCommentDao().addComment(c, 4193864);
+//			System.out.println(c.getId());
+//			System.out.println(c.getUrl());
+//			System.out.println(c.getUser());
+//			System.out.println(c.getUser_id());
+//			System.out.println(c.getPosition());
+//			System.out.println(c.getLine());
+//			System.out.println(c.getPath());
+//			System.out.println(c.getCommit_id());
+//			System.out.println(c.getCreated_at());
+//			System.out.println(c.getUpdated_at());
+//			System.out.println(c.getBody());
+//			
+//			System.out.println("---------------------");
+			
+		}
 		
 	}
 	

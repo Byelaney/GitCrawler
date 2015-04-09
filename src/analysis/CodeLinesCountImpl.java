@@ -18,8 +18,7 @@ import java.util.zip.ZipInputStream;
  */
 public class CodeLinesCountImpl implements CodeLinesCount{
 	static private int codeLines = 0;
-
-	@SuppressWarnings("resource")
+	
 	private static void readZipFile(String file, ArrayList<String> languages)
 			throws Exception {
 		ZipFile zf = new ZipFile(file);
@@ -67,15 +66,15 @@ public class CodeLinesCountImpl implements CodeLinesCount{
 			}
 		}
 
-
-		zin.closeEntry();
+		zf.close();
+		zin.close();
+		//zin.closeEntry();
 	}
 
 	public int getCodeLines(String file, ArrayList<String> languages) {
 		try {
 			readZipFile(file, languages);
-		} catch (Exception e) {
-			
+		} catch (Exception e) {			
 			e.printStackTrace();
 		}
 

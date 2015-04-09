@@ -551,7 +551,21 @@ public class Project extends GitHubEntity {
 		this.sourceCodeURL = sourceCodeURL;
 	}
 	
-	
+	/**
+	 * this method only used to transform to project used in gitcrawler database
+	 * @param codes
+	 * @return
+	 */
+	public usefuldata.Project ProjectTransform(int codes){
+		usefuldata.Project p = new usefuldata.Project();
+		p.setId(this.getId());
+		p.setName(this.getName());
+		p.setOwner(this.getOwner().getLogin());
+		p.setDescription(this.getDescription());
+		p.setCodes(codes);
+		
+		return p;
+	}
 	
 	
 }

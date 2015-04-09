@@ -3,7 +3,7 @@ package analysis;
 
 public interface Relation {
 	/**
-	 * 
+	 *  force_echarts
 	 * @param developers
 	 *            ' name
 	 * @param projectName
@@ -13,7 +13,7 @@ public interface Relation {
 	public String getRelations();
 
 	/**
-	 * 
+	 * force_echarts
 	 * @param developers
 	 *            ' name
 	 * @param projectName

@@ -1,6 +1,6 @@
 package entity;
 
-public class CommitFile {
+public class CommitFile extends GitHubEntity{
 	private String sha;
 	private String filename;
 	private String status;
@@ -90,6 +90,11 @@ public class CommitFile {
 
 	public void setCommit_sha(String commit_sha) {
 		this.commit_sha = commit_sha;
+	}
+
+	@Override
+	public String getURL() {
+		return commit_sha;
 	}
 	
 	

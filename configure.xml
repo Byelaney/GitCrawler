@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<serverRate>
+  <checkDB>
+  <rate id="1">
+    <value>86400000</value>
+  </rate>
+  <rate id="2">
+    <value>259200000</value>
+  </rate>
+  <rate id="3">
+    <value>432000000</value>
+  </rate>
+  </checkDB>  
+</serverRate>

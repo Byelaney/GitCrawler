@@ -1,6 +1,8 @@
 package dao.impl;
 
 
+import helper.DBHelper;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,13 +13,12 @@ import java.util.List;
 import usefuldata.Developer;
 import usefuldata.Project;
 import usefuldata.Vitality;
-import dao.DaoHelper;
 import dao.DeveloperDao;
 
 public class DeveloperDaoImpl implements DeveloperDao{
 
 	private static DeveloperDaoImpl developerDao=new DeveloperDaoImpl();
-	private static DaoHelper daoHelper=DaoHelperImpl.getBaseDaoInstance();
+	private static DBHelper daoHelper=DaoHelperImpl.getBaseDaoInstance();
 	
 	public static DeveloperDaoImpl getInstance(){
 		return developerDao;
@@ -168,26 +169,32 @@ public class DeveloperDaoImpl implements DeveloperDao{
 
 	@Override
 	public boolean addDeveloper(Developer developer) {
-		Connection con=daoHelper.getConnection();
-		PreparedStatement ps=null;
-		
-		try{
-			ps=con.prepareStatement("INSERT INTO `gitcrawler`.`developer` (`id`,`login`,`email`,`url`) VALUES (?,?,?,?)");
-			ps.setInt(1,developer.getId());
-			ps.setString(2,developer.getLogin());
-			ps.setString(3, developer.getEmail());
-			ps.setString(4, developer.getUrl());
-			ps.execute();			
-			return true;
+		Developer de = findDeveloperForName(developer.getId());
+		if(de != null){
+			return updateDeveloper(developer);
+		}
+		else{
+			Connection con=daoHelper.getConnection();
+			PreparedStatement ps=null;
 			
-		}catch(SQLException e){
-			e.printStackTrace();
-		}finally{
-			daoHelper.closePreparedStatement(ps);
-			daoHelper.closeConnection(con);
+			try{
+				ps=con.prepareStatement("INSERT INTO `gitcrawler`.`developer` (`id`,`login`,`email`,`url`) VALUES (?,?,?,?)");
+				ps.setInt(1,developer.getId());
+				ps.setString(2,developer.getLogin());
+				ps.setString(3, developer.getEmail());
+				ps.setString(4, developer.getUrl());
+				ps.execute();			
+				return true;
+				
+			}catch(SQLException e){
+				e.printStackTrace();
+			}finally{
+				daoHelper.closePreparedStatement(ps);
+				daoHelper.closeConnection(con);
+			}		
+			return false;
 		}
 		
-		return false;
 	}
 
 
@@ -220,5 +227,44 @@ public class DeveloperDaoImpl implements DeveloperDao{
 		}
 		
 		return null;
+	}
+
+
+	@Override
+	public boolean addDevelopers(List<Developer> dps) {
+		for(int i = 0;i<dps.size();i++){
+			addDeveloper(dps.get(i));
+		}
+					
+		return true;
+	}
+
+
+	@Override
+	public boolean updateDeveloper(Developer developer) {
+		Connection con=daoHelper.getConnection();
+		PreparedStatement ps=null;
+		
+		try{
+			ps=con.prepareStatement("UPDATE `gitcrawler`.`developer` SET `id`=?,`login`=?,`email`=?,`url`=? where `id` = ?");
+			ps.setInt(1,developer.getId());
+			ps.setString(2,developer.getLogin());
+			ps.setString(3, developer.getEmail());
+			ps.setString(4, developer.getUrl());
+			
+			ps.setInt(5,developer.getId());
+			
+			
+			ps.execute();			
+			return true;
+			
+		}catch(SQLException e){
+			e.printStackTrace();
+		}finally{
+			daoHelper.closePreparedStatement(ps);
+			daoHelper.closeConnection(con);
+		}
+		
+		return false;
 	}
 }

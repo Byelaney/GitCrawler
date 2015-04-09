@@ -325,5 +325,8 @@ public class Contributor extends GitHubEntity {
 	public String getURL() {
 		return String.format("https://api.github.com/users/%s", this.getLogin());
 	}
+	
+
+	
  
 }

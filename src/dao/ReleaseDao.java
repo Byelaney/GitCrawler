@@ -9,6 +9,11 @@ import usefuldata.Release;
 
 public interface ReleaseDao {
 
+	public boolean addReleases(List<Release> releases);
+	
+	
+	public boolean addRelease(Release r);
+	
 	
 	/**
 	 * try to find release for release's basic info
@@ -66,7 +71,7 @@ public interface ReleaseDao {
 	 * @param submits
 	 * @return
 	 */
-	public boolean updateRelease(int release_id,int developer_id,int project_id,int submits);
+	public boolean updateReleaseContributon(int release_id,int developer_id,int project_id,int submits);
 	
 	/**
 	 * try to update release basic info
@@ -94,7 +99,7 @@ public interface ReleaseDao {
 	 * @param contributions
 	 * @return
 	 */
-	public boolean addRelease(int release_id,int developer_id,int project_id,int contributions);
+	public boolean addReleaseContribution(int release_id,int developer_id,int project_id,int contributions);
 	
 	
 	public Map<String,Integer> getReleaseCommitNum(int projectId);

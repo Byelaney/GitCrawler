@@ -59,7 +59,7 @@ public class SearchGitHubTest {
 		
 		//a.testGetAllProjectReleases();
 		
-		//a.testGetAllProjectCommits();
+		a.testGetAllProjectCommits();
 
 		
 		//a.testSearchByProjectName();
@@ -75,7 +75,7 @@ public class SearchGitHubTest {
 		
 		//a.testGetFile();
 		
-		a.testGetMetaProject();
+		//a.testGetMetaProject();
 	}
 	
 	public void setup() {
@@ -211,7 +211,7 @@ public class SearchGitHubTest {
 			List<Commit> commits = searchGitHub.getAllProjectCommits(project);
 			
 			if(commits!=null){
-			System.out.println(commits.size());
+			//System.out.println(commits.size());
 			for(Commit cc:commits){
 				System.out.println(cc.getCommiter().getLogin());
 				System.out.println(cc.getAdditionsCount());
@@ -400,7 +400,7 @@ public class SearchGitHubTest {
 				for(String key_name:keys){
 					usefuldata.Release sars = DaoFactory.getReleaseDao().getRelease(4193864, key_name);
 					if(res.get(key_name) > 0)
-					DaoFactory.getReleaseDao().addRelease(sars.getId(),dp.getId(), 4193864,res.get(key_name));
+					DaoFactory.getReleaseDao().addReleaseContribution(sars.getId(),dp.getId(), 4193864,res.get(key_name));
 				
 				}
 				

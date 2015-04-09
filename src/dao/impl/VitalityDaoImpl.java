@@ -1,5 +1,7 @@
 package dao.impl;
 
+import helper.DBHelper;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,13 +11,12 @@ import java.util.List;
 
 import usefuldata.Developer;
 import usefuldata.Vitality;
-import dao.DaoHelper;
 import dao.VitalityDao;
 
 public class VitalityDaoImpl implements VitalityDao{
 
 	private static VitalityDaoImpl vitalityDaoImpl=new VitalityDaoImpl();
-	private static DaoHelper daoHelper=DaoHelperImpl.getBaseDaoInstance();
+	private static DBHelper daoHelper=DaoHelperImpl.getBaseDaoInstance();
 	
 	public static VitalityDaoImpl getInstance(){
 		return vitalityDaoImpl;
@@ -80,31 +81,38 @@ public class VitalityDaoImpl implements VitalityDao{
 
 	@Override
 	public boolean addVitality(Vitality vitality) {
-		Connection con=daoHelper.getConnection();
-		PreparedStatement ps=null;
-		
-		
-		try{
-			ps=con.prepareStatement("INSERT INTO `gitcrawler`.`vitality` (`id`,`date`,`vitality`,`developer_id`,`project_id`,`release_id`) VALUES (?,?,?,?,?,?)");
-			ps.setInt(1,0);
-			ps.setString(2,vitality.getDate());
-			ps.setInt(3, vitality.getVitality());
-			ps.setInt(4,vitality.getDeveloper_id());
-			ps.setInt(5,vitality.getProject_id());
-			ps.setInt(6,vitality.getRelease_id());
+		Vitality v = getVitalityById(vitality.getId());
+		if(v != null){
+			return updateVitality(vitality);
+		}
+		else{
+			Connection con=daoHelper.getConnection();
+			PreparedStatement ps=null;
 			
-			ps.execute();			
-			return true;
 			
-		}catch(SQLException e){
-			e.printStackTrace();
-		}finally{
-			daoHelper.closePreparedStatement(ps);
-			daoHelper.closeConnection(con);
+			try{
+				ps=con.prepareStatement("INSERT INTO `gitcrawler`.`vitality` (`id`,`date`,`vitality`,`developer_id`,`project_id`,`release_id`) VALUES (?,?,?,?,?,?)");
+				ps.setInt(1,0);
+				ps.setString(2,vitality.getDate());
+				ps.setInt(3, vitality.getVitality());
+				ps.setInt(4,vitality.getDeveloper_id());
+				ps.setInt(5,vitality.getProject_id());
+				ps.setInt(6,vitality.getRelease_id());
+				
+				ps.execute();			
+				return true;
+				
+			}catch(SQLException e){
+				e.printStackTrace();
+			}finally{
+				daoHelper.closePreparedStatement(ps);
+				daoHelper.closeConnection(con);
+			}
+			
+			
+			return false;
 		}
 		
-		
-		return false;
 	}
 
 	@Override
@@ -206,6 +214,47 @@ public class VitalityDaoImpl implements VitalityDao{
 			}	
 			
 			return a1;
+		}catch(SQLException e){
+			e.printStackTrace();
+		}finally{
+			daoHelper.closeResult(rs);
+			daoHelper.closePreparedStatement(ps);
+			daoHelper.closeConnection(con);
+		}
+		
+		return null;
+	}
+
+	@Override
+	public boolean addVitalities(List<Vitality> vs) {
+		for(int i = 0;i<vs.size();i++)
+			addVitality(vs.get(i));
+		
+		return true;
+	}
+
+	@Override
+	public Vitality getVitalityById(int vitality_id) {
+		Connection con=daoHelper.getConnection();
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		
+		try{
+			ps=con.prepareStatement("select * from gitcrawler.vitality where id=?");
+			ps.setInt(1, vitality_id);
+			rs=ps.executeQuery();
+			
+			Vitality v = null;
+			
+			if(rs.next()){
+				v = new Vitality();
+				v.setId(rs.getInt("id"));
+				v.setDate(rs.getString("date"));
+				v.setVitality(rs.getInt("vitality"));
+						
+			}	
+			
+			return v;
 		}catch(SQLException e){
 			e.printStackTrace();
 		}finally{

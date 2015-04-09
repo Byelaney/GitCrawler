@@ -1,6 +1,7 @@
 package dao;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import usefuldata.ReleaseContribution;
 
@@ -18,5 +19,14 @@ public interface ReleaseContributionDao {
 	public int getReleaseContributions(int developer_id, int project_id,
 			int release_id);
 	
+	public ReleaseContribution getContributions(int developer_id, int project_id,
+			int release_id);
+	
+	
 
+	public boolean addReleaseContribution(ReleaseContribution rc);
+	
+	public boolean addReleaseContributions(List<ReleaseContribution> rct);
+	
+	public boolean updateReleaseContribution(ReleaseContribution rc);
 }

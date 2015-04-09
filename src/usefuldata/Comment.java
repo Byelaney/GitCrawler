@@ -1,17 +1,17 @@
 package usefuldata;
 
 public class Comment {
-	private String commentId;
+	private int commentId;
 	private String content;
 	private String commentator;
 	private String commitId;
 	private String date;
 	private String projectName;
 	
-	public String getCommentId() {
+	public int getCommentId() {
 		return commentId;
 	}
-	public void setCommentId(String commentId) {
+	public void setCommentId(int commentId) {
 		this.commentId = commentId;
 	}
 	public String getContent() {

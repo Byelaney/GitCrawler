@@ -1,14 +1,18 @@
 package test;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import entity.Contributor;
+import entity.UnPublishedRelease;
+import factory.MetaDaoFactory;
 import usefuldata.VersionDate;
 import analysis.DataHelperImpl;
 
 public class DataHelperTest {
 	public static void main(String []args){
 		DataHelperTest t1 = new DataHelperTest();
-		t1.getVesionsTest();
+		t1.getFilesTest();
 	}
 	
 	
@@ -52,4 +56,20 @@ public class DataHelperTest {
 		}
 		
 	}
+	
+	public void getFilesTest(){
+		DataHelperImpl dhip = new DataHelperImpl();
+		List<UnPublishedRelease> up_releases = MetaDaoFactory.getUnPublishedReleaseDao().getAllUnPublishedReleases(4193864);
+		List<Contributor> contributos = MetaDaoFactory.getContributorDao().getAllContributors(4193864);
+		for(Contributor c:contributos){
+			for(UnPublishedRelease u:up_releases){
+				dhip.getFiles("mct", u.getName(), c.getLogin());
+			}
+		}
+		
+		
+		
+		
+	}
+	
 }

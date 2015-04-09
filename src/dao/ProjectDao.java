@@ -1,8 +1,10 @@
 package dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import usefuldata.Developer;
+import usefuldata.Project;
 import usefuldata.Release;
 
 public interface ProjectDao {
@@ -18,6 +20,10 @@ public interface ProjectDao {
 	public usefuldata.Project getProjectWithId(int project_id,String projectName);
 	
 	public usefuldata.Project getProject(String projectName);
+	
+	public usefuldata.Project getProjectById(int project_id);
+	
+	public ArrayList<Project> getAllProjects();
 	
 	/**
 	 * 
@@ -35,6 +41,6 @@ public interface ProjectDao {
 	
 	
 	public void deleteProject(String owner,String projectName);
-	public void updateProject(usefuldata.Project project);
-	public void addProject(usefuldata.Project project);
+	public boolean updateProject(usefuldata.Project project);
+	public boolean addProject(usefuldata.Project project);
 }

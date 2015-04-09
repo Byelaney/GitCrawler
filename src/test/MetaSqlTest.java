@@ -25,18 +25,20 @@ public class MetaSqlTest {
 	
 	public static void main(String []args){
 		
-//		MetaSqlTest mst = new MetaSqlTest();
-//		mst.setup();
-//		mst.testCommitDao();
-//		
-		List<Commit> ccs = MetaDaoFactory.getCommitDao().getCommits(4193864);
-		for(Commit c:ccs){
-			//c.setCommitDate(c.getCommitDate().toString());
-			
-			c.setCommitDate(Dates.metaDateFormat(c.getCommitDate().toString()));
-			MetaDaoFactory.getCommitDao().updateCommit(c, 4193864);
-		}
+		MetaSqlTest mst = new MetaSqlTest();
+		mst.setup();
+		mst.testIssueDao();
 		
+		
+		
+//		List<Commit> ccs = MetaDaoFactory.getCommitDao().getCommits(4193864);
+//		for(Commit c:ccs){
+//			//c.setCommitDate(c.getCommitDate().toString());
+//			
+//			c.setCommitDate(Dates.metaDateFormat(c.getCommitDate().toString()));
+//			MetaDaoFactory.getCommitDao().updateCommit(c, 4193864);
+//		}
+//		
 	}
 	
 	public void setup() {
@@ -107,6 +109,20 @@ public class MetaSqlTest {
 		}
 	}
 	
+	public void testIssueDao(){
+		try{
+			List<entity.Issue> isss = MetaDaoFactory.getIssueDao().getAllMetaIssues(4193864);
+			for(entity.Issue is:isss){
+				MetaDaoFactory.getIssueDao().updateIssue(is,4193864);
+				
+			}
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+			
+		}
+		
+	}
 	
 	
 }

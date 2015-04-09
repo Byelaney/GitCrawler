@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutionException;
 
 
 
+
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
@@ -22,17 +23,25 @@ public class CrawlGitHubTest {
 	
 	public static void main(String []args){
 		
-		GitClient gitClient =  new GitClient();
-		File destinationFolder = new File("Downloads/");
-		CrawlGitHub a = new CrawlGitHub(gitClient, destinationFolder);
-		Project p = new Project("mct", "description", "https://github.com/nasa/mct");
-		a.downloadProject(p);
+//		GitClient gitClient =  new GitClient();
+//		File destinationFolder = new File("Downloads/mct/latest");
+//		CrawlGitHub a = new CrawlGitHub(gitClient, destinationFolder);
+//		Project p = new Project("mct", "description", "https://github.com/nasa/mct");
+//		a.downloadProject(p);
+		
+		
+		//CrawlToDB cm = new CrawlToDB("mct","nasa","Downloads/mct/latest");
+		//cm.CrawlProjectInfoToDB();;
+		//System.out.println(cm.getLatest_path());
+		
+		CrawlGitHubTest cght = new CrawlGitHubTest();
+		cght.setup();
 		
 		
 	}
 	
 	
-	/*
+	
 	public void setup() {
 		Injector injector = Guice.createInjector(new ScmModule());
 		this.gitClient = injector.getInstance(GitClient.class);
@@ -44,5 +53,5 @@ public class CrawlGitHubTest {
 		Project p = new Project("Music beets", "description", "https://github.com/sampsyo/beets");
 		crawl.downloadProject(p);
 		}
-		*/
+		
 }

@@ -1,5 +1,7 @@
 package dao.impl;
 
+import helper.DBHelper;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,14 +13,13 @@ import usefuldata.Developer;
 import usefuldata.Project;
 import usefuldata.Release;
 import util.Dates;
-import dao.DaoHelper;
 import dao.ProjectDao;
 import factory.DaoFactory;
 
 public class ProjectDaoImpl implements ProjectDao{
 
 	private static ProjectDaoImpl projectDaoImpl=new ProjectDaoImpl();
-	private static DaoHelper daoHelper=DaoHelperImpl.getBaseDaoInstance();
+	private static DBHelper daoHelper=DaoHelperImpl.getBaseDaoInstance();
 	
 	
 	public static ProjectDaoImpl getInstance(){
@@ -99,15 +100,64 @@ public class ProjectDaoImpl implements ProjectDao{
 	}
 
 	@Override
-	public void updateProject(Project project) {
-		// TODO Auto-generated method stub
+	public boolean updateProject(Project project) {
+		Connection con=daoHelper.getConnection();
+		PreparedStatement ps=null;
+		
+		try{
+			ps=con.prepareStatement("UPDATE `gitcrawler`.`project` SET `id`=?,`name`=?,`codes`=?,`owner`=?,`description`=? where `id`=?");
+			
+			ps.setInt(1,project.getId());
+			ps.setString(2,project.getName());
+			ps.setInt(3, project.getCodes());
+			ps.setString(4, project.getOwner());
+			ps.setString(5, project.getDescription());
+			
+			ps.setInt(6,project.getId());			
+			
+			ps.execute();			
+			return true;
+			
+		}catch(SQLException e){
+			e.printStackTrace();
+		}finally{
+			daoHelper.closePreparedStatement(ps);
+			daoHelper.closeConnection(con);
+		}
+		
+		return false;
 		
 	}
 
 	@Override
-	public void addProject(Project project) {
-		// TODO Auto-generated method stub
-		
+	public boolean addProject(Project project) {
+		Project pj = getProjectById(project.getId());
+		if(pj != null){
+			return updateProject(project);
+		}
+		else{
+			Connection con=daoHelper.getConnection();
+			PreparedStatement ps=null;
+			
+			try{
+				ps=con.prepareStatement("INSERT INTO `gitcrawler`.`project` (`id`,`name`,`codes`,`owner`,`description`) VALUES (?,?,?,?,?)");
+				ps.setInt(1,project.getId());
+				ps.setString(2,project.getName());
+				ps.setInt(3, project.getCodes());
+				ps.setString(4, project.getOwner());
+				ps.setString(5, project.getDescription());
+				
+				ps.execute();			
+				return true;
+				
+			}catch(SQLException e){
+				e.printStackTrace();
+			}finally{
+				daoHelper.closePreparedStatement(ps);
+				daoHelper.closeConnection(con);
+			}		
+			return false;
+		}
 	}
 
 	@Override
@@ -213,6 +263,69 @@ public class ProjectDaoImpl implements ProjectDao{
 		return null;
 	}
 
+		public Project getProjectById(int project_id) {
+			Connection con=daoHelper.getConnection();
+			PreparedStatement ps=null;
+			ResultSet rs=null;
+			
+			try{
+				ps=con.prepareStatement("select * from gitcrawler.project where id = ?");
+				ps.setInt(1, project_id);
+				rs=ps.executeQuery();
+				Project project = null;
+				if(rs.next()){
+					project = new Project();
+					project.setId(rs.getInt("id"));
+					project.setName(rs.getString("name"));
+					project.setCodes(rs.getInt("codes"));
+					project.setOwner(rs.getString("owner"));
+					project.setDescription(rs.getString("description"));
+				}	
+				
+				return project;
+			}catch(SQLException e){
+				e.printStackTrace();
+			}finally{
+				daoHelper.closeResult(rs);
+				daoHelper.closePreparedStatement(ps);
+				daoHelper.closeConnection(con);
+			}
+			
+			return null;
+		}
+
+			@Override
+			public ArrayList<Project> getAllProjects() {
+				Connection con=daoHelper.getConnection();
+				PreparedStatement ps=null;
+				ResultSet rs=null;
+				ArrayList<Project> projects = new ArrayList<Project>();
+				
+				try{
+					ps=con.prepareStatement("select * from gitcrawler.project");
+					rs=ps.executeQuery();
+					while(rs.next()){
+						Project project = new Project();
+						project.setId(rs.getInt("id"));
+						project.setName(rs.getString("name"));
+						project.setCodes(rs.getInt("codes"));
+						project.setOwner(rs.getString("owner"));
+						project.setDescription(rs.getString("description"));
+						projects.add(project);
+					}	
+					
+					return projects;
+				}catch(SQLException e){
+					e.printStackTrace();
+				}finally{
+					daoHelper.closeResult(rs);
+					daoHelper.closePreparedStatement(ps);
+					daoHelper.closeConnection(con);
+				}
+				
+				return null;
+			}
+		}
 	
+
 	
-}

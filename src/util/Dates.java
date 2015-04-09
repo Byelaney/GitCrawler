@@ -5,6 +5,7 @@ import helper.QuickSort;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -130,6 +131,7 @@ public class Dates {
 	}
 	
 	
+	//<tagName,date>
 	public static int getDateIndex(String unformated_date,Map<String,String> release_date){
 		String formated_date = unformated_date.substring(0, 10);
 		ArrayList<String> sorted_dates = dateSort(release_date);
@@ -146,8 +148,15 @@ public class Dates {
 		return sorted_dates.size();
 	}
 	
-	
-	private static int compare_date(String date1,String date2){
+	/**
+	 * if date1 < date2 return -1
+	 * if date1 == date2 return 0
+	 * if date1 > date2 return 1
+	 * @param date1
+	 * @param date2
+	 * @return
+	 */
+	public static int compare_date(String date1,String date2){
 	    	if(date1.equals(date2))
 	    		return 0;
 	    	else{
@@ -190,7 +199,7 @@ public class Dates {
 			dates[i] = date;
 		}
 		
-		QuickSort.quick(dates);
+		QuickSort.qsort(dates);
 		List<Release> results = new ArrayList<Release>();
 		
 		for(int j = 0;j<dates.length;j++){
@@ -244,12 +253,16 @@ public class Dates {
 		for(int i = 0;i<unsorted_release.size();i++){
 			String date = unsorted_release.get(i).getDate();
 			dates[i] = date;
+			
 		}
 		
-		QuickSort.quick(dates);
+		QuickSort.qsort(dates);
+		
 		List<UnPublishedRelease> results = new ArrayList<UnPublishedRelease>();
 		
+		
 		for(int j = 0;j<dates.length;j++){
+			
 			for(int i =0;i<unsorted_release.size();i++){
 				if(dates[j].equals(unsorted_release.get(i).getDate())){
 					results.add(unsorted_release.get(i));
@@ -265,6 +278,76 @@ public class Dates {
 	public static String dateToString(Date date){
 		   SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd");
 		   return df.format(date);
+	}
+	
+	public static Date stringToDate(String date){
+		if(date.equals("")){
+			return null;
+		}
+		
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");  
+		try{
+			java.util.Date result=sdf.parse(date);
+			return result;
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	
+	public static long dayDiffer(String date1,String date2){
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");  
+		try{
+			java.util.Date da1=sdf.parse(date1);
+			java.util.Date da2=sdf.parse(date2);
+			Calendar cal1=Calendar.getInstance();
+			Calendar cal2=Calendar.getInstance();
+			
+			cal1.setTime(da1);
+			cal2.setTime(da2);
+			
+			long timeNow=cal1.getTimeInMillis();
+			long timeOld=cal2.getTimeInMillis();
+			
+			long tt =(timeNow-timeOld)/(1000*60*60*24);//化为天
+			
+			return Math.abs(tt);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		
+		return -1;
+	}
+	
+	/**
+	 * judges if a commit belongs to a certain release
+	 * using date to judge
+	 * @return
+	 */
+	public static boolean BelongToRelease(String commit_date,String release_date,List<String> all_dates){
+		Collections.sort(all_dates, new Comparator<String>(){
+			@Override
+			public int compare(String str1, String str2) {
+				return compare_date(str1,str2);
+			}
+		});
+		
+		for(int i = 0;i<all_dates.size();i++){
+			if(release_date.equals(all_dates.get(i))){
+				if(i == all_dates.size()-1){
+					if(compare_date(commit_date,all_dates.get(i))>0)
+						return true;
+				}
+				else{
+					if(compare_date(commit_date,all_dates.get(i))>=0 && compare_date(commit_date,all_dates.get(i+1))<=0)
+						return true;
+				}
+			}
+		}
+		
+		return false;
 	}
 	
 }

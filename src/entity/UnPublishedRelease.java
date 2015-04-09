@@ -6,8 +6,10 @@ import com.google.gson.annotations.SerializedName;
 
 
 @Entity("UnPublishedRelease")
-public class UnPublishedRelease {
+public class UnPublishedRelease extends GitHubEntity{
 
+	private int id;
+	
 	@SerializedName("name")
 	private String name;
 	
@@ -67,6 +69,19 @@ public class UnPublishedRelease {
 
 	public void setDate(String date) {
 		this.date = date;
+	}
+
+	@Override
+	public String getURL() {
+		return commit_url;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 	
 	

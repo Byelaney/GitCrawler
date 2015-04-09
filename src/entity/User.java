@@ -286,4 +286,15 @@ public class User extends GitHubEntity {
             + "Public repos = " + public_repos + ", "
             + (created_at != null ? "Created at = " + created_at : "") + ", Url: " + this.getURL();
     }
+    
+	public usefuldata.Developer DeveloperTransform(){
+		usefuldata.Developer developer = new usefuldata.Developer();
+		developer.setId(this.getId());
+		developer.setLogin(this.getLogin());
+		developer.setUrl(this.getURL());
+		developer.setEmail(this.getEmail());
+		
+		return developer;
+	}
+    
 }

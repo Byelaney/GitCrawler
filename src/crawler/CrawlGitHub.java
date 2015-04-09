@@ -1,7 +1,7 @@
 package crawler;
 
 import java.io.File;
-
+import java.io.IOException;
 import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
@@ -54,12 +54,24 @@ public class CrawlGitHub extends ForgeCrawler{
 		File file = new File(path + saveFile);
 		try{
 		FileUtils.copyURLToFile(new URL(httpUrl),file);
-		}catch(Exception e){
+		System.out.println("now downloading ... " + saveFile);
+		}catch(IOException ioe){
+			try {
+				//wait 5 minutes
+				Thread.sleep(1000 * 60 * 5);
+				httpDownload(httpUrl,path,saveFile);
+			
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		catch(Exception e){
 			e.printStackTrace();
 			return false;
 		}
 		
-		System.out.println(saveFile + "completed!");
+		System.out.println(saveFile + " completed!");
 		return true;
 	   }
 	

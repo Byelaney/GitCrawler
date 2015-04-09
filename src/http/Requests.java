@@ -21,6 +21,7 @@ public class Requests {
 	
 	public Requests() {
 		this.httpClient = new AsyncHttpClient();
+		
 	}
 	
 	/**
@@ -49,6 +50,7 @@ public class Requests {
 		    Request request = builder.setUrl(urlStr)
 		     .addHeader("Accept", "application/vnd.github.manifold-preview")
 		     .build();
+		    
 			return this.httpClient.prepareRequest(request).execute().get().getResponseBody();
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -16,6 +16,8 @@ public interface VitalityDao {
 	
 	public List<Vitality> getVitality(int developer_id);
 	
+	public Vitality getVitalityById(int vitality_id);
+	
 	public List<Vitality> getVitality(int project_id, int release_id,
 			int developer_id);
 	
@@ -35,6 +37,9 @@ public interface VitalityDao {
 	 * @return
 	 */
 	public boolean addVitality(Vitality vitality);
+	
+	public boolean addVitalities(List<Vitality> vs);
+	
 	
 	
 	/**
