@@ -8,6 +8,6 @@ Do some analysis and save useful data to database for this website.
 
 http://121.41.118.191:8888/DeveloperSocialNetwork/demo1.html?project=mct
 
-I just want to say thank you to https://github.com/spgroup/groundhog and GitHub APIS.
+I just want to say thank you to https://github.com/spgroup/groundhog and GitHub APIs.
 
 It helps me a lot!
