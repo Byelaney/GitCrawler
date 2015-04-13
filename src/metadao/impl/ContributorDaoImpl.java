@@ -178,7 +178,7 @@ public class ContributorDaoImpl implements ContributorDao{
 		Connection con=daoHelper.getConnection();
 		PreparedStatement ps=null;
 		try{
-			ps=con.prepareStatement("UPDATE `metadata`.`user` SET `id`=?,`login`=?,`avatar_url`=?,`gravatar_id`=?,`html_url`=?,`followers_url`=?,`following_url`=?,`gists_url`=?,`starred_url`=?,`subscriptions_url`=?,`repos_url`=?,`events_url`=?,`received_events_url`=?,`type`=?,`site_admin`=?,`contributions`=?,`project_id`=? where `id`=? and `project_id`=?");
+			ps=con.prepareStatement("UPDATE `metadata`.`contributor` SET `id`=?,`login`=?,`avatar_url`=?,`gravatar_id`=?,`html_url`=?,`followers_url`=?,`following_url`=?,`gists_url`=?,`starred_url`=?,`subscriptions_url`=?,`repos_url`=?,`events_url`=?,`received_events_url`=?,`type`=?,`site_admin`=?,`contributions`=?,`project_id`=? where `id`=? and `project_id`=?");
 			
 			ps.setInt(1,contributor.getId());
 			ps.setString(2,contributor.getLogin());

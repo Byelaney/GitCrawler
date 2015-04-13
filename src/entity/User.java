@@ -291,7 +291,7 @@ public class User extends GitHubEntity {
 		usefuldata.Developer developer = new usefuldata.Developer();
 		developer.setId(this.getId());
 		developer.setLogin(this.getLogin());
-		developer.setUrl(this.getURL());
+		developer.setUrl("https://github.com/" + this.getLogin());
 		developer.setEmail(this.getEmail());
 		
 		return developer;

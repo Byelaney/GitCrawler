@@ -129,8 +129,11 @@ public class MetaSearchGitHub implements ForgeSearch{
 			jsonArray = jsonElement.getAsJsonArray();
 		}
 		
-		this.crawlIndex.setIssue_page(page-1);
-			
+		if(page == 1){
+			this.crawlIndex.setIssue_page(page);
+		}else
+			this.crawlIndex.setIssue_page(page-1);
+		
 		return issues;
 	}
 
@@ -143,10 +146,9 @@ public class MetaSearchGitHub implements ForgeSearch{
 				  .withSimpleParam("/", project.getOwner().getLogin())
 				  .withSimpleParam("/", project.getName())
 				  .withParam("/issues")
-				  .withParam("?page=" +page +"&per_page=10")
+				  .withParam("?page=" +page +"&per_page=80")
 				  .build();
-		
-		System.out.println(searchUrl);		
+				
 		
 		String  jsonString = getWithProtection(searchUrl);
 		
@@ -188,8 +190,11 @@ public class MetaSearchGitHub implements ForgeSearch{
 			jsonElement = gson.fromJson(jsonString, JsonElement.class);
 			jsonArray = jsonElement.getAsJsonArray();
 		}
+		if(page == 1)
+			this.crawlIndex.setIssue_page(page);
+		else
+			this.crawlIndex.setIssue_page(page-1);
 		
-		this.crawlIndex.setIssue_page(page-1);
 		return issues;
 	}
 /**
@@ -373,7 +378,11 @@ public class MetaSearchGitHub implements ForgeSearch{
 			jsonArray = jsonElement.getAsJsonArray();
 			}
 
-			this.crawlIndex.setCommit_page(page-1);
+			if(page == 1)
+				this.crawlIndex.setCommit_page(page);
+			else
+				this.crawlIndex.setCommit_page(page-1);
+			
 			return commits;
 			
 			
@@ -488,9 +497,11 @@ public class MetaSearchGitHub implements ForgeSearch{
             jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
 
         }
-        
-        this.crawlIndex.setContributor_page(page-1);
-		return contributors;
+        if(page == 1)
+        	this.crawlIndex.setContributor_page(page);
+        else
+        	this.crawlIndex.setContributor_page(page-1);
+        return contributors;
 	}
 	
 	public List<Contributor> getAllProjectContributors(Project project,int page){
@@ -537,9 +548,11 @@ public class MetaSearchGitHub implements ForgeSearch{
             jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
 
         }
-        
-        this.crawlIndex.setContributor_page(page-1);
-		return contributors;
+        if(page == 1)
+        	this.crawlIndex.setContributor_page(page);
+        else
+        	this.crawlIndex.setContributor_page(page-1);
+        return contributors;
 	}
 	
 	
@@ -605,8 +618,10 @@ public class MetaSearchGitHub implements ForgeSearch{
             jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
 
         }
-		
-        this.crawlIndex.setUpbrelease_page(page-1);
+		if(page == 1)
+			this.crawlIndex.setUpbrelease_page(page);
+		else
+			this.crawlIndex.setUpbrelease_page(page-1);
 		return results;
 	}
 	
@@ -663,8 +678,10 @@ public class MetaSearchGitHub implements ForgeSearch{
             jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
 
         }
-		
-        this.crawlIndex.setUpbrelease_page(page-1);
+		if(page == 1)
+			this.crawlIndex.setUpbrelease_page(page);
+		else
+			this.crawlIndex.setUpbrelease_page(page-1);
 		return results;
 	}
 	
@@ -855,9 +872,11 @@ public class MetaSearchGitHub implements ForgeSearch{
             jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
 
         }
-        
-        this.crawlIndex.setComment_page(page-1);
-		return comments;
+        if(page == 1)
+        	this.crawlIndex.setComment_page(page);
+        else
+        	this.crawlIndex.setComment_page(page-1);
+        return comments;
 		
 	}
 	
@@ -940,8 +959,10 @@ public class MetaSearchGitHub implements ForgeSearch{
             jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
 
         }
-        
-        this.crawlIndex.setComment_page(page-1);
+        if(page == 1)
+        	this.crawlIndex.setComment_page(page);
+        else
+        	this.crawlIndex.setComment_page(page-1);
 		return comments;
 		
 		
@@ -997,8 +1018,10 @@ public class MetaSearchGitHub implements ForgeSearch{
             jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
 
 		}
-		
-		this.crawlIndex.setRelease_page(page-1);
+		if(page == 1)
+			this.crawlIndex.setRelease_page(page);
+		else
+			this.crawlIndex.setRelease_page(page-1);
 		return releases;
 	
 	}
@@ -1050,8 +1073,10 @@ public class MetaSearchGitHub implements ForgeSearch{
             jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
 
 		}
-		
-		this.crawlIndex.setRelease_page(page-1);
+		if(page == 1)
+			this.crawlIndex.setRelease_page(page);
+		else
+			this.crawlIndex.setRelease_page(page-1);
 		return releases;
 	}
 	

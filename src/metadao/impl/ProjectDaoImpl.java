@@ -24,7 +24,8 @@ public class ProjectDaoImpl implements ProjectDao{
 	
 	@Override
 	public boolean addProject(Project project) {
-		Project duplicate = getProject(project.getName());
+		Project duplicate = getProject(project.getOwner().getLogin(),project.getName());
+		
 		if(duplicate!=null)
 			return updateProject(project);
 			
@@ -53,7 +54,7 @@ public class ProjectDaoImpl implements ProjectDao{
 			ps.setInt(14, project.getForksCount());
 			ps.setInt(15, project.getIssuesCount());
 			
-			ps.setString(16, project.getUser().getName());
+			ps.setString(16, project.getOwner().getLogin());
 			
 			ps.execute();			
 			return true;
@@ -76,56 +77,10 @@ public class ProjectDaoImpl implements ProjectDao{
 		ResultSet rs=null;
 		
 		try{
-			ps=con.prepareStatement("select * from metadata.project where name =? and owner =?");
+			ps=con.prepareStatement("select * from metadata.project where name =? and owner=?");
 			ps.setString(1, projectName);
 			ps.setString(2, owner);
 			
-			rs=ps.executeQuery();
-			
-			Project project = null;
-			if(rs.next()){
-				project = new Project();
-				project.setId(rs.getInt("id"));
-				project.setName(rs.getString("name"));
-				project.setDescription(rs.getString("description"));
-				project.setLanguage(rs.getString("language"));
-				project.setCheckoutURL(rs.getString("checkouturl"));
-				project.setSourceCodeURL(rs.getString("sourcecodeurl"));
-				project.setCreatedAt(rs.getString("createdat"));
-				project.setLastPushedAt(rs.getString("lastpushedat"));
-				project.setIsFork((rs.getInt("isfork") == 0)?false:true);
-				project.setHasDownloads((rs.getInt("hasdownloads") == 0)?false:true);
-				project.setHasIssues((rs.getInt("hasissues") == 0)?false:true);
-				project.setHasWiki((rs.getInt("haswiki") == 0)?false:true);
-				project.setWatchersCount(rs.getInt("watcherscount"));
-				project.setForksCount(rs.getInt("forkscount"));
-				project.setIssuesCount(rs.getInt("issuescount"));
-				project.setUser(new User(rs.getString("owner")));
-			}	
-			
-			return project;
-			
-		}catch(SQLException e){
-			e.printStackTrace();
-		}finally{
-			daoHelper.closeResult(rs);
-			daoHelper.closePreparedStatement(ps);
-			daoHelper.closeConnection(con);
-		}
-		
-		return null;
-	}
-
-
-	@Override
-	public Project getProject(String projectName) {
-		Connection con=daoHelper.getConnection();
-		PreparedStatement ps=null;
-		ResultSet rs=null;
-		
-		try{
-			ps=con.prepareStatement("select * from metadata.project where name =?");
-			ps.setString(1, projectName);
 			
 			rs=ps.executeQuery();
 			
@@ -162,6 +117,7 @@ public class ProjectDaoImpl implements ProjectDao{
 		
 		return null;
 	}
+
 
 
 	@Override
@@ -190,7 +146,7 @@ public class ProjectDaoImpl implements ProjectDao{
 			ps.setInt(14, project.getForksCount());
 			ps.setInt(15, project.getIssuesCount());
 			
-			ps.setString(16, project.getUser().getName());
+			ps.setString(16, project.getOwner().getLogin());
 			ps.setInt(17, project.getId());
 			
 			ps.execute();

@@ -13,7 +13,6 @@ public interface ProjectDao {
 
 	public Project getProject(String owner,String projectName);
 	
-	public Project getProject(String projectName);
 	
 	public boolean updateProject(Project project);
 	

@@ -44,27 +44,31 @@ public class Server {
         		
         		MetaDaoController metadaoController = new MySQLController(dataSource);
         		metadaoController.IntoDataBase();
+        		System.out.println("succeed saving metadata...");
+        		
         		
         		AnalysisModule analysisModule = new BasicAnalysis(metadaoController);
         		analysisModule.analyzeAll();
+        		System.out.println("succeed analysising metadata...");
+        		
         		
         		DaoController daoController = new DaoController(analysisModule);
         		daoController.IntoDataBase();
-        		       		
+        		System.out.println("succeed saving useful data...");       		
         		        		
         		//now some data already in database
-        		//analysisModule.invokeEvolveAnalysis();
+        		analysisModule.invokeEvolveAnalysis();
         	
         		//finally evolve chart 
-        		//daoController.EvolveIntoDB(analysisModule.getEvolve_echarts());   		
+        		daoController.EvolveIntoDB(analysisModule.getEvolve_echarts());   		
     			
         		System.out.println(owner + "'s " + projectName + " project all finished!");
     		}
     		 		
     	    public void run() {
             	String projectName,owner,filepath;
-            	//nikolaypavlov,codahale
-            	//MLPNeuralNet,bcrypt-ruby
+            	//nikolaypavlov,codahale,spinfo,bytedeco,pagseguro
+            	//MLPNeuralNet,bcrypt-ruby,java,javacv,java
             	projectName = "java";
             	owner = "spinfo";
             	filepath = "Downloads/" + owner +"/";

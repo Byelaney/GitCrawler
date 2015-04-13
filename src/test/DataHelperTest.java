@@ -18,7 +18,7 @@ public class DataHelperTest {
 	
 	public void getSizeTest1(){
 		DataHelperImpl dhip = new DataHelperImpl();
-		int size = dhip.getSize("DanBerrios", "mct");
+		int size = dhip.getSize("DanBerrios", "mct","");
 		System.out.println(size);
 	}
 	
@@ -30,7 +30,7 @@ public class DataHelperTest {
 	
 	public void getAllDeveloperNamesTest(){
 		DataHelperImpl dhip = new DataHelperImpl();
-		ArrayList<String> names = dhip.getAllDeveloperNames("mct");
+		ArrayList<String> names = dhip.getAllDeveloperNames("mct","");
 		for(String e:names){
 			System.out.println(e);
 		}
@@ -38,13 +38,13 @@ public class DataHelperTest {
 	
 	public void getCodesTest(){
 		DataHelperImpl dhip = new DataHelperImpl();
-		int codes = dhip.getCodes("mct", "v1.8b1");
+		int codes = dhip.getCodes("mct", "v1.8b1","");
 		System.out.println(codes);
 	}
 	
 	public void getVesionsTest(){
 		DataHelperImpl dhip = new DataHelperImpl();
-		ArrayList<VersionDate> versiondates = dhip.getVersions("mct");
+		ArrayList<VersionDate> versiondates = dhip.getVersions("mct","");
 		
 		for(int i =0;i<versiondates.size();i++){
 			System.out.println(versiondates.get(i).getVersion());
@@ -63,7 +63,7 @@ public class DataHelperTest {
 		List<Contributor> contributos = MetaDaoFactory.getContributorDao().getAllContributors(4193864);
 		for(Contributor c:contributos){
 			for(UnPublishedRelease u:up_releases){
-				dhip.getFiles("mct", u.getName(), c.getLogin());
+				dhip.getFiles("mct", u.getName(), c.getLogin(),"");
 			}
 		}
 		

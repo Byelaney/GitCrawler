@@ -30,8 +30,8 @@ public class VitalityCount {
 		developerDao = DaoFactory.getDeveloperDao();
 	}
 	
-	public List<Vitality> handleVitalityRelease(List<Vitality> rawVitality,String projectName,String developer){
-		int project_id = projectDao.getProject(projectName).getId();
+	public List<Vitality> handleVitalityRelease(List<Vitality> rawVitality,String projectName,String developer,String owner){
+		int project_id = projectDao.getProject(owner,projectName).getId();
 		int developer_id = developerDao.findDeveloper(developer).getId();
 		
 		List<usefuldata.Release> releases = releaseDao.getAllRelease(project_id);

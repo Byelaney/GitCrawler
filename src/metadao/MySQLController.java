@@ -21,6 +21,7 @@ public class MySQLController extends MetaDaoController{
 	public void IntoDataBase() {
 		if(this.dataSource.getInIndex() == null){
 			Project project = this.dataSource.getProject();
+			project.getOwner().setLogin(this.dataSource.getOwner());
 			MetaDaoFactory.getProjectDao().addProject(project);
 			
 			List<Comment> comments = this.dataSource.getComments();
@@ -65,7 +66,9 @@ public class MySQLController extends MetaDaoController{
 			
 		}else{
 			//if already exist then update it
+			
 			Project project = this.dataSource.getProject();
+			project.getOwner().setLogin(this.dataSource.getOwner());
 			MetaDaoFactory.getProjectDao().addProject(project);
 			
 			List<Comment> comments = this.dataSource.getComments();
@@ -92,9 +95,4 @@ public class MySQLController extends MetaDaoController{
 				
 	}
 
-//public List<UnPublishedRelease> getUnPublishedRelease(){
-//	return MetaDaoFactory.getUnPublishedReleaseDao().getAllUnPublishedReleases(this.crawlModule.getProject().getId());
-//}
-
-	
 }

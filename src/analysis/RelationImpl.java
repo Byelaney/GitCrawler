@@ -16,22 +16,24 @@ public class RelationImpl implements Relation {
 	private ArrayList<String> developers = new ArrayList<String>();
 	private String projectName = null;
 	private String releaseName = null;
+	private String owner = null;
 	private int[] sizeRank = { 180, 130, 100, 75, 55, 40, 25, 15, 10, 5 };
 
-	public RelationImpl(String projectName, String releaseName) {
+	public RelationImpl(String projectName, String releaseName,String owner) {
 		dh = new DataHelperImpl();
-		this.developers = dh.getAllDeveloperNames(projectName);
+		this.developers = dh.getAllDeveloperNames(projectName,owner);
 		this.projectName = projectName;
 		this.releaseName = releaseName;
-		setFiles(developers, projectName, releaseName);
+		this.owner = owner;
+		setFiles(developers, projectName, releaseName,owner);
 
 	}
 
 	private void setFiles(ArrayList<String> developers, String projectName,
-			String releaseName) {
+			String releaseName,String owner) {
 		for (int i = 0; i < developers.size(); i++) {
 			ArrayList<String> filenames = new ArrayList<String>();
-			filenames = dh.getFiles(projectName, releaseName, developers.get(i));
+			filenames = dh.getFiles(projectName, releaseName, developers.get(i),owner);
 			files.add(filenames);
 
 		}
@@ -85,7 +87,7 @@ public class RelationImpl implements Relation {
 	@Override
 	public String getRelations() {
 		for (int i = 0; i < developers.size(); i++) {
-			int dsize = dh.getSize(developers.get(i), projectName, releaseName);
+			int dsize = dh.getSize(developers.get(i), projectName, releaseName,this.owner);
 
 			Node node = new Node(developers.get(i), dsize);
 			nodes.add(node);
@@ -184,7 +186,7 @@ public class RelationImpl implements Relation {
 	public String getMainRelations() {
 
 		for (int i = 0; i < developers.size(); i++) {
-			int dsize = dh.getSize(developers.get(i), projectName, releaseName);
+			int dsize = dh.getSize(developers.get(i), projectName, releaseName,this.owner);
 			Node node = new Node(developers.get(i), dsize);
 
 			nodes.add(node);

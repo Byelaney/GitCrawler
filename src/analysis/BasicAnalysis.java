@@ -18,6 +18,7 @@ import util.Dates;
 import util.ZipFiles;
 import crawler.DataSource;
 import entity.Contributor;
+import entity.Crawlindex;
 import entity.UnPublishedRelease;
 import entity.User;
 import factory.MetaDaoFactory;
@@ -36,7 +37,7 @@ public class BasicAnalysis extends AnalysisModule{
 	
 	private int project_id;
 	private String project_name;
-	
+	private String owner;
 	
 	public BasicAnalysis(MetaDaoController metaController){
 		this.metaController = metaController;
@@ -44,12 +45,13 @@ public class BasicAnalysis extends AnalysisModule{
 		
 		this.project_id = datasource.getProject().getId();
 		this.project_name = datasource.getProject().getName();
+		this.owner = datasource.getOwner();
 		
 		this.codeLinesCount = new CodeLinesCountImpl();
 		this.developDigram = new DevelopDigramImpl();
-		this.evolveAnalysis = new EvolveAnalysis(project_name);
+		this.evolveAnalysis = new EvolveAnalysis(project_name,owner);
 		this.packageDependency = new PackageDependencyImpl();
-		this.dataHelperImpl = new DataHelperImpl(project_name);
+		this.dataHelperImpl = new DataHelperImpl(project_name,owner);
 				
 	}
 	
@@ -121,7 +123,7 @@ public class BasicAnalysis extends AnalysisModule{
 				dle.setProject_id(this.project_id);
 				dle.setRelease_id(uprs.get(j).getId());
 				dle.setDeveloper_id(contributors.get(i).getId());
-				ArrayList<String> file_names = this.dataHelperImpl.getFiles(this.project_name, uprs.get(j).getName(), contributors.get(i).getLogin());
+				ArrayList<String> file_names = this.dataHelperImpl.getFiles(this.project_name, uprs.get(j).getName(), contributors.get(i).getLogin(),this.owner);
 				String json_string = "";
 				if(file_names!=null && file_names.size() != 0)
 					json_string = this.developDigram.getDevelopDigramByVersion(file_names);
@@ -165,7 +167,7 @@ public class BasicAnalysis extends AnalysisModule{
 		String main_relation_json = "";
 		
 		for(int i = 0;i<uprs.size();i++){
-			this.relation = new RelationImpl(this.project_name,uprs.get(i).getName());
+			this.relation = new RelationImpl(this.project_name,uprs.get(i).getName(),this.owner);
 			relation_json = this.relation.getRelations();
 			main_relation_json = this.relation.getMainRelations();
 			if(!relation_json.equals("") && !main_relation_json.equals("")){
@@ -200,7 +202,10 @@ public class BasicAnalysis extends AnalysisModule{
 		int main_count = codeLinesCount.getCodeLines(destination, languages);
 		System.out.println(main_count + " is the code num!");
 		
-		this.project = this.datasource.getProject().ProjectTransform(main_count);
+		File zipFile = new File(destination);
+		zip.recursiveDelete(zipFile);
+		
+		this.project = this.datasource.getProject().ProjectTransform(main_count,this.datasource.getOwner());
 				
 	}
 	
@@ -243,7 +248,7 @@ public class BasicAnalysis extends AnalysisModule{
 			rlct.setDeveloper_id(contributors.get(i).getId());
 			rlct.setReleaseName(uprs.get(j).getName());
 			
-			int contributions = this.dataHelperImpl.getReleaseSize(contributors.get(i).getLogin(), this.project_name, uprs.get(j).getName());
+			int contributions = this.dataHelperImpl.getReleaseSize(contributors.get(i).getLogin(), this.project_name, uprs.get(j).getName(),this.owner);
 			rlct.setContributions(contributions);
 			
 			this.release_contributions.add(rlct);
@@ -289,48 +294,69 @@ public class BasicAnalysis extends AnalysisModule{
 		this.releases = new ArrayList<usefuldata.Release>();
 		ArrayList<String> uprs_location = this.datasource.getRelease_location();
 		List<UnPublishedRelease> unpublish_releases = MetaDaoFactory.getUnPublishedReleaseDao().getAllUnPublishedReleases(this.project_id);
-		for(int i = 0;i<unpublish_releases.size();i++){
-			Release release = new Release();
-			release.setId(unpublish_releases.get(i).getId());			
-			release.setName(unpublish_releases.get(i).getName());	
-			
-			int codes = codeLinesCount.getCodeLines(uprs_location.get(i), languages);
-			
-			//int codes = this.dataHelperImpl.getCodes(this.project_name, unpublish_releases.get(i).getName());
-			
-			release.setCodes(codes);
-			release.setDate(unpublish_releases.get(i).getDate());
-			
-			int commits = this.dataHelperImpl.getReleaseCommits(this.project_name, unpublish_releases.get(i).getName());
-			release.setRelease_commits(commits);
-			
-			release.setDocument(this.dataHelperImpl.getDocument());
-			release.setTest(this.dataHelperImpl.getTest());
-			
-			if(i != unpublish_releases.size()-1){
-				String date1 = unpublish_releases.get(i).getDate();
-				String date2 = unpublish_releases.get(i+1).getDate();
-				long diff_day = Dates.dayDiffer(date1, date2);
-				double rate = diff_day/1.0;
-				release.setCommit_rate(rate);
-			}
-			else{
-				String date1 = unpublish_releases.get(i).getDate();
-				String date2 = Dates.dateToString(new Date());
-				long diff_day = Dates.dayDiffer(date1, date2);
-				double rate = diff_day/7.0;
-				release.setCommit_rate(rate);
-			}
-			
-			int issues = this.dataHelperImpl.getIssueNum(this.project_name, unpublish_releases.get(i).getName());
-			release.setIssue_number(issues);
-			
-			release.setComprehensive(this.dataHelperImpl.getComprehensive());
-			
-			releases.add(release);
+		
+		Crawlindex  outIndex = this.datasource.getOutIndex();
+		int i;
+				
+		if(uprs_location.size() >= unpublish_releases.size()){
+				i = 0;	
+		}else{
+				i = outIndex.getRelease_idx() - 1;
+				if(i < 0)
+					i = 0;
 		}
-	
-	}
+				
+			for(;i<unpublish_releases.size();i++){
+				Release release = new Release();
+				release.setId(unpublish_releases.get(i).getId());			
+				release.setName(unpublish_releases.get(i).getName());	
+				release.setProject_id(this.project_id);
+				
+				int codes = codeLinesCount.getCodeLines(uprs_location.get(i), languages);
+				
+				//int codes = this.dataHelperImpl.getCodes(this.project_name, unpublish_releases.get(i).getName());
+				
+				release.setCodes(codes);
+				release.setDate(unpublish_releases.get(i).getDate());
+				
+				int commits = this.dataHelperImpl.getReleaseCommits(this.project_name, unpublish_releases.get(i).getName(),this.owner);
+				release.setRelease_commits(commits);
+				
+				release.setDocument(this.dataHelperImpl.getDocument());
+				release.setTest(this.dataHelperImpl.getTest());
+				
+				if(i != unpublish_releases.size()-1){
+					String date1 = unpublish_releases.get(i).getDate();
+					String date2 = unpublish_releases.get(i+1).getDate();
+					long diff_day = Dates.dayDiffer(date1, date2);
+					double rate = diff_day/1.0;
+					release.setCommit_rate(rate);
+				}
+				else{
+					String date1 = unpublish_releases.get(i).getDate();
+					String date2 = Dates.dateToString(new Date());
+					long diff_day = Dates.dayDiffer(date1, date2);
+					double rate = diff_day/7.0;
+					release.setCommit_rate(rate);
+				}
+				
+				int issues = this.dataHelperImpl.getIssueNum(this.project_name, unpublish_releases.get(i).getName(),this.owner);
+				release.setIssue_number(issues);
+				
+				release.setComprehensive(this.dataHelperImpl.getComprehensive());
+				
+				releases.add(release);
+				
+				try{
+					ZipFiles zip = new ZipFiles(uprs_location.get(i),"");			
+					File file = new File(uprs_location.get(i));
+					zip.recursiveDelete(file);
+				}catch(Exception e){
+					e.printStackTrace();
+				}
+			}					
+		}
+		
 	
 	/**
 	 * get vitality with meta data
@@ -339,7 +365,7 @@ public class BasicAnalysis extends AnalysisModule{
 		this.vitalities = new ArrayList<Vitality>();
 		List<Contributor> developers = MetaDaoFactory.getContributorDao().getAllContributors(this.project_id);
 		for(Contributor c:developers){
-			List<Vitality> v1 = this.dataHelperImpl.getVitality(this.project_name, c.getLogin());
+			List<Vitality> v1 = this.dataHelperImpl.getVitality(this.project_name, c.getLogin(),this.owner);
 			if(v1!=null)
 			this.vitalities.addAll(v1);			
 		}
@@ -504,4 +530,25 @@ public class BasicAnalysis extends AnalysisModule{
 		this.metaController = metaController;
 	}
 
+
+	public DataSource getDatasource() {
+		return datasource;
+	}
+
+
+	public void setDatasource(DataSource datasource) {
+		this.datasource = datasource;
+	}
+
+
+	public String getOwner() {
+		return owner;
+	}
+
+
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
+
+	
 }

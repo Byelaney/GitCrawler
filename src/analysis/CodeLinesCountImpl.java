@@ -42,9 +42,24 @@ public class CodeLinesCountImpl implements CodeLinesCount{
 				boolean findLanguageType = false;
 
 				for (String language : languages) {
-					if (ftype.equals(language))
-						findLanguageType = true;
+					if (!language.equals("objective-c")) {
+						String lan = "";
+						for (int i = 0; i < language.length(); i++) {
+							lan = lan
+									+ language.substring(i, i + 1)
+											.toLowerCase();
+						}
+						if (ftype.equals(lan))
 
+							findLanguageType = true;
+					} else {
+						if (ftype.equals("c") || ftype.equals("cc")
+								|| ftype.equals("ccp") || ftype.equals("h")
+								|| ftype.equals("m") || ftype.equals("mm")
+								|| ftype.equals("o")) {
+							findLanguageType = true;
+						}
+					}
 				}
 
 				if (findLanguageType) {

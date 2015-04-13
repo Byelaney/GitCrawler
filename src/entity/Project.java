@@ -556,11 +556,11 @@ public class Project extends GitHubEntity {
 	 * @param codes
 	 * @return
 	 */
-	public usefuldata.Project ProjectTransform(int codes){
+	public usefuldata.Project ProjectTransform(int codes,String owner){
 		usefuldata.Project p = new usefuldata.Project();
 		p.setId(this.getId());
 		p.setName(this.getName());
-		p.setOwner(this.getOwner().getLogin());
+		p.setOwner(owner);
 		p.setDescription(this.getDescription());
 		p.setCodes(codes);
 		

@@ -47,7 +47,7 @@ public class DaoController {
 		List<ReleaseEcharts> res = this.anm.getRelease_echarts();
 		DaoFactory.getReleaseEchartsDao().addReleaseEcharts(res);
 		
-		List<Release> releases = this.anm.getReleases();
+		List<Release> releases = this.anm.getReleases();		
 		DaoFactory.getReleaseDao().addReleases(releases);
 		
 		List<ReleaseContribution> rct = this.anm.getRelease_contributions();

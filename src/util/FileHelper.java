@@ -71,7 +71,7 @@ public class FileHelper {
 	  }  
 	  
 	  if (dirFile.delete()) {  
-	   System.out.println("delete" + dir + "succeed");  
+	   //System.out.println("delete" + dir + " succeed");  
 	   return true;  
 	  } else {  
 	   return false;  
@@ -90,14 +90,14 @@ public class FileHelper {
 	   
 	  if (file.exists() && file.isFile()) {  
 	   if (file.delete()) {  
-	    System.out.println("delete single file" + fileName + "succeed");  
+	    //System.out.println("delete single file" + fileName + " succeed");  
 	    return true;  
 	   } else {  
-	    System.out.println("delete single file" + fileName + "failure");  
+	    System.out.println("delete single file" + fileName + " failure");  
 	    return false;  
 	   }  
 	  } else {  
-	   System.out.println("delete single file" + fileName + "not exist");  
+	   System.out.println("delete single file" + fileName + " not exist");  
 	   return false;  
 	  }  
 	 }  

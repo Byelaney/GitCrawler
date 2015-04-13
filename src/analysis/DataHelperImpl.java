@@ -1,14 +1,24 @@
 package analysis;
 
 
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import entity.Commit;
 import entity.CommitFile;
+import entity.Project;
 import entity.UnPublishedRelease;
 import factory.DaoFactory;
 import factory.MetaDaoFactory;
@@ -29,18 +39,18 @@ public class DataHelperImpl implements DataHelper {
 		super();
 	}
 	
-	public DataHelperImpl(String projectName){
-		this.project = MetaDaoFactory.getProjectDao().getProject(projectName);
+	public DataHelperImpl(String projectName,String owner){
+		this.project = MetaDaoFactory.getProjectDao().getProject(owner,projectName);
 		this.ups = MetaDaoFactory.getUnPublishedReleaseDao().getAllUnPublishedReleases(this.project.getId());
 	}
 	
 	
 	@Override
 	public int getSize(String developerName, String projectName,
-			String releaseName) {
+			String releaseName,String owner) {
 		
 		int developer_id = MetaDaoFactory.getContributorDao().getContributor(developerName).getId();
-		int project_id = MetaDaoFactory.getProjectDao().getProject(projectName).getId();
+		int project_id = MetaDaoFactory.getProjectDao().getProject(owner,projectName).getId();
 		int release_id = MetaDaoFactory.getUnPublishedReleaseDao().getUnPublishedRelease(releaseName, project_id).getId();
 		
 		//int contributions = DaoFactory.getReleaseContribution().getReleaseContributions(developer_id, project_id, release_id);
@@ -51,10 +61,10 @@ public class DataHelperImpl implements DataHelper {
 	}
 
 	@Override
-	public int getSize(String developerName, String projectName) {
+	public int getSize(String developerName, String projectName,String owner) {
 		
 		int developer_id = MetaDaoFactory.getContributorDao().getContributor(developerName).getId();
-		int project_id = MetaDaoFactory.getProjectDao().getProject(projectName).getId();
+		int project_id = MetaDaoFactory.getProjectDao().getProject(owner,projectName).getId();
 		
 		//int contributions = DaoFactory.getProjectContribution().getProjectContributions(developer_id, project_id);
 		
@@ -65,8 +75,8 @@ public class DataHelperImpl implements DataHelper {
 
 
 	@Override
-	public ArrayList<String> getAllDeveloperNames(String projectName) {
-		int project_id = MetaDaoFactory.getProjectDao().getProject(projectName).getId();
+	public ArrayList<String> getAllDeveloperNames(String projectName,String owner) {
+		int project_id = MetaDaoFactory.getProjectDao().getProject(owner,projectName).getId();
 		
 		List<entity.Contributor> all_contributors = MetaDaoFactory.getContributorDao().getAllContributors(project_id);
 		
@@ -86,30 +96,37 @@ public class DataHelperImpl implements DataHelper {
 	
 
 	@Override
-	public ArrayList<VersionDate> getVersions(String projectName) {
-		int project_id = MetaDaoFactory.getProjectDao().getProject(projectName).getId();
-		//List<usefuldata.Release> releases = DaoFactory.getReleaseDao().getAllRelease(project_id);
-		List<entity.UnPublishedRelease> uprs =  MetaDaoFactory.getUnPublishedReleaseDao().getAllUnPublishedReleases(project_id);
+	public ArrayList<VersionDate> getVersions(String projectName,String owner) {
+		Project p = MetaDaoFactory.getProjectDao().getProject(owner,projectName);
 		
-		ArrayList<VersionDate> versionDates = new ArrayList<VersionDate>();
-		for(int i =0;i<uprs.size();i++){
-			VersionDate vd = new VersionDate();
-			vd.setVersion(uprs.get(i).getName());
-			vd.setDate(uprs.get(i).getDate());
-			vd.setOrder(i + 1);
+		if(p==null)
+			return null;
+		else
+		{
+			int project_id = p.getId();
+			//List<usefuldata.Release> releases = DaoFactory.getReleaseDao().getAllRelease(project_id);
+			List<entity.UnPublishedRelease> uprs =  MetaDaoFactory.getUnPublishedReleaseDao().getAllUnPublishedReleases(project_id);
 			
-			versionDates.add(vd);
+			ArrayList<VersionDate> versionDates = new ArrayList<VersionDate>();
+			for(int i =0;i<uprs.size();i++){
+				VersionDate vd = new VersionDate();
+				vd.setVersion(uprs.get(i).getName());
+				vd.setDate(uprs.get(i).getDate());
+				vd.setOrder(i + 1);				
+				versionDates.add(vd);
+			}
+			
+			return versionDates;
 		}
 		
-		return versionDates;
 	}
 
 
 
 	@Override
-	public int getCodes(String projectName, String release) {
+	public int getCodes(String projectName, String release,String owner) {
 		
-		int project_id = MetaDaoFactory.getProjectDao().getProject(projectName).getId();	
+		int project_id = MetaDaoFactory.getProjectDao().getProject(owner,projectName).getId();	
 
 		/**
 		 * this could cause some bugs 
@@ -122,8 +139,8 @@ public class DataHelperImpl implements DataHelper {
 	}
 
 	@Override
-	public ArrayList<CommitDate> getCommits(String projectName) {
-		int projectId = MetaDaoFactory.getProjectDao().getProject(projectName).getId();
+	public ArrayList<CommitDate> getCommits(String projectName,String owner) {
+		int projectId = MetaDaoFactory.getProjectDao().getProject(owner,projectName).getId();
 		List<Commit> commits = MetaDaoFactory.getCommitDao().getCommits(projectId);
 		ArrayList<CommitDate> cds = new ArrayList<CommitDate>();
 		
@@ -140,9 +157,9 @@ public class DataHelperImpl implements DataHelper {
 
 	@Override
 	public int getReleaseSize(String developerName, String projectName,
-			String releaseName) {	
+			String releaseName,String owner) {	
 		int developer_id = MetaDaoFactory.getContributorDao().getContributor(developerName).getId();
-		int project_id = MetaDaoFactory.getProjectDao().getProject(projectName).getId();
+		int project_id = MetaDaoFactory.getProjectDao().getProject(owner,projectName).getId();
 		int release_id = MetaDaoFactory.getUnPublishedReleaseDao().getUnPublishedRelease(releaseName, project_id).getId();
 		
 		int contributions = getContributions(developer_id, project_id, release_id);
@@ -152,9 +169,9 @@ public class DataHelperImpl implements DataHelper {
 
 	@Override
 	public ArrayList<String> getFiles(String projectName, String release,
-			String developer) {
+			String developer,String owner) {
 		int developer_id = MetaDaoFactory.getContributorDao().getContributor(developer).getId();
-		int project_id = MetaDaoFactory.getProjectDao().getProject(projectName).getId();
+		int project_id = MetaDaoFactory.getProjectDao().getProject(owner,projectName).getId();
 		
 		UnPublishedRelease upbr = MetaDaoFactory.getUnPublishedReleaseDao().getUnPublishedRelease(release, project_id);
 		List<UnPublishedRelease> releases = MetaDaoFactory.getUnPublishedReleaseDao().getAllUnPublishedReleases(project_id);
@@ -193,9 +210,9 @@ public class DataHelperImpl implements DataHelper {
 	
 	@Override
 	public ArrayList<String> getFiles(String projectName, String developer,
-			String start, String end) {
+			String start, String end,String owner) {
 		int developer_id = MetaDaoFactory.getContributorDao().getContributor(developer).getId();
-		int project_id = MetaDaoFactory.getProjectDao().getProject(projectName).getId();
+		int project_id = MetaDaoFactory.getProjectDao().getProject(owner,projectName).getId();
 		List<Commit> metacommits = MetaDaoFactory.getCommitDao().getCommits(project_id, developer_id);
 		List<String> shas = new ArrayList<String>();
 		for(Commit c:metacommits){
@@ -220,15 +237,15 @@ public class DataHelperImpl implements DataHelper {
 	}
 
 	@Override
-	public ArrayList<usefuldata.Issue> getIssues(String projectName) {
-		int project_id = MetaDaoFactory.getProjectDao().getProject(projectName).getId();
+	public ArrayList<usefuldata.Issue> getIssues(String projectName,String owner) {
+		int project_id = MetaDaoFactory.getProjectDao().getProject(owner,projectName).getId();
 		ArrayList<usefuldata.Issue> issues = MetaDaoFactory.getIssueDao().getAllIssues(project_id);
 		return issues;
 	}
 
 	@Override
-	public ArrayList<Comment> getComments(String projectName) {
-		int project_id = MetaDaoFactory.getProjectDao().getProject(projectName).getId();
+	public ArrayList<Comment> getComments(String projectName,String owner) {
+		int project_id = MetaDaoFactory.getProjectDao().getProject(owner,projectName).getId();
 		ArrayList<Comment> comments = MetaDaoFactory.getCommentDao().getUsefulComments(projectName, project_id);
 		return comments;
 	}
@@ -260,10 +277,10 @@ public class DataHelperImpl implements DataHelper {
 	}
 
 	@Override
-	public int getReleaseCommits(String projectName, String release) {
+	public int getReleaseCommits(String projectName, String release,String owner) {
 		String start_time = "";
 		String end_time = "";
-		int project_id = MetaDaoFactory.getProjectDao().getProject(projectName).getId();
+		int project_id = MetaDaoFactory.getProjectDao().getProject(owner,projectName).getId();
 		List<UnPublishedRelease> uprs = MetaDaoFactory.getUnPublishedReleaseDao().getAllUnPublishedReleases(project_id);
 		for(int i = 0;i<uprs.size();i++){
 			if(uprs.get(i).getName().equals(release)){
@@ -286,10 +303,10 @@ public class DataHelperImpl implements DataHelper {
 	}
 
 	@Override
-	public int getIssueNum(String projectName, String release) {
+	public int getIssueNum(String projectName, String release,String owner) {
 		String start_time = "";
 		String end_time = "";
-		int project_id = MetaDaoFactory.getProjectDao().getProject(projectName).getId();
+		int project_id = MetaDaoFactory.getProjectDao().getProject(owner,projectName).getId();
 		List<UnPublishedRelease> uprs = MetaDaoFactory.getUnPublishedReleaseDao().getAllUnPublishedReleases(project_id);
 		for(int i = 0;i<uprs.size();i++){
 			if(uprs.get(i).getName().equals(release)){
@@ -330,9 +347,9 @@ public class DataHelperImpl implements DataHelper {
 	}
 
 	@Override
-	public List<Vitality> getVitality(String projectName, String developer) {
+	public List<Vitality> getVitality(String projectName, String developer,String owner) {
 		int developer_id = MetaDaoFactory.getContributorDao().getContributor(developer).getId();
-		int project_id = MetaDaoFactory.getProjectDao().getProject(projectName).getId();
+		int project_id = MetaDaoFactory.getProjectDao().getProject(owner,projectName).getId();
 		List<Vitality> vitalities = new ArrayList<Vitality>();
 				
 		List<Commit> commits = MetaDaoFactory.getCommitDao().getCommits(project_id, developer_id);
@@ -378,5 +395,73 @@ public class DataHelperImpl implements DataHelper {
 		
 		return vitalities;
 	}
+
+	@Override
+	public String packFile(String filepath) {
+		// TODO Auto-generated method stub		
+		File fileDownload = new File(filepath);
+		if (fileDownload.isDirectory()) {			
+			createZip(filepath, filepath+".zip");
+			return filepath + ".zip";
+		}
+		return filepath;
+		
+	}
+	
+	 private void createZip(String sourcePath, String zipPath) {
+	        FileOutputStream fos = null;
+	        ZipOutputStream zos = null;
+	        try {
+	            fos = new FileOutputStream(zipPath);
+	            zos = new ZipOutputStream(fos);
+	            writeZip(new File(sourcePath), "", zos);
+	        } catch (FileNotFoundException e) {
+	        } finally {
+	            try {
+	                if (zos != null) {
+	                    zos.close();
+	                }
+	            } catch (IOException e) {
+	            }
+
+	        }
+	    }
+	    
+	    private static void writeZip(File file, String parentPath, ZipOutputStream zos) {
+	        if(file.exists()){
+	            if(file.isDirectory()){//处理文件夹
+	                parentPath+=file.getName()+File.separator;
+	                File [] files=file.listFiles();
+	                for(File f:files){
+	                    writeZip(f, parentPath, zos);
+	                }
+	            }else{
+	                FileInputStream fis=null;
+	                DataInputStream dis=null;
+	                try {
+	                    fis=new FileInputStream(file);
+	                    dis=new DataInputStream(new BufferedInputStream(fis));
+	                    ZipEntry ze = new ZipEntry(parentPath + file.getName());
+	                    zos.putNextEntry(ze);
+	                    byte [] content=new byte[1024];
+	                    int len;
+	                    while((len=fis.read(content))!=-1){
+	                        zos.write(content,0,len);
+	                        zos.flush();
+	                    }
+	                    	                
+	                } catch (FileNotFoundException e) {
+	                } catch (IOException e) {
+	                }finally{
+	                    try {
+	                        if(dis!=null){
+	                            dis.close();
+	                        }
+	                    }catch(IOException e){
+	                    }
+	                }
+	            }
+	        }
+	    }    
 	
 }

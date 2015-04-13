@@ -266,4 +266,42 @@ public class VitalityDaoImpl implements VitalityDao{
 		return null;
 	}
 
+	@Override
+	public Vitality checkVitality(Vitality v) {
+		Connection con=daoHelper.getConnection();
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		
+		try{
+			ps=con.prepareStatement("select * from gitcrawler.vitality where date=? and developer_id=? and project_id=? and release_id=?");
+			ps.setString(1, v.getDate());
+			ps.setInt(2, v.getDeveloper_id());
+			ps.setInt(3, v.getProject_id());
+			ps.setInt(4, v.getRelease_id());
+			rs=ps.executeQuery();
+			
+			Vitality vs = null;
+			
+			if(rs.next()){
+				vs = new Vitality();
+				vs.setId(rs.getInt("id"));
+				vs.setDate(rs.getString("date"));
+				vs.setVitality(rs.getInt("vitality"));
+				vs.setDeveloper_id(rs.getInt("developer_id"));
+				vs.setProject_id(rs.getInt("project_id"));
+				vs.setRelease_id(rs.getInt(rs.getInt("release_id")));
+			}	
+			
+			return v;
+		}catch(SQLException e){
+			e.printStackTrace();
+		}finally{
+			daoHelper.closeResult(rs);
+			daoHelper.closePreparedStatement(ps);
+			daoHelper.closeConnection(con);
+		}
+		
+		return null;
+	}
+
 }

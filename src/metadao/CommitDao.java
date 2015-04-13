@@ -14,14 +14,14 @@ public interface CommitDao {
 	 */
 	public boolean addCommit(Commit commit,int project_id);
 	
-	public int CheckaddCommit(Commit commit,int project_id);
+	public int CheckaddCommit(Commit commit,int project_id,int contributor_id);
 	
 	
 	public List<Commit> getCommits(int projectId);
 	
 	public List<Commit> getCommits(int projectId,int contributor_id);
 	
-	public Commit getCommit(String sha,int projectId);
+	public Commit getCommit(String sha,int projectId,int contributor_id);
 	
 	
 	public boolean updateCommit(Commit commit,int project_id);

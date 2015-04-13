@@ -58,18 +58,24 @@ public class CrawlModule extends DataSource{
 	private Crawlindex IncrawlIndex;
 	private Crawlindex OutcrawlIndex;
 	
+	private String projectName;
+	private String owner;
 	
 	public CrawlModule(String projectName,String projectOwner,String destinationFolder){
 		this.crawlController = new CrawlController(projectName,projectOwner);
 		destinationFile = new File(destinationFolder);
 		crawlGitHub= new CrawlGitHub(new GitClient(), destinationFile);
-		
-		
+				
+		this.projectName = projectName;
+		this.owner = projectOwner;
 		Project p = MetaDaoFactory.getProjectDao().getProject(projectOwner, projectName);
+				
 		if(p == null)
 			this.IncrawlIndex = null;
-		else
+		else{
 			this.IncrawlIndex = MetaDaoFactory.getCrawlindexDao().getCrawlindex(p.getId());
+		}
+			
 	}	
 	
 	/**
@@ -79,6 +85,7 @@ public class CrawlModule extends DataSource{
 		int release_idx = 0;
 		
 		if(this.IncrawlIndex == null){
+			
 			CrawlProjectInfo();
 			CrawlCommitsToDB();
 				
@@ -87,14 +94,24 @@ public class CrawlModule extends DataSource{
 			release_idx = this.getUnpublish_releases().size();
 		}
 		
-		else{
+		else{	
+			System.out.println("trying to update this project info...");
+			
 			CrawlProjectInfo();
 			CrawlCommitsToDB(this.IncrawlIndex.getCommit_page());
 			
 			downLoadOneProject();
 			
 			List<UnPublishedRelease> uprs = this.getUnpublish_releases();
-			List<UnPublishedRelease> upr = uprs.subList(this.IncrawlIndex.getRelease_idx(), uprs.size());
+			List<UnPublishedRelease> upr = new ArrayList<UnPublishedRelease>();
+			int i = this.IncrawlIndex.getRelease_idx()-1;
+			if(i<0)
+				i = 0;
+			
+			for(;i<uprs.size();i++){
+				upr.add(uprs.get(i));			
+			}
+			
 			release_idx = uprs.size();
 			if(!upr.isEmpty())
 				downLoadUnpublish_releases(upr);
@@ -117,6 +134,7 @@ public class CrawlModule extends DataSource{
 	public void CrawlProjectInfo(){
 		if(this.IncrawlIndex == null){
 			project = crawlController.getProject();
+			
 			//sometimes the language is UpperCase
 			project.setLanguage(project.getLanguage().toLowerCase());
 			contributors = crawlController.getContributors();
@@ -127,6 +145,7 @@ public class CrawlModule extends DataSource{
 			users = crawlController.getAllUsers(this.getLogins(contributors));
 		}else{
 			project = crawlController.getProject();
+						
 			project.setLanguage(project.getLanguage().toLowerCase());
 			contributors = crawlController.getContributors(IncrawlIndex.getContributor_page());
 			issues = crawlController.getIssues(IncrawlIndex.getIssue_page());
@@ -164,7 +183,7 @@ public class CrawlModule extends DataSource{
 		List<Commit> commits = crawlController.getCommits(commit_page);			
 		int num = commits.size();
 		for(Commit commit:commits){
-			int flag = MetaDaoFactory.getCommitDao().CheckaddCommit(commit, project.getId());
+			int flag = MetaDaoFactory.getCommitDao().CheckaddCommit(commit, project.getId(),commit.getCommiter().getId());
 			if(flag == 1){
 				List<CommitFile> cmf = crawlController.getCommitFile(commit.getSha());
 				if(cmf != null)
@@ -199,6 +218,7 @@ public class CrawlModule extends DataSource{
 		String projectName = crawlController.getProjectName();
 		String owner = crawlController.getProjectOwner();
 		unpublished_path = "Downloads/"+owner+"_"+projectName +"/" ;
+		
 		for(UnPublishedRelease upr:unpublish_releases){
 			String httpurl = upr.getZipball_url();
 			crawlGitHub.httpDownload(httpurl, unpublished_path, upr.getName() + ".zip");
@@ -452,5 +472,22 @@ public class CrawlModule extends DataSource{
 		return latest_path;
 	}
 
+	public String getProjectName() {
+		return projectName;
+	}
+
+	public void setProjectName(String projectName) {
+		this.projectName = projectName;
+	}
+
+	public String getOwner() {
+		return owner;
+	}
+
+	public void setOwner(String owner) {
+		this.owner = owner;
+	}
+
+	
 	
 }

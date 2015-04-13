@@ -56,4 +56,6 @@ public interface VitalityDao {
 	 * @return
 	 */
 	public boolean deleteAllVitality(int id);
+	
+	public Vitality checkVitality(Vitality v);
 }

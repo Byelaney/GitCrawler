@@ -192,12 +192,12 @@ public class ProjectDaoImpl implements ProjectDao{
 	}
 
 	@Override
-	public List<Release> getAllReleases(String projectName) {
+	public List<Release> getAllReleases(String projectName,String owner) {
 		Connection con=daoHelper.getConnection();
 		PreparedStatement ps=null;
 		ResultSet rs=null;
 		try{
-			int projectId = getProject(projectName).getId();
+			int projectId = getProject(owner,projectName).getId();
 			con=daoHelper.getConnection();
 			
 			ps=con.prepareStatement("select * from gitcrawler.releases where project_id=?");
@@ -231,37 +231,7 @@ public class ProjectDaoImpl implements ProjectDao{
 		return null;
 	}
 
-	@Override
-	public Project getProject(String projectName) {
-		Connection con=daoHelper.getConnection();
-		PreparedStatement ps=null;
-		ResultSet rs=null;
-		
-		try{
-			ps=con.prepareStatement("select * from gitcrawler.project where name =?");
-			ps.setString(1,projectName);
-			rs=ps.executeQuery();
-			Project project = null;
-			if(rs.next()){
-				project = new Project();
-				project.setId(rs.getInt("id"));
-				project.setName(rs.getString("name"));
-				project.setCodes(rs.getInt("codes"));
-				project.setOwner(rs.getString("owner"));
-				project.setDescription(rs.getString("description"));
-			}	
-			
-			return project;
-		}catch(SQLException e){
-			e.printStackTrace();
-		}finally{
-			daoHelper.closeResult(rs);
-			daoHelper.closePreparedStatement(ps);
-			daoHelper.closeConnection(con);
-		}
-		
-		return null;
-	}
+	
 
 		public Project getProjectById(int project_id) {
 			Connection con=daoHelper.getConnection();

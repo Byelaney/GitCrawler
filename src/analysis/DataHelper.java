@@ -18,7 +18,7 @@ public interface DataHelper {
 	 * @return
 	 */
 	public int getReleaseSize(String developerName, String projectName,
-			String releaseName);// use in force chart
+			String releaseName,String owner);// use in force chart
 	
 	/**
 	 * try to get a developer's contribution from some release(contained)  to Now
@@ -26,7 +26,8 @@ public interface DataHelper {
 	 * @param projectName
 	 * @return int
 	 */
-	public int getSize(String developerName, String projectName,String release);//use in evolve
+	public int getSize(String developerName, String projectName,
+			String releaseName,String owner);//use in evolve
 
 	
 	
@@ -36,7 +37,7 @@ public interface DataHelper {
 	 * @param projectName
 	 * @return
 	 */
-	public int getSize(String developerName, String projectName);
+	public int getSize(String developerName, String projectName,String owner);
 	
 	
 	/**
@@ -47,7 +48,7 @@ public interface DataHelper {
 	 * @return
 	 */
 	
-	public ArrayList<String> getFiles(String projectName,String release,String developer); //use in force chart
+	public ArrayList<String> getFiles(String projectName,String release,String developer,String owner); //use in force chart
 	
 	/**
 	 * get all developers of a project
@@ -55,7 +56,7 @@ public interface DataHelper {
 	 * @return ArrayList<String>
 	 */
 
-	public ArrayList<String> getAllDeveloperNames(String projectName);//use in evolve
+	public ArrayList<String> getAllDeveloperNames(String projectName,String owner);//use in evolve
 	
 	
 	/**
@@ -67,7 +68,7 @@ public interface DataHelper {
 	 * @return ArrayList<String>
 	 */
 	
-	public ArrayList<String> getFiles(String projectName,String developer,String start,String end);//use in evolve
+	public ArrayList<String> getFiles(String projectName,String developer,String start,String end,String owner);//use in evolve
 	
 	
 	/**
@@ -77,7 +78,7 @@ public interface DataHelper {
 	 *
 	 */
 	
-	public ArrayList<VersionDate> getVersions(String projectName);//use in evolve
+	public ArrayList<VersionDate> getVersions(String projectName,String owner);//use in evolve
 	
 	
 	/**
@@ -88,7 +89,7 @@ public interface DataHelper {
 	 *
 	 */
 	
-	public ArrayList<CommitDate> getCommits(String projectName);//use in evolve
+	public ArrayList<CommitDate> getCommits(String projectName,String owner);//use in evolve
 	
 	
 	/**
@@ -99,7 +100,7 @@ public interface DataHelper {
 	 *
 	 */
 	
-	public ArrayList<usefuldata.Issue> getIssues(String projectName);//use in evolve
+	public ArrayList<usefuldata.Issue> getIssues(String projectName,String owner);//use in evolve
 	
 
 	/**
@@ -109,7 +110,7 @@ public interface DataHelper {
 	 *@return ArrayList<Issue>
 	 *
 	 */
-	public ArrayList<Comment> getComments(String projectName);//use in evolve
+	public ArrayList<Comment> getComments(String projectName,String owner);//use in evolve
 	
 	
 	/**
@@ -120,7 +121,7 @@ public interface DataHelper {
 	 *
 	 */
 	
-	public int getCodes(String projectName,String release);//use in evolve
+	public int getCodes(String projectName,String release,String owner);//use in evolve
 	
 	/**
 	 * get commit nums of a certain release
@@ -128,7 +129,7 @@ public interface DataHelper {
 	 * @param release
 	 * @return
 	 */
-	public int getReleaseCommits(String projectName,String release);
+	public int getReleaseCommits(String projectName,String release,String owner);
 	
 	/**
 	 * get issue nums of a certain release
@@ -136,7 +137,7 @@ public interface DataHelper {
 	 * @param release
 	 * @return
 	 */
-	public int getIssueNum(String projectName,String release);
+	public int getIssueNum(String projectName,String release,String owner);
 	
 	public int getComprehensive();
 	
@@ -144,5 +145,12 @@ public interface DataHelper {
 	
 	public int getDocument();
 	
-	public List<usefuldata.Vitality> getVitality(String projectName,String developer);
+	public List<usefuldata.Vitality> getVitality(String projectName,String developer,String owner);
+	
+	/**
+	 *check if file downloaded is zip, or pack it a zipfile 
+	 *@param path
+	 * @return zip path( and delete the prior file)
+	 */
+	public String packFile(String filepath);
 }

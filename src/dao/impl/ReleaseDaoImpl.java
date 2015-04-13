@@ -218,7 +218,7 @@ public class ReleaseDaoImpl implements ReleaseDao{
 			try{
 				ps=con.prepareStatement("INSERT INTO `gitcrawler`.`releases` (`id`, `name`,`codes`,`project_id`,`date`,`release_commits`,`document`,`test`,`commit_rate`,`issue_number`,`comprehensive`) VALUES (?,?,?,?,?,?,?,?,?,?,?)");
 				
-				ps.setInt(1,0);
+				ps.setInt(1,release.getId());
 				ps.setString(2, release.getName());
 				ps.setInt(3,release.getCodes());
 				ps.setInt(4,release.getProject_id());

@@ -26,12 +26,11 @@ public class EvolveEchartsDaoImpl implements EvolveEchartsDao{
 		PreparedStatement ps=null;
 		
 		try{
-			ps=con.prepareStatement("INSERT INTO `gitcrawler`.`evolve_echarts` (`id`,`project_id`,`release_id`,`json_string`) VALUES (?,?,?,?)");
+			ps=con.prepareStatement("INSERT INTO `gitcrawler`.`evolve_echarts` (`project_id`,`release_id`,`json_string`) VALUES (?,?,?)");
 			
-			ps.setInt(1,0);
-			ps.setInt(2,project_id);
-			ps.setInt(3,release_id);
-			ps.setString(4, json);
+			ps.setInt(1,project_id);
+			ps.setInt(2,release_id);
+			ps.setString(3, json);
 			
 			ps.execute();			
 			return true;
@@ -57,12 +56,12 @@ public class EvolveEchartsDaoImpl implements EvolveEchartsDao{
 			PreparedStatement ps=null;
 			
 			try{
-				ps=con.prepareStatement("INSERT INTO `gitcrawler`.`evolve_echarts` (`id`,`project_id`,`release_id`,`json_string`) VALUES (?,?,?,?)");
+				ps=con.prepareStatement("INSERT INTO `gitcrawler`.`evolve_echarts` (`project_id`,`release_id`,`json_string`) VALUES (?,?,?)");
 				
-				ps.setInt(1,0);
-				ps.setInt(2,eve.getProject_id());
-				ps.setInt(3,eve.getRelease_id());
-				ps.setString(4, eve.getJson_string());
+				
+				ps.setInt(1,eve.getProject_id());
+				ps.setInt(2,eve.getRelease_id());
+				ps.setString(3, eve.getJson_string());
 				
 				ps.execute();			
 				return true;

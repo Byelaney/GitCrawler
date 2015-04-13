@@ -303,7 +303,7 @@ public class SearchGitHubTest {
 			for(Developer dev:devlops){
 				List<Vitality> sas = searchGitHub.getVitality(project,dev.getLogin());
 				VitalityCount vc = new VitalityCount();				
-				List<Vitality> results = vc.handleVitalityRelease(sas, project.getName(), dev.getLogin());
+				List<Vitality> results = vc.handleVitalityRelease(sas, project.getName(), dev.getLogin(),"");
 				
 				for(Vitality vvvv:results){
 					DaoFactory.getVitalityDao().addVitality(vvvv);				

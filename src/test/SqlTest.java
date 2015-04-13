@@ -39,21 +39,24 @@ public class SqlTest {
 //		dpe.setRelease_id(3);
 //		DaoFactory.getDeveloperEchartsDao().updateEcharts(dpe);
 //		
-		Crawlindex ci = new Crawlindex();
-		ci.setComment_page(1);
-		ci.setCommit_page(1);
-		ci.setContributor_page(1);
-		ci.setIssue_page(1);
-		ci.setMilestone_page(1);
-		ci.setProject_id(1);
-		ci.setPullrequest_page(1);
-		ci.setRelease_idx(1);
-		ci.setRelease_page(1);
-		ci.setUpbrelease_page(1);
-		ci.setUser_page(1);
+//		Crawlindex ci = new Crawlindex();
+//		ci.setComment_page(1);
+//		ci.setCommit_page(1);
+//		ci.setContributor_page(1);
+//		ci.setIssue_page(1);
+//		ci.setMilestone_page(1);
+//		ci.setProject_id(1);
+//		ci.setPullrequest_page(1);
+//		ci.setRelease_idx(1);
+//		ci.setRelease_page(1);
+//		ci.setUpbrelease_page(1);
+//		ci.setUser_page(1);
+//		
+//		
+//		MetaDaoFactory.getCrawlindexDao().addCrawlindex(ci);
 		
+		entity.Project p = MetaDaoFactory.getProjectDao().getProject("spinfo", "java");
 		
-		MetaDaoFactory.getCrawlindexDao().addCrawlindex(ci);
-		
+		System.out.println(p == null);
 	}
 }

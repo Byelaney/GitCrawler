@@ -8,7 +8,9 @@ import java.util.Map;
 
 import usefuldata.CommitDate;
 import usefuldata.Release;
+import usefuldata.VersionDate;
 import entity.Contributor;
+import entity.Project;
 import entity.UnPublishedRelease;
 import factory.DaoFactory;
 import factory.MetaDaoFactory;
@@ -58,13 +60,25 @@ public class AnalysisTest {
 		//paths.add("v1.7b1.zip");
 		
 		
-		AnalysisTest at = new AnalysisTest();
-		at.evolveTest();
+//		AnalysisTest at = new AnalysisTest();
+//		at.evolveTest();
+		
+		//AnalysisTest a = new AnalysisTest();
+		//a.release_echartTest();
+		
+		//Project p = MetaDaoFactory.getProjectDao().getProject("spinfo","java");
+		//System.out.println(p == null);
+		
+		DataHelperImpl dhi = new DataHelperImpl();
+		ArrayList<VersionDate> vd = dhi.getVersions("java","spinfo");
+		System.out.println(vd.size());
+		
+		System.out.println(MetaDaoFactory.getProjectDao().getProject("spinfo","java").getId());
 	}
 	
 	public void DataHelperImplTest(){
 		DataHelperImpl dhi = new DataHelperImpl();
-		ArrayList<String> ss = dhi.getFiles("mct", "v1.8b2", "DanBerrios");
+		ArrayList<String> ss = dhi.getFiles("mct", "v1.8b2", "DanBerrios","");
 		for(int i =0;i<ss.size();i++){
 			System.out.println(ss.get(i));
 		}
@@ -73,7 +87,7 @@ public class AnalysisTest {
 	
 	public void getCommitsTest(){
 		DataHelperImpl dhi = new DataHelperImpl();
-		ArrayList<CommitDate> cds = dhi.getCommits("mct");
+		ArrayList<CommitDate> cds = dhi.getCommits("mct","");
 		for(CommitDate c:cds){
 			System.out.println(c.getName());
 			System.out.println(c.getDate());
@@ -92,9 +106,9 @@ public class AnalysisTest {
 	}
 	
 	public void evolveTest(){
-		EvolveAnalysis ea = new EvolveAnalysis("mct");
+		EvolveAnalysis ea = new EvolveAnalysis("mct","");
 		List<UnPublishedRelease> upr = MetaDaoFactory.getUnPublishedReleaseDao().getAllUnPublishedReleases(4193864);
-		int project_id = MetaDaoFactory.getProjectDao().getProject("mct").getId();
+		int project_id = MetaDaoFactory.getProjectDao().getProject("mct","").getId();
 		for(UnPublishedRelease e:upr){
 			String json = ea.getEvolveJson(e.getName());
 			System.out.println(e.getName());
@@ -136,7 +150,7 @@ public class AnalysisTest {
 		String projectName = "mct";
 				
 		for(UnPublishedRelease u:upr){
-			relation = new RelationImpl(projectName, u.getName());
+			relation = new RelationImpl(projectName, u.getName(),"");
 			System.out.println(u.getName());
 			System.out.println(relation.getRelations());
 			System.out.println(relation.getMainRelations());
@@ -144,5 +158,16 @@ public class AnalysisTest {
 		}
 	}
 	
-	
+	public void release_echartTest(){
+		PackageDependency dd = new PackageDependencyImpl();
+		ArrayList<String> as = new ArrayList<String>();
+		ArrayList<String> languages = new ArrayList<String>();
+		languages.add("java");
+		
+		as.add("Downloads/java-s11.zip");
+		ArrayList<String> s = dd.getPakageDependency(as, languages);
+		for(int i = 0;i<s.size();i++){
+			System.out.println(s.get(i));
+		}
+	}
 }

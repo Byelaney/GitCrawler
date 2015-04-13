@@ -25,11 +25,13 @@ public class MetaSqlTest {
 	
 	public static void main(String []args){
 		
-		MetaSqlTest mst = new MetaSqlTest();
-		mst.setup();
-		mst.testIssueDao();
+//		MetaSqlTest mst = new MetaSqlTest();
+//		mst.setup();
+//		mst.testIssueDao();
+//		
 		
-		
+		Project p = MetaDaoFactory.getProjectDao().getProject("spinfo", "java");
+		System.out.println( p == null);
 		
 //		List<Commit> ccs = MetaDaoFactory.getCommitDao().getCommits(4193864);
 //		for(Commit c:ccs){

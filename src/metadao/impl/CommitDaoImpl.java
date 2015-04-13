@@ -12,6 +12,7 @@ import java.util.List;
 import util.Dates;
 import entity.Commit;
 import entity.User;
+import factory.MetaDaoFactory;
 import metadao.CommitDao;
 
 public class CommitDaoImpl implements CommitDao{
@@ -25,31 +26,36 @@ public class CommitDaoImpl implements CommitDao{
 	
 	@Override
 	public boolean addCommit(Commit commit,int project_id) {
-		Connection con=daoHelper.getConnection();
-		PreparedStatement ps=null;
-		
-		try{
-			ps=con.prepareStatement("INSERT INTO `metadata`.`commits` (`sha`,`message`,`commitdate`,`additionscount`,`deletionscount`,`project_id`,`contributor_id`) VALUES (?,?,?,?,?,?,?)");
+		Commit c = MetaDaoFactory.getCommitDao().getCommit(commit.getSha(), project_id, commit.getCommiter().getId());
+		if(c==null){
+			Connection con=daoHelper.getConnection();
+			PreparedStatement ps=null;
 			
-			ps.setString(1,commit.getSha());
-			ps.setString(2,commit.getMessage());
-			ps.setString(3, Dates.metaDateFormat(commit.getCommitDate().toString()));
-			ps.setInt(4, commit.getAdditionsCount());
-			ps.setInt(5, commit.getDeletionsCount());
-			ps.setInt(6, project_id);
-			ps.setInt(7, commit.getCommiter().getId());
+			try{
+				ps=con.prepareStatement("INSERT INTO `metadata`.`commits` (`sha`,`message`,`commitdate`,`additionscount`,`deletionscount`,`project_id`,`contributor_id`) VALUES (?,?,?,?,?,?,?)");
+				
+				ps.setString(1,commit.getSha());
+				ps.setString(2,commit.getMessage());
+				ps.setString(3, Dates.metaDateFormat(commit.getCommitDate().toString()));
+				ps.setInt(4, commit.getAdditionsCount());
+				ps.setInt(5, commit.getDeletionsCount());
+				ps.setInt(6, project_id);
+				ps.setInt(7, commit.getCommiter().getId());
+				
+				ps.execute();			
+				return true;
+				
+			}catch(SQLException e){
+				e.printStackTrace();
+			}finally{
+				daoHelper.closePreparedStatement(ps);
+				daoHelper.closeConnection(con);
+			}
 			
-			ps.execute();			
-			return true;
-			
-		}catch(SQLException e){
-			e.printStackTrace();
-		}finally{
-			daoHelper.closePreparedStatement(ps);
-			daoHelper.closeConnection(con);
+			return false;
 		}
 		
-		return false;
+		return true;
 	}
 
 	@Override
@@ -271,8 +277,8 @@ public class CommitDaoImpl implements CommitDao{
 	}
 
 	@Override
-	public int CheckaddCommit(Commit commit, int project_id) {
-		Commit c = getCommit(commit.getSha(),project_id);
+	public int CheckaddCommit(Commit commit, int project_id,int contributor_id) {
+		Commit c = getCommit(commit.getSha(),project_id,contributor_id);
 		if(c == null){
 			//not in the database yet
 			addCommit(commit,project_id);
@@ -283,15 +289,18 @@ public class CommitDaoImpl implements CommitDao{
 	}
 
 	@Override
-	public Commit getCommit(String sha, int projectId) {
+	public Commit getCommit(String sha, int projectId,int contributor_id) {
 		Connection con=daoHelper.getConnection();
 		PreparedStatement ps=null;
 		ResultSet rs=null;
 		ResultSet rs2=null;
 		PreparedStatement ps2=null;
 		try{
-			ps=con.prepareStatement("select * from metadata.commits where sha = ? and project_id =?");
-			ps.setInt(1, projectId);
+			ps=con.prepareStatement("select * from metadata.commits where sha = ? and project_id =? and contributor_id=?");
+			ps.setString(1, sha);
+			ps.setInt(2, projectId);
+			ps.setInt(3, contributor_id);
+			
 			
 			rs=ps.executeQuery();
 			

@@ -104,6 +104,6 @@ public abstract class AnalysisModule {
 		return vitalities;
 	}
 	
-	
+	public abstract void invokeEvolveAnalysis();
 	
 }

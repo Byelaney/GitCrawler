@@ -19,7 +19,6 @@ public interface ProjectDao {
 	
 	public usefuldata.Project getProjectWithId(int project_id,String projectName);
 	
-	public usefuldata.Project getProject(String projectName);
 	
 	public usefuldata.Project getProjectById(int project_id);
 	
@@ -37,7 +36,7 @@ public interface ProjectDao {
 	 * @param projectName
 	 * @return
 	 */
-	public List<Release> getAllReleases(String projectName);
+	public List<Release> getAllReleases(String projectName,String owner);
 	
 	
 	public void deleteProject(String owner,String projectName);

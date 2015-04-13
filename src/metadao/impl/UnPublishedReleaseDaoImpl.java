@@ -25,31 +25,38 @@ public class UnPublishedReleaseDaoImpl implements UnPublishedReleaseDao{
 	
 	@Override
 	public boolean addUnPublishedRelease(UnPublishedRelease unPublishedRelease,int projectId) {
-		Connection con=daoHelper.getConnection();
-		PreparedStatement ps=null;
-		
-		try{
-			ps=con.prepareStatement("INSERT INTO `metadata`.`unpublish_releases` (`id`,`name`,`zipball_url`,`tarball_url`,`commit_url`,`project_id`,`date`) VALUES (?,?,?,?,?,?,?)");
+		UnPublishedRelease up = getUnPublishedRelease(unPublishedRelease.getName(),projectId);
+		if(up!=null){
+			return UpdateRelease(unPublishedRelease,projectId);
+		}else{
+			Connection con=daoHelper.getConnection();
+			PreparedStatement ps=null;
 			
-			ps.setInt(1,0);
-			ps.setString(2,unPublishedRelease.getName());
-			ps.setString(3,unPublishedRelease.getZipball_url());
-			ps.setString(4,unPublishedRelease.getTarball_url());
-			ps.setString(5,unPublishedRelease.getCommit_url());
-			ps.setInt(6,projectId);
-			ps.setString(7,unPublishedRelease.getDate());
+			try{
+				ps=con.prepareStatement("INSERT INTO `metadata`.`unpublish_releases` (`id`,`name`,`zipball_url`,`tarball_url`,`commit_url`,`project_id`,`date`) VALUES (?,?,?,?,?,?,?)");
+				
+				ps.setInt(1,0);
+				ps.setString(2,unPublishedRelease.getName());
+				ps.setString(3,unPublishedRelease.getZipball_url());
+				ps.setString(4,unPublishedRelease.getTarball_url());
+				ps.setString(5,unPublishedRelease.getCommit_url());
+				ps.setInt(6,projectId);
+				ps.setString(7,unPublishedRelease.getDate());
+				
+				ps.execute();			
+				return true;
+				
+			}catch(SQLException e){
+				e.printStackTrace();
+			}finally{
+				daoHelper.closePreparedStatement(ps);
+				daoHelper.closeConnection(con);
+			}
 			
-			ps.execute();			
-			return true;
-			
-		}catch(SQLException e){
-			e.printStackTrace();
-		}finally{
-			daoHelper.closePreparedStatement(ps);
-			daoHelper.closeConnection(con);
+			return false;			
 		}
 		
-		return false;
+		
 	}
 
 
@@ -213,7 +220,7 @@ public class UnPublishedReleaseDaoImpl implements UnPublishedReleaseDao{
 		Connection con=daoHelper.getConnection();
 		PreparedStatement ps=null;
 		try{
-			ps=con.prepareStatement("UPDATE `metadata`.`unpublish_releases` SET `id`=?,`name`=?,`zipball_url`=?,`tarball_url`=?,`commit_url`=?,`project_id`=?,`date`=? where `id`=? and `project_id=?`");
+			ps=con.prepareStatement("UPDATE `metadata`.`unpublish_releases` SET `id`=?,`name`=?,`zipball_url`=?,`tarball_url`=?,`commit_url`=?,`project_id`=?,`date`=? where `id`=? and `project_id`=?");
 			
 			ps.setInt(1,unPublishedRelease.getId());
 			ps.setString(2,unPublishedRelease.getName());

@@ -27,7 +27,7 @@ public class MetaSearchTest {
 	public static void main(String []args){
 		MetaSearchTest a = new MetaSearchTest();
 		a.setup();
-		a.testgetAllProjectIssues();
+		a.testgetProject();
 	}
 	
 	public void setup() {
@@ -41,7 +41,7 @@ public class MetaSearchTest {
 	 */
 	public void testgetProject(){
 		try{
-		Project p = MetasearchGitHub.getProject("mct", "nasa");
+		Project p = MetasearchGitHub.getProject("java", "spinfo");
 		if(p!=null){
 			System.out.println(p.getId());
 			System.out.println(p.getName());
@@ -58,8 +58,10 @@ public class MetaSearchTest {
 			System.out.println(p.getWatchersCount());
 			System.out.println(p.getForksCount());
 			System.out.println(p.getIssuesCount());
+			System.out.println(p.getOwner().getLogin());
 			
-			MetaDaoFactory.getProjectDao().addProject(p);
+			
+			//MetaDaoFactory.getProjectDao().addProject(p);
 			
 			//System.out.println(p.getUser().getName());
 			

@@ -51,7 +51,7 @@ public class ModuleTest {
 		ArrayList<usefuldata.EvolveEcharts> evolve_echarts = new ArrayList<usefuldata.EvolveEcharts>();
 		List<UnPublishedRelease> uprs = MetaDaoFactory.getUnPublishedReleaseDao().getAllUnPublishedReleases(15293);
 		String json = "";
-		EvolveAnalysis evolveAnalysis = new EvolveAnalysis("bcrypt-ruby");
+		EvolveAnalysis evolveAnalysis = new EvolveAnalysis("bcrypt-ruby","");
 		
 		for(int i = 0;i<uprs.size();i++){
 			json = evolveAnalysis.getEvolveJson(uprs.get(i).getName());
@@ -83,7 +83,7 @@ public class ModuleTest {
 		
 		List<Contributor> contributors = MetaDaoFactory.getContributorDao().getAllContributors(15293);
 		
-		DataHelper dataHelperImpl = new DataHelperImpl("bcrypt-ruby");
+		DataHelper dataHelperImpl = new DataHelperImpl("bcrypt-ruby","");
 		DevelopDigram developDigram = new DevelopDigramImpl();
 		
 		for(int i = 0;i<contributors.size();i++){
@@ -92,7 +92,7 @@ public class ModuleTest {
 				dle.setProject_id(15293);
 				dle.setRelease_id(uprs.get(j).getId());
 				dle.setDeveloper_id(contributors.get(i).getId());
-				ArrayList<String> file_names = dataHelperImpl.getFiles("bcrypt-ruby", uprs.get(j).getName(), contributors.get(i).getLogin());
+				ArrayList<String> file_names = dataHelperImpl.getFiles("bcrypt-ruby", uprs.get(j).getName(), contributors.get(i).getLogin(),"");
 				
 //				System.out.println(file_names.size());
 //				for(int z = 0;z<file_names.size();z++){
@@ -132,7 +132,7 @@ public class ModuleTest {
 		Relation relation;
 		
 		for(int i = 0;i<uprs.size();i++){
-			relation = new RelationImpl("bcrypt-ruby",uprs.get(i).getName());
+			relation = new RelationImpl("bcrypt-ruby",uprs.get(i).getName(),"");
 			relation_json = relation.getRelations();
 			main_relation_json = relation.getMainRelations();
 			if(!relation_json.equals("") && !main_relation_json.equals("")){
@@ -181,7 +181,7 @@ public class ModuleTest {
 		
 		List<Contributor> contributors = MetaDaoFactory.getContributorDao().getAllContributors(15293);
 		
-		DataHelper dataHelperImpl = new DataHelperImpl("bcrypt-ruby");
+		DataHelper dataHelperImpl = new DataHelperImpl("bcrypt-ruby","");
 		
 		for(int i = 0;i<contributors.size();i++){
 		
@@ -192,7 +192,7 @@ public class ModuleTest {
 			rlct.setDeveloper_id(contributors.get(i).getId());
 			rlct.setReleaseName(uprs.get(j).getName());
 			
-			int contributions = dataHelperImpl.getReleaseSize(contributors.get(i).getLogin(), "bcrypt-ruby", uprs.get(j).getName());
+			int contributions = dataHelperImpl.getReleaseSize(contributors.get(i).getLogin(), "bcrypt-ruby", uprs.get(j).getName(),"");
 			rlct.setContributions(contributions);
 			
 			release_contributions.add(rlct);
@@ -259,7 +259,7 @@ public class ModuleTest {
 		uprs_location.add("Downloads/codahale_bcrypt-ruby/v3.1.3.zip");
 		uprs_location.add("Downloads/codahale_bcrypt-ruby/v3.1.6.zip");
 		
-		DataHelper dataHelperImpl = new DataHelperImpl("bcrypt-ruby");
+		DataHelper dataHelperImpl = new DataHelperImpl("bcrypt-ruby","");
 		
 		for(int i = 0;i<unpublish_releases.size();i++){
 			Release release = new Release();
@@ -270,7 +270,7 @@ public class ModuleTest {
 			release.setCodes(codes);
 			release.setDate(unpublish_releases.get(i).getDate());
 			
-			int commits = dataHelperImpl.getReleaseCommits("bcrypt-ruby", unpublish_releases.get(i).getName());
+			int commits = dataHelperImpl.getReleaseCommits("bcrypt-ruby", unpublish_releases.get(i).getName(),"");
 			release.setRelease_commits(commits);
 			
 			release.setDocument(dataHelperImpl.getDocument());
@@ -291,7 +291,7 @@ public class ModuleTest {
 				release.setCommit_rate(rate);
 			}
 			
-			int issues = dataHelperImpl.getIssueNum("bcrypt-ruby", unpublish_releases.get(i).getName());
+			int issues = dataHelperImpl.getIssueNum("bcrypt-ruby", unpublish_releases.get(i).getName(),"");
 			release.setIssue_number(issues);
 			
 			release.setComprehensive(dataHelperImpl.getComprehensive());
@@ -315,10 +315,10 @@ public class ModuleTest {
 		
 		List<Contributor> developers = MetaDaoFactory.getContributorDao().getAllContributors(15293);
 		
-		DataHelper dataHelperImpl = new DataHelperImpl("bcrypt-ruby");
+		DataHelper dataHelperImpl = new DataHelperImpl("bcrypt-ruby","");
 		
 		for(Contributor c:developers){
-			List<Vitality> v1 = dataHelperImpl.getVitality("bcrypt-ruby", c.getLogin());
+			List<Vitality> v1 = dataHelperImpl.getVitality("bcrypt-ruby", c.getLogin(),"");
 			if(v1!=null){
 				vitalities.addAll(v1);	
 				
