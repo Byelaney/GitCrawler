@@ -87,7 +87,7 @@ public class CrawlModule extends DataSource{
 		if(this.IncrawlIndex == null){
 			
 			CrawlProjectInfo();
-			CrawlCommitsToDB();
+			CrawlCommitsToDB(1);
 				
 			downLoadOneProject();		
 			downLoadUnpublish_releases(this.getUnpublish_releases());						

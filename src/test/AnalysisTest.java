@@ -6,6 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import timer.Server;
 import usefuldata.CommitDate;
 import usefuldata.Release;
 import usefuldata.VersionDate;
@@ -26,7 +30,14 @@ import analysis.Relation;
 import analysis.RelationImpl;
 public class AnalysisTest {
 	
+	final static Logger logger = LoggerFactory.getLogger(AnalysisTest.class);
+	
 	public static void main(String []args){
+
+		
+		AnalysisTest at = new AnalysisTest();
+		at.logttest();
+		
 		//CodeLinesCount clc = new CodeLinesCount();
 		
 		//System.out.println(clc.StatisticCodeLines("", "v1.7b1.zip"));
@@ -69,11 +80,15 @@ public class AnalysisTest {
 		//Project p = MetaDaoFactory.getProjectDao().getProject("spinfo","java");
 		//System.out.println(p == null);
 		
-		DataHelperImpl dhi = new DataHelperImpl();
-		ArrayList<VersionDate> vd = dhi.getVersions("java","spinfo");
-		System.out.println(vd.size());
-		
-		System.out.println(MetaDaoFactory.getProjectDao().getProject("spinfo","java").getId());
+//		DataHelperImpl dhi = new DataHelperImpl();
+//		ArrayList<VersionDate> vd = dhi.getVersions("java","spinfo");
+//		System.out.println(vd.size());
+//		
+//		System.out.println(MetaDaoFactory.getProjectDao().getProject("spinfo","java").getId());
+	}
+	
+	public void logttest(){
+		logger.info("hello");
 	}
 	
 	public void DataHelperImplTest(){

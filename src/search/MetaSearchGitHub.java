@@ -6,6 +6,9 @@ import http.Requests;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import search.UrlBuilder.GithubAPI;
 import util.Dates;
 
@@ -32,6 +35,7 @@ import entity.User;
 
 public class MetaSearchGitHub implements ForgeSearch{
 
+	final static Logger logger = LoggerFactory.getLogger(MetaSearchGitHub.class);
 	public static int INFINITY = -1;
 
 	private final Gson gson;
@@ -80,7 +84,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 	
 	public List<Issue> getAllProjectIssues(Project project) {
 
-		System.out.println("Searching project all issues metadata");
+		logger.info(("Searching project all issues metadata"));
 		
 		int page = 1;
 		
@@ -138,7 +142,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 	}
 
 	public List<Issue> getAllProjectIssues(Project project,int page){
-		System.out.println("Searching project all issues metadata");
+		logger.info(("Searching project all issues metadata"));
 		
 		
 		String searchUrl = builder.uses(GithubAPI.ROOT)
@@ -204,7 +208,7 @@ public class MetaSearchGitHub implements ForgeSearch{
  * @return List<Commit>
  */
 	public List<Commit> getProjectCommitsByCommiter(Project project, String commiter){
-		System.out.println("Searching " +commiter + "'s commits metadata");
+		//System.out.println("Searching " +commiter + "'s commits metadata");
 				
 		int page = 1;
 		
@@ -215,7 +219,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 				  .withParam("/commits?author=" + commiter + "&page=" +page +"&per_page=80")
 				  .build();
 		
-		System.out.println(searchUrl);
+		
 		
 		try{
 			String jsonLegacy = getWithProtection(searchUrl);
@@ -279,7 +283,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 					  .withParam("/commits?author=" + commiter + "&page=" +page +"&per_page=80")
 					  .build();
 			
-			System.out.println(searchUrl);
+			
 			
 			jsonElement = gson.fromJson(requests.get(searchUrl), JsonElement.class);
 			jsonArray = jsonElement.getAsJsonArray();
@@ -299,7 +303,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 	}
 	
 	public List<Commit> getProjectCommits(Project project,int page){
-		System.out.println("Searching " + "updated commits metadata");
+		logger.info(("Searching " + "updated commits metadata"));
 		
 		String searchUrl = builder.uses(GithubAPI.ROOT)
 				  .withParam("repos")
@@ -308,7 +312,6 @@ public class MetaSearchGitHub implements ForgeSearch{
 				  .withParam("/commits?"  + "&page=" +page +"&per_page=80")
 				  .build();
 		
-		System.out.println(searchUrl);
 		
 		try{
 			String jsonLegacy = getWithProtection(searchUrl);
@@ -372,7 +375,6 @@ public class MetaSearchGitHub implements ForgeSearch{
 					  .withParam("/commits?"  + "&page=" +page +"&per_page=80")
 					  .build();
 			
-			System.out.println(searchUrl);
 			
 			jsonElement = gson.fromJson(requests.get(searchUrl), JsonElement.class);
 			jsonArray = jsonElement.getAsJsonArray();
@@ -408,7 +410,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 				  .withParam("order", "desc")
 				  .build();
 		
-		System.out.println("trying to get " + ownerName +"'s " + projectName + " project");
+		logger.info(("trying to get " + ownerName +"'s " + projectName + " project"));
 		//System.out.println(searchUrl);
 		try{
 			String json = getWithProtection(searchUrl);
@@ -452,7 +454,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 	 */
 	public List<Contributor> getAllProjectContributors(Project project) {
 		
-		System.out.println("Searching project all contributors metadata");
+		logger.info(("Searching project all contributors metadata"));
 		
 		List<Contributor> contributors = new ArrayList<>();
 		
@@ -505,7 +507,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 	}
 	
 	public List<Contributor> getAllProjectContributors(Project project,int page){
-		System.out.println("Searching project all contributors metadata");
+		logger.info(("Searching project all contributors metadata"));
 		
 		List<Contributor> contributors = new ArrayList<>();
 				
@@ -564,7 +566,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 	 */
 	public List<UnPublishedRelease> getAllUnPublishedRelease(String owner,String projectName){
 		
-		System.out.println("getting " + projectName + " project UnPublishedRelease metadata...");
+		logger.info(("getting " + projectName + " project UnPublishedRelease metadata..."));
 		
 		int page = 1;
 		
@@ -626,7 +628,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 	}
 	
 	public List<UnPublishedRelease> getAllUnPublishedRelease(String owner,String projectName,int page){
-		System.out.println("getting " + projectName + " project UnPublishedRelease metadata...");
+		logger.info(("getting " + projectName + " project UnPublishedRelease metadata..."));
 				
 		String searchUrl = builder.uses(GithubAPI.ROOT)
 				  .withParam("repos")
@@ -713,7 +715,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 	 */
 	public List<CommitFile> getCommitFiles(String owner,String projectName,String sha){
 		try{
-			System.out.println("Getting commit files for a certain commit...");
+			//System.out.println("Getting commit files for a certain commit...");
 			
 			String searchUrl = builder.uses(GithubAPI.ROOT)
 					  .withParam("repos")
@@ -727,8 +729,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 			JsonObject jsonobject = new JsonParser().parse(jsonLegacy).getAsJsonObject();
 			JsonArray jsonArray = jsonobject.get("files").getAsJsonArray();
 			
-			System.out.println(searchUrl);
-			System.out.println("----------------------");
+			
 			
 			
 			if(jsonArray.size()==0){
@@ -778,7 +779,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 	}
 	
 	public entity.User getUser(String login){
-		System.out.println("Searching " + login + "user's specific metadata");
+		//System.out.println("Searching " + login + "user's specific metadata");
 		
 		String searchUrl = builder.uses(GithubAPI.USERS)
 				  .withParam(login)
@@ -792,7 +793,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 	}
 	
 	public List<entity.Comment> getComments(String projectName,String owner){
-		System.out.println("Searching " + projectName + " project's comment metadata");
+		logger.info(("Searching " + projectName + " project's comment metadata"));
 		
 		List<entity.Comment> comments = new ArrayList<entity.Comment>();
 		
@@ -881,7 +882,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 	}
 	
 	public List<entity.Comment> getComments(String projectName,String owner,int page){
-		System.out.println("Searching " + projectName + " project's comment metadata");
+		logger.info(("Searching " + projectName + " project's comment metadata"));
 		
 		List<entity.Comment> comments = new ArrayList<entity.Comment>();
 				
@@ -976,7 +977,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 	 */
 	public List<Release> getAllProjectReleases(Project project) {
 
-		System.out.println("Searching " + project.getName() +  " project releases metadata");
+		logger.info(("Searching " + project.getName() +  " project releases metadata"));
 		
 		int page = 1;
 		
@@ -1033,7 +1034,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 	 * @return
 	 */
 	public List<Release> getAllProjectReleases(Project project,int page) {
-		System.out.println("Searching " + project.getName() +  " project releases metadata");
+		logger.info(("Searching " + project.getName() +  " project releases metadata"));
 				
 		String searchUrl = builder.uses(GithubAPI.ROOT)
 				  .withParam("repos")

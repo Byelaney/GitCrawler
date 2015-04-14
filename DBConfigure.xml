@@ -2,7 +2,7 @@
 <DBconfigure>
   <DataBase id="1">
     <driver>com.mysql.jdbc.Driver</driver>
-    <url>jdbc:mysql://localhost:3306/GitCrawler?autoReconnect=true&amp;failOverReadOnly=false&amp;maxReconnects=10;</url>
+    <url>jdbc:mysql://localhost:3306/GitCrawler?autoReconnect=true&amp;failOverReadOnly=false&amp;</url>
     <user>root</user>
     <password>null</password>
   </DataBase>

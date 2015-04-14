@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import util.XMLHelper;
 import metadao.MetaDaoController;
 import metadao.MySQLController;
@@ -16,6 +19,8 @@ import dao.DaoController;
 public class Server {
     Timer timer;
     int task_period;
+    
+    final static Logger logger = LoggerFactory.getLogger(Server.class);
     
     public Server(){
     	super();
@@ -44,17 +49,17 @@ public class Server {
         		
         		MetaDaoController metadaoController = new MySQLController(dataSource);
         		metadaoController.IntoDataBase();
-        		System.out.println("succeed saving metadata...");
+        		logger.info("succeed saving metadata...");
         		
         		
         		AnalysisModule analysisModule = new BasicAnalysis(metadaoController);
         		analysisModule.analyzeAll();
-        		System.out.println("succeed analysising metadata...");
+        		logger.info("succeed analysising metadata...");
         		
         		
         		DaoController daoController = new DaoController(analysisModule);
         		daoController.IntoDataBase();
-        		System.out.println("succeed saving useful data...");       		
+        		logger.info("succeed saving useful data...");       		
         		        		
         		//now some data already in database
         		analysisModule.invokeEvolveAnalysis();
@@ -62,17 +67,17 @@ public class Server {
         		//finally evolve chart 
         		daoController.EvolveIntoDB(analysisModule.getEvolve_echarts());   		
     			
-        		System.out.println(owner + "'s " + projectName + " project all finished!");
+        		logger.info(owner + "'s " + projectName + " project all finished!");
     		}
     		 		
     	    public void run() {
             	String projectName,owner,filepath;
-            	//nikolaypavlov,codahale,spinfo,bytedeco,pagseguro
-            	//MLPNeuralNet,bcrypt-ruby,java,javacv,java
-            	projectName = "java";
-            	owner = "spinfo";
+            	//nikolaypavlov,codahale,spinfo,bytedeco,pagseguro,riolet
+            	//MLPNeuralNet,bcrypt-ruby,java,javacv,java,nope.c
+            	owner = "riolet";
+            	projectName = "nope.c";
+            	
             	filepath = "Downloads/" + owner +"/";
-            	System.out.println(filepath);
             	crawlAndAnalysis(projectName,owner,filepath);
             }
     	}
