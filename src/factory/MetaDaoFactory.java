@@ -5,6 +5,7 @@ import metadao.CommitDao;
 import metadao.CommitFileDao;
 import metadao.ContributorDao;
 import metadao.CrawlindexDao;
+import metadao.GitURLDao;
 import metadao.IssueDao;
 import metadao.ProjectDao;
 import metadao.PublishedReleaseDao;
@@ -15,6 +16,7 @@ import metadao.impl.CommitDaoImpl;
 import metadao.impl.CommitFileDaoImpl;
 import metadao.impl.ContributorDaoImpl;
 import metadao.impl.CrawlindexDaoImpl;
+import metadao.impl.GitURLDaoImpl;
 import metadao.impl.IssueDaoImpl;
 import metadao.impl.PublishedReleaseDaoImpl;
 import metadao.impl.UnPublishedReleaseDaoImpl;
@@ -64,4 +66,7 @@ public class MetaDaoFactory {
 		return CrawlindexDaoImpl.getInstance();
 	}
 	
+	public static GitURLDao getGitURLDao(){
+		return GitURLDaoImpl.getInstance();
+	}
 }

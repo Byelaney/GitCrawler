@@ -7,6 +7,7 @@ import java.util.TimerTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import util.URLHelper;
 import util.XMLHelper;
 import metadao.MetaDaoController;
 import metadao.MySQLController;
@@ -15,6 +16,7 @@ import analysis.BasicAnalysis;
 import crawler.CrawlModule;
 import crawler.DataSource;
 import dao.DaoController;
+import factory.MetaDaoFactory;
 
 public class Server {
     Timer timer;
@@ -74,16 +76,30 @@ public class Server {
             	String projectName,owner,filepath;
             	//nikolaypavlov,codahale,spinfo,bytedeco,pagseguro,riolet
             	//MLPNeuralNet,bcrypt-ruby,java,javacv,java,nope.c
-            	owner = "riolet";
-            	projectName = "nope.c";
+            	          	
+            	ArrayList<String> uncrawled = MetaDaoFactory.getGitURLDao().getURLNotCrawled("uncrawled");
+            	ArrayList<String> unupdated = MetaDaoFactory.getGitURLDao().getURLNotCrawled("unupdated");
             	
-            	filepath = "Downloads/" + owner +"/";
-            	crawlAndAnalysis(projectName,owner,filepath);
+            	for(int i = 0;i<uncrawled.size();i++){
+            		owner = URLHelper.getProjectOwner(uncrawled.get(i));
+                	projectName = URLHelper.getProjectName(uncrawled.get(i));
+                	filepath = "Downloads/" + owner +"/";
+                	crawlAndAnalysis(projectName,owner,filepath);
+                	MetaDaoFactory.getGitURLDao().changeState(uncrawled.get(i), "finished");
+            	}
+            	
+            	for(int i = 0;i<unupdated.size();i++){
+            		owner = URLHelper.getProjectOwner(unupdated.get(i));
+                	projectName = URLHelper.getProjectName(unupdated.get(i));
+                	filepath = "Downloads/" + owner +"/";
+                	crawlAndAnalysis(projectName,owner,filepath);
+                	MetaDaoFactory.getGitURLDao().changeState(unupdated.get(i), "finished");
+            	}
+            	
             }
     	}
     	
-    	
-    
+    	   
     public static void main(String []args){
     	Server server = new Server();
     	server.setUp();

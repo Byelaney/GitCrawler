@@ -116,14 +116,15 @@ public class GitURLDaoImpl implements GitURLDao {
 	}
 
 	@Override
-	public void changeState(String url) {
+	public void changeState(String url,String state) {
 		// TODO Auto-generated method stub
 		Connection con=daoHelper.getConnection();
 		PreparedStatement ps=null;
 		
 		try{
-			ps=con.prepareStatement("update metadata.giturl set state='yes' where url=?");
-			ps.setString(1, url);
+			ps=con.prepareStatement("update metadata.giturl set state=? where url=?");
+			ps.setString(1, state);
+			ps.setString(2, url);
 			ps.executeUpdate();
 						
 		}catch(SQLException e){
@@ -132,6 +133,34 @@ public class GitURLDaoImpl implements GitURLDao {
 			daoHelper.closePreparedStatement(ps);
 			daoHelper.closeConnection(con);
 		}
+	}
+
+	@Override
+	public String getState(String url) {
+		Connection con=daoHelper.getConnection();
+		PreparedStatement ps=null;
+		ResultSet rs=null;
+		
+		try{
+			ps=con.prepareStatement("select * from metadata.giturl where url =?");
+			ps.setString(1, url);
+			rs=ps.executeQuery();
+			
+			String state = null;
+			if(rs.next()){
+				state = rs.getString("state");
+			}	
+			
+			return state;
+		}catch(SQLException e){
+			e.printStackTrace();
+		}finally{
+			daoHelper.closeResult(rs);
+			daoHelper.closePreparedStatement(ps);
+			daoHelper.closeConnection(con);
+		}
+		
+		return null;
 	}
 
 }
