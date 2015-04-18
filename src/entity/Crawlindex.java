@@ -23,6 +23,8 @@ public class Crawlindex {
 	
 	private int release_idx;
 	
+	private int closed_issue_page;
+	
 	public Crawlindex(){
 		super();
 	}
@@ -31,7 +33,7 @@ public class Crawlindex {
 	public Crawlindex(int project_id, int commit_page, int comment_page,
 			int issue_page, int release_page, int upbrelease_page,
 			int contributor_page, int milestone_page, int pullrequest_page,
-			int user_page, int release_idx) {
+			int user_page, int release_idx,int closed_issue_page) {
 		super();
 		this.project_id = project_id;
 		this.commit_page = commit_page;
@@ -44,6 +46,7 @@ public class Crawlindex {
 		this.pullrequest_page = pullrequest_page;
 		this.user_page = user_page;
 		this.release_idx = release_idx;
+		this.closed_issue_page = closed_issue_page;
 	}
 
 
@@ -150,6 +153,16 @@ public class Crawlindex {
 	}
 	public void setUpbrelease_page(int upbrelease_page) {
 		this.upbrelease_page = upbrelease_page;
+	}
+
+
+	public int getClosed_issue_page() {
+		return closed_issue_page;
+	}
+
+
+	public void setClosed_issue_page(int closed_issue_page) {
+		this.closed_issue_page = closed_issue_page;
 	}
 	
 	

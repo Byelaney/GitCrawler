@@ -52,8 +52,7 @@ public class MetaSearchGitHub implements ForgeSearch{
 		this.builder = Guice.createInjector(new HttpModule()).getInstance(UrlBuilder.class);
 		crawlIndex = new Crawlindex();
 	}
-	
-	
+		
 	@Override
 	public List<Project> getProjects(String term, int page, int limit)
 			throws SearchException {
@@ -141,6 +140,123 @@ public class MetaSearchGitHub implements ForgeSearch{
 		return issues;
 	}
 
+	public List<Issue> getAllClosedProjectIssues(Project project){
+		logger.info(("Searching project closed issues metadata"));		
+		int page = 1;
+		
+		String searchUrl = builder.uses(GithubAPI.ROOT)
+				  .withParam("repos")
+				  .withSimpleParam("/", project.getOwner().getLogin())
+				  .withSimpleParam("/", project.getName())
+				  .withParam("/issues")
+				  .withParam("?state=closed")
+				  .withParam("&page=" +page +"&per_page=80")
+				  .build();
+				
+		String  jsonString = getWithProtection(searchUrl);
+				
+		JsonElement jsonElement = gson.fromJson(jsonString, JsonElement.class);
+		JsonArray jsonArray = jsonElement.getAsJsonArray();
+		
+		List<Issue> issues = new ArrayList<Issue>();
+		List<IssueLabel> labels = new ArrayList<IssueLabel>();
+				
+		while(jsonArray.size()!=0){
+			for (JsonElement element : jsonArray) {
+				Issue issue = gson.fromJson(element, Issue.class);
+				issue.setProject(project);
+				
+				for (JsonElement lab : element.getAsJsonObject().get("labels").getAsJsonArray()) {
+					IssueLabel label = gson.fromJson(lab, IssueLabel.class);				
+					labels.add(label);
+				}
+				
+				issue.setLabels(labels);				
+				issues.add(issue);
+			}
+			
+			page++;
+			searchUrl = builder.uses(GithubAPI.ROOT)
+					  .withParam("repos")
+					  .withSimpleParam("/", project.getOwner().getLogin())
+					  .withSimpleParam("/", project.getName())
+					  .withParam("/issues")
+					  .withParam("?state=closed")
+					  .withParam("&page=" +page +"&per_page=80")
+					  .build();
+			
+			jsonString = getWithProtection(searchUrl);
+			jsonElement = gson.fromJson(jsonString, JsonElement.class);
+			
+			jsonArray = jsonElement.getAsJsonArray();
+		}
+		
+		if(page == 1){
+			this.crawlIndex.setClosed_issue_page(page);
+		}else
+			this.crawlIndex.setClosed_issue_page(page-1);
+		
+		return issues;
+	}
+
+	public List<Issue> getAllClosedProjectIssues(Project project,int page){
+		logger.info(("Searching project closed issues metadata"));		
+		
+		String searchUrl = builder.uses(GithubAPI.ROOT)
+				  .withParam("repos")
+				  .withSimpleParam("/", project.getOwner().getLogin())
+				  .withSimpleParam("/", project.getName())
+				  .withParam("/issues")
+				  .withParam("?state=closed")
+				  .withParam("&page=" +page +"&per_page=80")
+				  .build();
+				
+		String  jsonString = getWithProtection(searchUrl);
+				
+		JsonElement jsonElement = gson.fromJson(jsonString, JsonElement.class);
+		JsonArray jsonArray = jsonElement.getAsJsonArray();
+		
+		List<Issue> issues = new ArrayList<Issue>();
+		List<IssueLabel> labels = new ArrayList<IssueLabel>();
+				
+		while(jsonArray.size()!=0){
+			for (JsonElement element : jsonArray) {
+				Issue issue = gson.fromJson(element, Issue.class);
+				issue.setProject(project);
+				
+				for (JsonElement lab : element.getAsJsonObject().get("labels").getAsJsonArray()) {
+					IssueLabel label = gson.fromJson(lab, IssueLabel.class);				
+					labels.add(label);
+				}
+				
+				issue.setLabels(labels);				
+				issues.add(issue);
+			}
+			
+			page++;
+			searchUrl = builder.uses(GithubAPI.ROOT)
+					  .withParam("repos")
+					  .withSimpleParam("/", project.getOwner().getLogin())
+					  .withSimpleParam("/", project.getName())
+					  .withParam("/issues")
+					  .withParam("?state=closed")
+					  .withParam("&page=" +page +"&per_page=80")
+					  .build();
+			
+			jsonString = getWithProtection(searchUrl);
+			jsonElement = gson.fromJson(jsonString, JsonElement.class);
+			
+			jsonArray = jsonElement.getAsJsonArray();
+		}
+		
+		if(page == 1){
+			this.crawlIndex.setClosed_issue_page(page);
+		}else
+			this.crawlIndex.setClosed_issue_page(page-1);
+				
+		return issues;
+	}
+	
 	public List<Issue> getAllProjectIssues(Project project,int page){
 		logger.info(("Searching project all issues metadata"));
 		
@@ -790,6 +906,97 @@ public class MetaSearchGitHub implements ForgeSearch{
 		user.setCreated_at(Dates.dateFormat(user.getCreated_at()));
 		user.setUpdatedAt(Dates.dateFormat(user.getUpdatedAt()));
 		return user;
+	}
+	
+	public List<entity.Comment> getIssueComments(String projectName,String owner,entity.Issue issue){
+		logger.info(("Searching " + projectName + " project's comment metadata"));
+		
+		List<entity.Comment> comments = new ArrayList<entity.Comment>();
+		
+		int page = 1;
+		
+		String searchUrl = builder.uses(GithubAPI.ROOT)
+				  .withParam("repos")
+				  .withSimpleParam("/", owner)
+				  .withSimpleParam("/", projectName)
+				  .withParam("/issues/" + issue.getNumber())
+				  .withParam("/comments")
+				  .withParam("?page=" + page + "&per_page=80")
+				  .build();
+		
+		//System.out.println(searchUrl);
+		
+		String jsonString = requests.getWithPreviewHeader(searchUrl);
+        JsonArray jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
+        
+        if(jsonArray.size() == 0){
+			return null;
+		}
+        
+        
+        while(jsonArray.size()!=0){
+        	
+        	for (JsonElement element: jsonArray) {
+        		Comment comment = new Comment();
+        		
+        		comment.setId(element.getAsJsonObject().get("id").getAsInt());
+        		comment.setUrl(element.getAsJsonObject().get("url").getAsString());
+        		
+        		comment.setUser(element.getAsJsonObject().get("user").getAsJsonObject().get("login").getAsString()
+        		);
+        		comment.setUser_id(element.getAsJsonObject().get("user").getAsJsonObject().get("id").getAsInt()
+                );
+        		
+        		if(element.getAsJsonObject().get("position").isJsonNull()){
+        			comment.setPosition(0);
+        		}
+        		else{
+        			comment.setPosition(element.getAsJsonObject().get("position").getAsInt());
+        		}
+        		
+        		if(element.getAsJsonObject().get("line").isJsonNull()){
+        			comment.setLine(0);
+        		}
+        		else{
+        			comment.setLine(element.getAsJsonObject().get("line").getAsInt());
+        		}
+        		
+        		if(element.getAsJsonObject().get("path").isJsonNull()){
+        			comment.setPath("");
+        		}
+        		else{
+        			comment.setPath(element.getAsJsonObject().get("path").getAsString());
+        		}
+     
+        		comment.setCommit_id(element.getAsJsonObject().get("commit_id").getAsString());
+        		comment.setCreated_at(Dates.dateFormat(element.getAsJsonObject().get("created_at").getAsString()));
+        		comment.setUpdated_at(Dates.dateFormat(element.getAsJsonObject().get("updated_at").getAsString()));
+        		comment.setBody(element.getAsJsonObject().get("body").getAsString());
+        		
+            	comments.add(comment);
+            }
+        	
+        	page++;
+        	
+        	searchUrl = builder.uses(GithubAPI.ROOT)
+  				  .withParam("repos")
+  				  .withSimpleParam("/", owner)
+  				  .withSimpleParam("/", projectName)
+  				  .withParam("/issues/" + issue.getNumber())
+  				  .withParam("/comments")
+  				  .withParam("?page=" + page + "&per_page=80")
+  				  .build();
+        	
+        	jsonString = requests.getWithPreviewHeader(searchUrl);
+            jsonArray = gson.fromJson(jsonString, JsonElement.class).getAsJsonArray();
+
+        }
+        if(page == 1)
+        	this.crawlIndex.setComment_page(page);
+        else
+        	this.crawlIndex.setComment_page(page-1);
+        return comments;
+			
 	}
 	
 	public List<entity.Comment> getComments(String projectName,String owner){

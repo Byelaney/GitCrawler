@@ -17,7 +17,6 @@ public class PackageDependencyImpl implements PackageDependency {
 	private static List<PackageNode> architectures = new ArrayList<PackageNode>();
 	private static ArrayList<String> srcpaths = new ArrayList<String>();
 
-	
 	private static void readZipFile(String file, ArrayList<String> languages)
 			throws Exception {
 
@@ -48,24 +47,113 @@ public class PackageDependencyImpl implements PackageDependency {
 				boolean findLanguageType = false;
 
 				for (String language : languages) {
+					String lan = "";
+					for (int i = 0; i < language.length(); i++) {
+						lan = lan + language.substring(i, i + 1).toLowerCase();
+					}
 
-					if (!language.equals("objective-c")) {
-						String lan = "";
-						for (int i = 0; i < language.length(); i++) {
-							lan = lan
-									+ language.substring(i, i + 1)
-											.toLowerCase();
-						}
-						if (ftype.equals(lan))
-
+					switch (lan) {
+					case "java":
+						if (lan.equals(ftype))
 							findLanguageType = true;
-					} else {
+						break;
+					case "groff":
+						lan = "1";
+						if (lan.equals(ftype))
+							findLanguageType = true;
+						break;
+					case "javascript":
+						lan = "js";
+						if (lan.equals(ftype))
+							findLanguageType = true;
+						break;
+					case "shell":
+						lan = "sh";
+						if (lan.equals(ftype))
+							findLanguageType = true;
+						break;
+					case "ruby":
+						lan = "rb";
+						if (lan.equals(ftype))
+							findLanguageType = true;
+						break;
+					case "postscript":
+						if (ftype.equals("cmp") || ftype.equals("eps"))
+							findLanguageType = true;
+						break;
+					case "perl":
+						if (ftype.equals("pl") || ftype.equals("pm")
+								|| ftype.equals("perl"))
+							findLanguageType = true;
+						break;
+					case "html":
+						if (lan.equals(ftype))
+							findLanguageType = true;
+						break;
+					case "css":
+						if (lan.equals(ftype))
+							findLanguageType = true;
+						break;
+					case "r":
+						if (lan.equals(ftype))
+							findLanguageType = true;
+						break;
+					case "c":
+						if (lan.equals(ftype))
+							findLanguageType = true;
+						break;
+					case "php":
+						if (lan.equals(ftype))
+							findLanguageType = true;
+						break;
+					case "makefile":
+						if (ftype.equals("bcp") || ftype.equals("fmk"))
+							findLanguageType = true;
+						break;
+					case "c++":
+						if (ftype.equals("asi") || ftype.equals("bcp")
+								|| ftype.equals("c++") || ftype.equals("cc")
+								|| ftype.equals("cls") || ftype.equals("cpp")
+								|| ftype.equals("crf") || ftype.equals("cxx")
+								|| ftype.equals("dbg") || ftype.equals("dpr")
+								|| ftype.equals("dsk") || ftype.equals("h")
+								|| ftype.equals("hpp") || ftype.equals("hxx"))
+							findLanguageType = true;
+						break;
+
+					case "python":
+						if (ftype.equals("py") || ftype.equals("pyc")
+								|| ftype.equals("pyo") || ftype.equals("pyw")
+								|| ftype.equals("pyd"))
+							findLanguageType = true;
+						break;
+
+					case "objective-c":
 						if (ftype.equals("c") || ftype.equals("cc")
 								|| ftype.equals("ccp") || ftype.equals("h")
 								|| ftype.equals("m") || ftype.equals("mm")
-								|| ftype.equals("o")) {
+								|| ftype.equals("o"))
 							findLanguageType = true;
-						}
+						break;
+
+					case "xslt":
+						if (ftype.equals("xslt") || ftype.equals("xsl"))
+							findLanguageType = true;
+						break;
+					case "clojure":
+						if (ftype.equals("cjl"))
+							findLanguageType = true;
+						break;
+					case "assembly":
+						if (ftype.equals("asm"))
+							findLanguageType = true;
+						break;
+					case "matlab":
+						if (ftype.equals("m") || ftype.equals("mat"))
+							findLanguageType = true;
+						break;
+					default:
+						break;
 					}
 
 				}
@@ -87,7 +175,7 @@ public class PackageDependencyImpl implements PackageDependency {
 		// directories.addAll(srcpaths);
 		zf.close();
 		zin.close();
-		//zin.closeEntry();
+		// zin.closeEntry();
 	}
 
 	private static void buildArchitectures() {
@@ -140,20 +228,8 @@ public class PackageDependencyImpl implements PackageDependency {
 
 	}
 
-	
-//	private static void architecturesToString() {
-//		for (PackageNode pn : architectures) {
-//			System.out.print(pn.takePath());
-//			System.out.print("  children: ");
-//			for (Integer j : pn.takeCIndex())
-//				System.out.print(j + ",");
-//
-//			System.out.println();
-//		}
-//	}
-
 	private static void traverse(int i) {
-		if(i < architectures.size()){
+		if (i < architectures.size()) {
 			PackageNode pnc = architectures.get(i);
 			if (pnc.takeCIndex() == null) {
 
@@ -166,7 +242,7 @@ public class PackageDependencyImpl implements PackageDependency {
 				}
 			}
 		}
-		
+
 	}
 
 	private static int findPakage(String path) {
@@ -186,16 +262,16 @@ public class PackageDependencyImpl implements PackageDependency {
 	private static String architecturesToJson() {
 		// String json=JSONValue.toJSONString(architectures);
 
-		if(architectures.size() !=0){
+		if (architectures.size() != 0) {
 			JSONArray json = JSONArray.fromObject(architectures.get(0));
 			String resultStr = json.toString();
 			directories = new ArrayList<String>();
 			architectures = new ArrayList<PackageNode>();
 			srcpaths = new ArrayList<String>();
 			return resultStr.substring(1, resultStr.length() - 1);
-		}		
-		
-		 return "";
+		}
+
+		return "";
 	}
 
 	public ArrayList<String> getPakageDependency(ArrayList<String> files,
@@ -235,7 +311,5 @@ public class PackageDependencyImpl implements PackageDependency {
 
 		return null;
 	}
-
-
 
 }

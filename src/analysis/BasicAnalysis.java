@@ -32,6 +32,7 @@ public class BasicAnalysis extends AnalysisModule{
 	private EvolveAnalysis evolveAnalysis;
 	private PackageDependency packageDependency;
 	private Relation relation;
+	private TestFilesStatistics tests;
 	
 	private DataHelper dataHelperImpl;
 	
@@ -52,7 +53,7 @@ public class BasicAnalysis extends AnalysisModule{
 		this.evolveAnalysis = new EvolveAnalysis(project_name,owner);
 		this.packageDependency = new PackageDependencyImpl();
 		this.dataHelperImpl = new DataHelperImpl(project_name,owner);
-				
+		this.tests = new TestFilesStatisticsImpl();		
 	}
 	
 
@@ -199,7 +200,7 @@ public class BasicAnalysis extends AnalysisModule{
 		
 		System.out.println(destination + " is the destination!");
 		
-		int main_count = codeLinesCount.getCodeLines(destination, languages);
+		int main_count = codeLinesCount.getCodeLines(destination);
 		System.out.println(main_count + " is the code num!");
 		
 		File zipFile = new File(destination);
@@ -312,11 +313,13 @@ public class BasicAnalysis extends AnalysisModule{
 				release.setName(unpublish_releases.get(i).getName());	
 				release.setProject_id(this.project_id);
 				
-				int codes = codeLinesCount.getCodeLines(uprs_location.get(i), languages);
+				int codes = codeLinesCount.getCodeLines(uprs_location.get(i));
+				int test_counts = tests.getTestFilesCount(uprs_location.get(i));
 				
 				//int codes = this.dataHelperImpl.getCodes(this.project_name, unpublish_releases.get(i).getName());
 				
 				release.setCodes(codes);
+				release.setTest(test_counts);
 				release.setDate(unpublish_releases.get(i).getDate());
 				
 				int commits = this.dataHelperImpl.getReleaseCommits(this.project_name, unpublish_releases.get(i).getName(),this.owner);

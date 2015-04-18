@@ -266,7 +266,7 @@ public class ModuleTest {
 			release.setId(unpublish_releases.get(i).getId());			
 			release.setName(unpublish_releases.get(i).getName());	
 			
-			int codes = codeLinesCount.getCodeLines(uprs_location.get(i), languages);
+			int codes = codeLinesCount.getCodeLines(uprs_location.get(i));
 			release.setCodes(codes);
 			release.setDate(unpublish_releases.get(i).getDate());
 			
@@ -351,7 +351,7 @@ public class ModuleTest {
 		
 		CodeLinesCount codeLinesCount = new CodeLinesCountImpl();
 		
-		int main_count = codeLinesCount.getCodeLines("Downloads/bcrypt-ruby.zip", languages);
+		int main_count = codeLinesCount.getCodeLines("Downloads/bcrypt-ruby.zip");
 		
 		System.out.println(main_count);
 		

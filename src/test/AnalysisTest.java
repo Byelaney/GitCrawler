@@ -139,7 +139,7 @@ public class AnalysisTest {
 		CodeLinesCount ds = new CodeLinesCountImpl();
 		ArrayList<String> languages = new ArrayList<String>();
 		languages.add("java");
-		System.out.println(ds.getCodeLines("Downloads/nasa_mct/v1.7.0.zip", languages));
+		System.out.println(ds.getCodeLines("Downloads/nasa_mct/v1.7.0.zip"));
 	}
 	
 	

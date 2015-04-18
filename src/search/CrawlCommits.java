@@ -19,7 +19,7 @@ import entity.GroundhogException;
 import entity.Project;
 import entity.User;
 
-public class CrawlCommits implements Runnable{
+public class CrawlCommits{
 
 	public static int INFINITY = -1;
 
@@ -149,13 +149,5 @@ public class CrawlCommits implements Runnable{
 
 			return data;
 		}
-
-
-		@Override
-		public void run() {
-			
-			
-			
-			
-		}
+		
 }

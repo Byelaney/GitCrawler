@@ -22,7 +22,7 @@ public class DataFactoryImpl implements DataFactory{
 	@Override
 	public int getCodeLines(String file,ArrayList<String> languages) {
 		CodeLinesCount cl=new CodeLinesCountImpl();
-		return cl.getCodeLines(file,languages);
+		return cl.getCodeLines(file);
 	}
 
 	@Override

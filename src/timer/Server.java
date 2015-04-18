@@ -64,6 +64,7 @@ public class Server {
         		logger.info("succeed saving useful data...");       		
         		        		
         		//now some data already in database
+        		//evolve will use some analyzed data 
         		analysisModule.invokeEvolveAnalysis();
         	
         		//finally evolve chart 

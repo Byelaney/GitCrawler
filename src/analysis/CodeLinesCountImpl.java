@@ -6,7 +6,6 @@ import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
@@ -16,11 +15,13 @@ import java.util.zip.ZipInputStream;
  * from a zip file
  * return lines of code
  */
-public class CodeLinesCountImpl implements CodeLinesCount{
+
+public class CodeLinesCountImpl implements CodeLinesCount {
 	static private int codeLines = 0;
+
 	
-	private static void readZipFile(String file, ArrayList<String> languages)
-			throws Exception {
+	private static void readZipFile(String file) throws Exception {
+		codeLines=0;
 		ZipFile zf = new ZipFile(file);
 		InputStream in = new BufferedInputStream(new FileInputStream(file));
 		ZipInputStream zin = new ZipInputStream(in);
@@ -41,24 +42,17 @@ public class CodeLinesCountImpl implements CodeLinesCount{
 				}
 				boolean findLanguageType = false;
 
-				for (String language : languages) {
-					if (!language.equals("objective-c")) {
-						String lan = "";
-						for (int i = 0; i < language.length(); i++) {
-							lan = lan
-									+ language.substring(i, i + 1)
-											.toLowerCase();
-						}
-						if (ftype.equals(lan))
-
-							findLanguageType = true;
-					} else {
-						if (ftype.equals("c") || ftype.equals("cc")
-								|| ftype.equals("ccp") || ftype.equals("h")
-								|| ftype.equals("m") || ftype.equals("mm")
-								|| ftype.equals("o")) {
-							findLanguageType = true;
-						}
+				String[] languagetype = { "java", "1", "js", "sh", "rb", "cmp",
+						"eps", "perl", "pl", "pm", "html", "php", "css", "bcp",
+						"fmk", "asi", "bcp", "c++", "cc", "cls", "cpp", "crf",
+						"cxx", "dbg", "dpr", "dsk", "h", "hpp", "hxx", "py",
+						"pyc", "pyw", "pyo", "pyd", "r", "R", "c", "m", "mm",
+						"o", "xslt", "xsl", "cjl", "asm", "m" ,"yml"};
+				for (int i = 0; i < languagetype.length; i++) {
+					if (ftype.equals(languagetype[i])) {
+						findLanguageType = true;
+				//		System.out.println(fnp);
+						break;
 					}
 				}
 
@@ -72,7 +66,6 @@ public class CodeLinesCountImpl implements CodeLinesCount{
 					br.close();
 				}
 
-			
 				long size = ze.getSize();
 				if (size > 0) {
 
@@ -83,19 +76,17 @@ public class CodeLinesCountImpl implements CodeLinesCount{
 
 		zf.close();
 		zin.close();
-		//zin.closeEntry();
+		// zin.closeEntry();
 	}
 
-	public int getCodeLines(String file, ArrayList<String> languages) {
+	public int getCodeLines(String file) {
 		try {
-			readZipFile(file, languages);
-		} catch (Exception e) {			
+			readZipFile(file);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		return codeLines;
 	}
 
-
 }
-
