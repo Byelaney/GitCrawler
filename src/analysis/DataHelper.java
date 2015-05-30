@@ -153,4 +153,18 @@ public interface DataHelper {
 	 * @return zip path( and delete the prior file)
 	 */
 	public String packFile(String filepath);
+	/**
+	 * @param releaseName
+	 *            ,projectName,owner
+	 * @return issue ids in one release
+	 */
+	public ArrayList<String> getIssueIds(String releaseName, String project,
+			String owner);
+
+	/**
+	 * @param releaseName
+	 * @return Relevant Persons id in one issue
+	 */
+	public ArrayList<String> getRelevantPersonsInOneIssue(String issueId);
 }
+

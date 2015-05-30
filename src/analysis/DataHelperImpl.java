@@ -24,6 +24,7 @@ import factory.DaoFactory;
 import factory.MetaDaoFactory;
 import usefuldata.Comment;
 import usefuldata.CommitDate;
+import usefuldata.Issue;
 import usefuldata.VersionDate;
 import usefuldata.Vitality;
 import util.Dates;
@@ -462,6 +463,53 @@ public class DataHelperImpl implements DataHelper {
 	                }
 	            }
 	        }
-	    }    
+	    }
+
+		@Override
+		public ArrayList<String> getIssueIds(String releaseName,
+				String project, String owner) {
+			ArrayList<String> ids = new ArrayList<String>();
+			
+			int project_id = MetaDaoFactory.getProjectDao().getProject(owner,project).getId();
+			ArrayList<Issue> issues = MetaDaoFactory.getIssueDao().getAllIssues(project_id);
+			
+			String start_time = "";
+			String end_time = "";
+			
+			List<UnPublishedRelease> uprs = MetaDaoFactory.getUnPublishedReleaseDao().getAllUnPublishedReleases(project_id);
+			for(int i = 0;i<uprs.size();i++){
+				if(uprs.get(i).getName().equals(releaseName)){
+					start_time = uprs.get(i).getDate();
+					if(i!=uprs.size()-1)
+						end_time = uprs.get(i+1).getDate();
+					
+					break;
+				}
+				
+			}
+			
+			for(int i = 0;i<issues.size();i++){
+				if(inPeriod(issues.get(i).getInjectedDate(),start_time,end_time))
+					ids.add(issues.get(i).getIssueId() + "");
+			}
+			
+			return ids;
+		}
+
+		@Override
+		public ArrayList<String> getRelevantPersonsInOneIssue(String issueId) {
+			// TODO Auto-generated method stub
+			return null;
+		}    
 	
+		private boolean inPeriod(String date,String start_time,String end_time){
+			int result1 = Dates.compare_date(date, start_time);
+			int result2 = Dates.compare_date(date, end_time);
+			
+			if(result1 == 1 && result2 == -1)
+				return true;
+			
+			return false;
+		}
+		
 }

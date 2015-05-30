@@ -20,6 +20,8 @@ import factory.MetaDaoFactory;
 
 public class Server {
     Timer timer;
+    Timer dbtimer;
+    
     int task_period;
     
     final static Logger logger = LoggerFactory.getLogger(Server.class);
@@ -34,12 +36,29 @@ public class Server {
         timer.schedule(new CrawlTask(),
                0,        //initial delay
                task_period); 
+        
+        dbtimer = new Timer();
+        dbtimer.schedule(new DbTask(),86400000,86400000);
     }
     
     public int selectPeriod(){
     	XMLHelper xmlHelper = new XMLHelper();
 		ArrayList<Integer> periods = xmlHelper.PeriodInputXML("configure.xml");		
     	return periods.get(0);
+    }
+    
+    class DbTask extends TimerTask {
+
+		@Override
+		public void run() {
+			ArrayList<String> finished = MetaDaoFactory.getGitURLDao().getURLNotCrawled("finished");
+			for(int i = 0;i<finished.size();i++){
+				MetaDaoFactory.getGitURLDao().changeState(finished.get(i), "ready");
+			}
+			
+		}
+    	
+    	
     }
     
     class CrawlTask extends TimerTask {
@@ -86,7 +105,7 @@ public class Server {
                 	projectName = URLHelper.getProjectName(uncrawled.get(i));
                 	filepath = "Downloads/" + owner +"/";
                 	crawlAndAnalysis(projectName,owner,filepath);
-                	MetaDaoFactory.getGitURLDao().changeState(uncrawled.get(i), "finished");
+                	MetaDaoFactory.getGitURLDao().changeState(uncrawled.get(i), "unupdated");
             	}
             	
             	for(int i = 0;i<unupdated.size();i++){
